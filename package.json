@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node check-env.js && tsc -b && vite build",
+    "build:check": "node check-env.js",
     "lint": "eslint .",
     "preview": "vite preview",
     "backend": "cd server && node sunat-api.js",
