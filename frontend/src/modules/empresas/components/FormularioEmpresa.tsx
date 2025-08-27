@@ -305,10 +305,10 @@ const FormularioEmpresa = ({
         tipoConsulta = 'SUNAT-ONLY';
         console.log('🔍 Consultando persona natural (10) - SOLO SUNAT');
       } else {
-        // Para personas jurídicas, usar endpoint consolidado
-        endpoint = `${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`;
-        tipoConsulta = 'CONSOLIDADO';
-        console.log('🔍 Consultando persona jurídica (20) - CONSOLIDADO');
+        // Para personas jurídicas, usar endpoint simple que funciona
+        endpoint = `${API_ENDPOINTS.consultaRuc}/${formData.ruc}`;
+        tipoConsulta = 'SUNAT-ONLY';
+        console.log('🔍 Consultando persona jurídica (20) - SUNAT SOLO');
       }
       const response = await fetch(endpoint);
       if (!response.ok) {
