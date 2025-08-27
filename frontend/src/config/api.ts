@@ -11,9 +11,24 @@ if (import.meta.env.DEV) {
   });
 }
 
-// URL base del backend - Usa variable de entorno o fallback a localhost para desarrollo
-// Eliminar barra final si existe para evitar doble barras
-const rawUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+// URL base del backend - Usa variable de entorno o fallback según el entorno
+// En producción usa Cloud Run, en desarrollo usa localhost
+const getBackendUrl = () => {
+  // Si hay variable de entorno definida, úsala
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  
+  // En producción usa Cloud Run
+  if (import.meta.env.PROD) {
+    return 'https://registro-valorizaciones-backend-503600768755.us-central1.run.app';
+  }
+  
+  // En desarrollo usa localhost
+  return 'http://localhost:8000';
+};
+
+const rawUrl = getBackendUrl();
 export const API_BASE_URL = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
 // Verificar que en producción no se use localhost
