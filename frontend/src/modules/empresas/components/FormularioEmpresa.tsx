@@ -149,9 +149,9 @@ const FormularioEmpresa = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [tipoConsultaRealizada, setTipoConsultaRealizada] = useState<'SUNAT' | 'CONSOLIDADO' | ''>('');
   const [renderKey, setRenderKey] = useState(0); // Force re-render key
-  // Reset form cuando se abre
+  // Reset form cuando se abre (solo si no hay datos)
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !datosObtenidos && !formData.ruc) {
       console.log('🔄 FORM RESET - Dialog opened, resetting form data');
       setFormData({
         ruc: '',
