@@ -843,6 +843,22 @@ const FormularioEmpresa = ({
     </div>
   );
   if (!isOpen) return null;
+  
+  // CRITICAL DEBUG: Log exact formData state during JSX render
+  console.log('🎯 RENDER DEBUG - EXACT formData at JSX render time:', {
+    timestamp: new Date().toISOString(),
+    renderKey,
+    datosObtenidos,
+    formData: {
+      ruc: formData.ruc,
+      razon_social: formData.razon_social,
+      email: formData.email,
+      celular: formData.celular,
+      direccion: formData.direccion,
+      representantes_count: formData.representantes?.length || 0
+    }
+  });
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
       <motion.div
@@ -953,6 +969,43 @@ const FormularioEmpresa = ({
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   {isPersonaNatural(formData.ruc) ? 'NOMBRE:' : 'Razón Social'} *
                 </label>
+                
+                {/* INPUT DEBUG MINIMAL */}
+                <div style={{border: '2px solid red', padding: '10px', margin: '10px'}}>
+                  <p>DEBUG - Estado actual: formData.razon_social = "{formData.razon_social}"</p>
+                  <p>DEBUG - Render key: {renderKey}</p>
+                  <p>DEBUG - datosObtenidos: {String(datosObtenidos)}</p>
+                  <p>DEBUG - JSX render timestamp: {new Date().toISOString()}</p>
+                  <input 
+                    ref={(input) => {
+                      if (input) {
+                        setTimeout(() => {
+                          const computedStyles = window.getComputedStyle(input);
+                          console.log('🔍 DEBUG INPUT CSS STYLES:', {
+                            color: computedStyles.color,
+                            backgroundColor: computedStyles.backgroundColor,
+                            fontSize: computedStyles.fontSize,
+                            opacity: computedStyles.opacity,
+                            visibility: computedStyles.visibility,
+                            display: computedStyles.display,
+                            zIndex: computedStyles.zIndex,
+                            textIndent: computedStyles.textIndent,
+                            value: input.value,
+                            placeholder: input.placeholder
+                          });
+                        }, 100);
+                      }
+                    }}
+                    style={{border: '2px solid blue', width: '100%', fontSize: '16px', color: 'black', backgroundColor: 'white'}}
+                    value={formData.razon_social || ''} 
+                    onChange={(e) => {
+                      console.log('🔧 DEBUG INPUT onChange:', e.target.value);
+                      setFormData(prev => ({...prev, razon_social: e.target.value}));
+                    }}
+                    placeholder="INPUT DEBUG SIMPLE"
+                  />
+                </div>
+
                 <input
                   key={`razon-social-${renderKey}`}
                   type="text"
