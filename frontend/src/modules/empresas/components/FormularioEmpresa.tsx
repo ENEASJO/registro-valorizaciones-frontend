@@ -228,6 +228,22 @@ const FormularioEmpresa = ({
     }
   }, [datosObtenidos, formData.ruc, formData.razon_social, formData.email, formData.celular, formData.direccion]);
 
+  // CRITICAL FIX: Force input re-render when state changes with populated data
+  useEffect(() => {
+    if (datosObtenidos && formData.razon_social) {
+      console.log('🎯 CRITICAL UPDATE: Force re-render inputs with populated data');
+      const forceRenderKey = Date.now() + Math.random();
+      setRenderKey(forceRenderKey);
+      console.log('🔄 FORCED RENDER KEY:', forceRenderKey);
+      
+      // Additional forced update after a micro delay to ensure DOM updates
+      setTimeout(() => {
+        console.log('⚡ MICRO DELAY FORCE UPDATE - Ensuring DOM sync');
+        setRenderKey(prev => prev + 1);
+      }, 10);
+    }
+  }, [datosObtenidos, formData.razon_social, formData.email, formData.celular, formData.direccion]);
+
   // Enhanced form update function with race condition protection
   const updateFormDataWithApiResponse = useCallback((data: any, tipoRespuesta: string) => {
     console.log(`🚀 UPDATING FORM DATA - Tipo: ${tipoRespuesta}`);
@@ -239,6 +255,11 @@ const FormularioEmpresa = ({
       console.log('⚡ Setting formInitialized to true to prevent reset race condition');
       formInitializedRef.current = true;
     }
+    
+    // CRITICAL: Force render key update BEFORE state update
+    const newRenderKey = Date.now();
+    setRenderKey(newRenderKey);
+    console.log('🔑 RENDER KEY UPDATED TO:', newRenderKey);
     
     // FIXED: Manejar diferentes estructuras de respuesta
     // Persona natural: campos directos (email, telefono, direccion, dni)
@@ -341,7 +362,6 @@ const FormularioEmpresa = ({
     setDatosObtenidos(true);
     setCurrentStep(2);
     setTipoConsultaRealizada('CONSOLIDADO');
-    setRenderKey(prev => prev + 1);
     setError('');
   }, []); // FIXED: Removed stale closure dependencies
   // =================================================================
@@ -916,16 +936,15 @@ const FormularioEmpresa = ({
                   {isPersonaNatural(formData.ruc) ? 'NOMBRE:' : 'Razón Social'} *
                 </label>
                 <input
-                  key={`razon-social-${renderKey}`}
+                  key={`razon-social-${renderKey}-${(formData.razon_social || '').substring(0,10)}`}
                   type="text"
-                  value={formData.razon_social}
+                  value={formData.razon_social || ''}
                   onChange={(e: any) => {
                     console.log('🔄 RAZON SOCIAL INPUT CHANGED:', e.target.value);
                     setFormData(prev => ({ ...prev, razon_social: e.target.value }));
                   }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
                   placeholder="Se completará automáticamente..."
-                  readOnly={false}
                 />
               </div>
               {/* DNI field for natural persons */}
@@ -988,9 +1007,9 @@ const FormularioEmpresa = ({
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
-                      key={`email-${renderKey}`}
+                      key={`email-${renderKey}-${(formData.email || '').substring(0,10)}`}
                       type="email"
-                      value={formData.email}
+                      value={formData.email || ''}
                       onChange={(e: any) => {
                         console.log('🔄 EMAIL INPUT CHANGED:', e.target.value);
                         setFormData(prev => ({ ...prev, email: e.target.value }));
@@ -1007,9 +1026,9 @@ const FormularioEmpresa = ({
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
-                      key={`celular-${renderKey}`}
+                      key={`celular-${renderKey}-${(formData.celular || '').substring(0,10)}`}
                       type="text"
-                      value={formData.celular}
+                      value={formData.celular || ''}
                       onChange={(e: any) => {
                         console.log('🔄 CELULAR INPUT CHANGED:', e.target.value);
                         setFormData(prev => ({ ...prev, celular: e.target.value }));
@@ -1027,8 +1046,8 @@ const FormularioEmpresa = ({
                 <div className="relative">
                   <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
                   <textarea
-                    key={`direccion-${renderKey}`}
-                    value={formData.direccion}
+                    key={`direccion-${renderKey}-${(formData.direccion || '').substring(0,10)}`}
+                    value={formData.direccion || ''}
                     onChange={(e: any) => {
                       console.log('🔄 DIRECCION INPUT CHANGED:', e.target.value);
                       setFormData(prev => ({ ...prev, direccion: e.target.value }));
