@@ -128,7 +128,6 @@ function transformarRespuestaAPI(apiData: any): DatosRucConsulta {
   
   if (apiData.sunat || apiData.osce) {
     // Estructura consolidada con datos anidados
-    console.log('📊 Procesando respuesta consolidada con estructura anidada');
     
     // Priorizar datos de SUNAT, fallback a OSCE
     const sunatData = apiData.sunat || {};
@@ -147,10 +146,8 @@ function transformarRespuestaAPI(apiData: any): DatosRucConsulta {
       ...(osceData.representantes || [])
     ];
     
-    console.log(`✅ Datos consolidados procesados - SUNAT: ${!!apiData.sunat}, OSCE: ${!!apiData.osce}`);
   } else {
     // Estructura plana original
-    console.log('📋 Procesando respuesta con estructura plana');
     datosBase = apiData;
     representantes = apiData.representantes || [];
   }
@@ -258,10 +255,8 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
     // Crear controlador para timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
-      console.warn(`Consulta RUC timeout después de ${TIMEOUT_MS}ms para RUC: ${rucLimpio}`);
       controller.abort();
     }, TIMEOUT_MS);
-    console.log(`Iniciando consulta RUC para: ${rucLimpio}`);
     // Intentar primero con el endpoint GET más moderno
     let response = await fetch(`${API_BASE_URL}/consulta-ruc/${rucLimpio}`, {
       method: 'GET',
@@ -273,7 +268,6 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
     });
     // Si falla, intentar con el endpoint POST original como fallback
     if (!response.ok && response.status === 404) {
-      console.log(`Endpoint GET no disponible, usando endpoint POST como fallback`);
       response = await fetch(`${API_BASE_URL}/buscar`, {
         method: 'POST',
         headers: {
@@ -285,7 +279,6 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
       });
     }
     clearTimeout(timeoutId);
-    console.log(`Respuesta recibida para RUC ${rucLimpio}:`, response.status, response.statusText);
     // Verificar si la respuesta es exitosa
     if (!response.ok) {
       let errorMessage = 'Error desconocido en la consulta';
@@ -306,10 +299,8 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
       };
     }
     const data = await response.json();
-    console.log(`Datos recibidos para RUC ${rucLimpio}:`, data);
     // Verificar estructura de respuesta
     if (!data || typeof data !== 'object') {
-      console.error('Respuesta inválida:', data);
       return {
         success: false,
         error: 'INVALID_RESPONSE',
@@ -320,10 +311,8 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
     // La API de SUNAT devuelve datos directamente, no en un objeto wrapper
     // Transformar la respuesta de la API al formato esperado por la aplicación
     const transformedData = transformarRespuestaAPI(data);
-    console.log(`Datos transformados para RUC ${rucLimpio}:`, transformedData);
     // Validar datos mínimos requeridos
     if (!transformedData.ruc || !transformedData.razon_social) {
-      console.error('Datos incompletos:', transformedData);
       return {
         success: false,
         error: 'INCOMPLETE_DATA',
@@ -332,7 +321,6 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
         timestamp: new Date().toISOString(),
       };
     }
-    console.log(`Consulta RUC exitosa para ${rucLimpio}`);
     return {
       success: true,
       data: transformedData,
@@ -342,12 +330,10 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
   } catch (error) {
     let errorMessage = 'Error de conexión con el servicio de consulta RUC';
     let errorCode = 'NETWORK_ERROR';
-    console.error(`Error en consulta RUC para ${rucLimpio}:`, error);
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
         errorMessage = `La consulta ha excedido el tiempo límite de ${TIMEOUT_MS/1000} segundos`;
         errorCode = 'TIMEOUT';
-        console.warn(`Timeout en consulta RUC para ${rucLimpio}`);
       } else if (error.message.includes('fetch') || error.message.includes('NetworkError')) {
         errorMessage = `Error de conexión. Verifique que la API esté ejecutándose en ${API_BASE_URL}`;
         errorCode = 'CONNECTION_ERROR';

@@ -370,10 +370,8 @@ export async function consultarRucConsolidado(ruc: string): Promise<ResultadoCon
     // Crear controlador para timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
-      console.warn(`Consulta consolidada timeout después de ${TIMEOUT_MS}ms para RUC: ${rucLimpio}`);
       controller.abort();
     }, TIMEOUT_MS);
-    console.log(`🔄 Iniciando consulta consolidada para RUC: ${rucLimpio}`);
     // Realizar consulta al endpoint consolidado
     const response = await fetch(`${API_BASE_URL}/consulta-ruc-consolidada/${rucLimpio}`, {
       method: 'GET',
@@ -384,7 +382,6 @@ export async function consultarRucConsolidado(ruc: string): Promise<ResultadoCon
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
-    console.log(`📊 Respuesta consolidada recibida para RUC ${rucLimpio}:`, response.status, response.statusText);
     if (!response.ok) {
       let errorMessage = 'Error en la consulta consolidada';
       let errorDetails = `HTTP ${response.status}: ${response.statusText}`;
@@ -404,7 +401,6 @@ export async function consultarRucConsolidado(ruc: string): Promise<ResultadoCon
       };
     }
     const data = await response.json();
-    console.log(`📋 Datos consolidados recibidos para RUC ${rucLimpio}`);
     // Verificar estructura de respuesta
     if (!data || !data.success || !data.data) {
       return {
@@ -416,12 +412,10 @@ export async function consultarRucConsolidado(ruc: string): Promise<ResultadoCon
         timestamp: new Date().toISOString(),
       };
     }
-    console.log(`✅ Consulta consolidada exitosa para RUC ${rucLimpio}`);
     return data as RespuestaConsolidada;
   } catch (error) {
     let errorMessage = 'Error de conexión con el servicio consolidado';
     let errorCode = 'NETWORK_ERROR';
-    console.error(`❌ Error en consulta consolidada para ${rucLimpio}:`, error);
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
         errorMessage = `La consulta consolidada ha excedido el tiempo límite de ${TIMEOUT_MS/1000} segundos`;
@@ -529,7 +523,6 @@ export async function consultarRucConsolidadoConCache(ruc: string): Promise<Resu
   // Verificar cache primero
   const cached = cacheConsolidado.get(rucLimpio);
   if (cached) {
-    console.log(`📋 Usando datos en cache para RUC: ${rucLimpio}`);
     return cached;
   }
   // Realizar consulta

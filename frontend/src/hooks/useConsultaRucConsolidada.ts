@@ -113,21 +113,16 @@ export function useConsultaRucConsolidada(): EstadoConsultaConsolidada & Accione
     }));
 
     try {
-      console.log(`🔄 Iniciando consulta consolidada para RUC: ${rucLimpio}`);
       
       // Realizar consulta consolidada
       const resultado = await consultarRucConsolidadoConCache(rucLimpio);
 
       // Verificar si esta consulta sigue siendo relevante
       if (ultimaConsultaRef.current !== rucLimpio) {
-        console.log(`⏭️ Consulta obsoleta para RUC: ${rucLimpio}`);
         return { success: false, error: 'Consulta cancelada' };
       }
 
       if (resultado.success) {
-        console.log(`✅ Consulta consolidada exitosa para RUC: ${rucLimpio}`);
-        console.log(`📊 Fuentes utilizadas:`, resultado.fuentes_utilizadas);
-        console.log(`👥 Representantes encontrados:`, resultado.representantes_disponibles.length);
 
         setEstado(prev => ({
           ...prev,
@@ -147,7 +142,6 @@ export function useConsultaRucConsolidada(): EstadoConsultaConsolidada & Accione
           advertencias: resultado.advertencias,
         };
       } else {
-        console.log(`❌ Error en consulta consolidada para RUC: ${rucLimpio}`);
         setEstado(prev => ({
           ...prev,
           loading: false,
@@ -169,11 +163,9 @@ export function useConsultaRucConsolidada(): EstadoConsultaConsolidada & Accione
     } catch (error) {
       // Verificar si el error es por cancelación
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log(`⏹️ Consulta cancelada para RUC: ${rucLimpio}`);
         return { success: false, error: 'Consulta cancelada' };
       }
 
-      console.error(`❌ Error inesperado en consulta consolidada:`, error);
       const mensajeError = error instanceof Error ? error.message : 'Error inesperado en la consulta';
       
       setEstado(prev => ({
@@ -235,7 +227,6 @@ export function useConsultaRucConsolidada(): EstadoConsultaConsolidada & Accione
       }));
       return disponible;
     } catch (error) {
-      console.error('Error verificando disponibilidad de API:', error);
       setEstado(prev => ({
         ...prev,
         disponibilidadAPI: false,
@@ -250,7 +241,6 @@ export function useConsultaRucConsolidada(): EstadoConsultaConsolidada & Accione
 
   const seleccionarRepresentante = useCallback((indice: number) => {
     if (!estado.representantesDisponibles || indice < 0 || indice >= estado.representantesDisponibles.length) {
-      console.warn(`Índice de representante inválido: ${indice}`);
       return;
     }
 
@@ -269,7 +259,6 @@ export function useConsultaRucConsolidada(): EstadoConsultaConsolidada & Accione
       };
     });
 
-    console.log(`👤 Representante seleccionado:`, representanteSeleccionado);
   }, [estado.representantesDisponibles]);
 
   // =================================================================

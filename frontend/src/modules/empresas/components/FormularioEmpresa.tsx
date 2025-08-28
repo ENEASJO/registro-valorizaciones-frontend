@@ -7,35 +7,6 @@ import {
   Database, FileText, Globe, Star, Crown, UserCheck
 } from 'lucide-react';
 import { API_ENDPOINTS } from '../../../config/api';
-// =================================================================
-// FORM POPULATION FIXES APPLIED (v2.1)
-// =================================================================
-// ISSUE: Form fields not populating despite successful API calls
-// ROOT CAUSES IDENTIFIED:
-// 1. Readonly inputs preventing visual updates (readOnly={!datosObtenidos})
-// 2. React state batching timing issues
-// 3. No force re-render mechanism for form inputs
-// 4. Complex manual state updates without proper tracking
-//
-// FIXES IMPLEMENTED:
-// ✅ Removed readOnly restriction from razon_social input
-// ✅ Added comprehensive debugging logs throughout state updates
-// ✅ Implemented renderKey mechanism to force form input re-renders
-// ✅ Added useCallback enhanced form update function
-// ✅ Used React.startTransition for better performance
-// ✅ Added delayed verification logging to confirm updates
-// ✅ Applied unique keys to all form inputs (email, celular, direccion)
-// ✅ Enhanced error handling and state clearing
-//
-// EXPECTED BEHAVIOR:
-// - API call succeeds -> Console shows detailed debugging
-// - Form fields populate immediately with received data
-// - User sees populated form fields (not empty)
-// - Form automatically advances to Step 2
-// - All form inputs are editable and show proper values
-// =================================================================
-// INTERFACES CONSOLIDADAS
-// =================================================================
 // Utility functions for RUC type detection
 const getRucType = (ruc: string): 'NATURAL' | 'JURIDICA' | 'UNKNOWN' => {
   if (ruc.startsWith('10')) return 'NATURAL';
@@ -148,55 +119,13 @@ const FormularioEmpresa = ({
   const [error, setError] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [tipoConsultaRealizada, setTipoConsultaRealizada] = useState<'SUNAT' | 'CONSOLIDADO' | ''>('');
-  const [renderKey, setRenderKey] = useState(0); // Force re-render key
-  const formInitializedRef = useRef(false); // Track if form was initialized using ref for synchronous updates
-  const latestFormDataRef = useRef(formData); // Keep latest form data reference to avoid stale closures
+  const [renderKey, setRenderKey] = useState(0);
+  const formInitializedRef = useRef(false);
   
-  // CRITICAL FIX: Direct DOM synchronization function
-  const forceDOMSync = useCallback(() => {
-    console.log('🔄 FORCING DOM SYNC - Direct element manipulation');
-    
-    // Find all form inputs by their key attributes and update their values directly
-    const razonSocialInput = document.querySelector(`input[key*="razon-social"]`) as HTMLInputElement;
-    const emailInput = document.querySelector(`input[key*="email"]`) as HTMLInputElement;
-    const celularInput = document.querySelector(`input[key*="celular"]`) as HTMLInputElement;
-    const direccionInput = document.querySelector(`textarea[key*="direccion"]`) as HTMLTextAreaElement;
-    
-    const currentData = latestFormDataRef.current;
-    
-    if (razonSocialInput && currentData.razon_social !== razonSocialInput.value) {
-      console.log('🔧 DIRECT DOM UPDATE - Razon Social:', currentData.razon_social);
-      razonSocialInput.value = currentData.razon_social || '';
-      // Trigger input event to maintain React state sync
-      razonSocialInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-    
-    if (emailInput && currentData.email !== emailInput.value) {
-      console.log('🔧 DIRECT DOM UPDATE - Email:', currentData.email);
-      emailInput.value = currentData.email || '';
-      emailInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-    
-    if (celularInput && currentData.celular !== celularInput.value) {
-      console.log('🔧 DIRECT DOM UPDATE - Celular:', currentData.celular);
-      celularInput.value = currentData.celular || '';
-      celularInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-    
-    if (direccionInput && currentData.direccion !== direccionInput.value) {
-      console.log('🔧 DIRECT DOM UPDATE - Direccion:', currentData.direccion);
-      direccionInput.value = currentData.direccion || '';
-      direccionInput.dispatchEvent(new Event('input', { bubbles: true }));
-    }
-  }, []);
-  
-  // Reset form cuando se abre (solo si no fue inicializado)
+  // Reset form cuando se abre
   useEffect(() => {
-    console.log('🔍 RESET EFFECT TRIGGERED - isOpen:', isOpen, 'formInitialized:', formInitializedRef.current);
-    
     if (isOpen && !formInitializedRef.current) {
-      console.log('🔄 FORM RESET - Dialog opened, resetting form data (RACE CONDITION FIXED)');
-      formInitializedRef.current = true; // Set synchronously
+      formInitializedRef.current = true;
       setFormData({
         ruc: '',
         razon_social: '',
@@ -216,96 +145,19 @@ const FormularioEmpresa = ({
       setCurrentStep(1);
       setTipoConsultaRealizada('');
       setRenderKey(0);
-    } else if (isOpen && formInitializedRef.current) {
-      console.log('✅ RESET PREVENTED - Form already initialized, skipping reset');
     }
   }, [isOpen]);
 
   // Reset form initialized flag when dialog closes
   useEffect(() => {
     if (!isOpen) {
-      formInitializedRef.current = false; // Reset synchronously
+      formInitializedRef.current = false;
     }
   }, [isOpen]);
 
-  // Keep ref updated with latest form data
-  useEffect(() => {
-    latestFormDataRef.current = formData;
-  }, [formData]);
-
-  // CRITICAL DEBUG: Track form data changes
-  useEffect(() => {
-    console.log('🔄 FORM DATA CHANGED:', {
-      ruc: formData.ruc,
-      razon_social: formData.razon_social,
-      email: formData.email,
-      celular: formData.celular,
-      direccion: formData.direccion,
-      representantes: formData.representantes?.length || 0,
-      timestamp: new Date().toISOString()
-    });
-  }, [formData]);
-
-  // Additional verification effect to catch state updates
-  useEffect(() => {
-    if (datosObtenidos && formData.ruc) {
-      console.log('✅ FORM STATE VERIFICATION AFTER UPDATE:', {
-        hasRuc: !!formData.ruc,
-        hasRazonSocial: !!formData.razon_social,
-        hasEmail: !!formData.email,
-        hasCelular: !!formData.celular,
-        hasDireccion: !!formData.direccion,
-        values: {
-          ruc: formData.ruc,
-          razon_social: formData.razon_social,
-          email: formData.email,
-          celular: formData.celular,
-          direccion: formData.direccion
-        }
-      });
-    }
-  }, [datosObtenidos, formData.ruc, formData.razon_social, formData.email, formData.celular, formData.direccion]);
-
-  // CRITICAL FIX: Force DOM synchronization when form data is populated
-  useEffect(() => {
-    if (datosObtenidos && (formData.razon_social || formData.email || formData.celular)) {
-      console.log('🔄 DOM SYNC EFFECT TRIGGERED:', {
-        razon_social: formData.razon_social,
-        email: formData.email,
-        celular: formData.celular,
-        direccion: formData.direccion
-      });
-
-      // Force DOM sync by temporarily updating renderKey
-      const syncKey = Date.now();
-      console.log('🔄 FORCE DOM SYNC WITH KEY:', syncKey);
-      setRenderKey(syncKey);
-
-      // Force direct DOM synchronization as backup
-      setTimeout(() => {
-        forceDOMSync();
-        
-        // Additional verification that inputs show correct values
-        const inputs = document.querySelectorAll('input[value], textarea[value]');
-        console.log('🔍 DOM INPUT VALUES VERIFICATION:', Array.from(inputs).map(input => ({
-          type: input.getAttribute('type') || 'textarea',
-          key: input.getAttribute('key'),
-          value: (input as HTMLInputElement).value,
-          placeholder: input.getAttribute('placeholder')
-        })));
-      }, 100);
-    }
-  }, [datosObtenidos, formData.razon_social, formData.email, formData.celular, formData.direccion]);
-
-  // CRITICAL FIX: Enhanced form update function with proper dependencies and synchronized updates
+  // Enhanced form update function
   const updateFormDataWithApiResponse = useCallback((data: any, tipoRespuesta: string) => {
-    console.log(`🚀 UPDATING FORM DATA - Tipo: ${tipoRespuesta}`);
-    console.log('📋 Data to populate:', data);
-    console.log('🛡️ RACE CONDITION CHECK - formInitialized:', formInitializedRef.current);
-    
-    // PROTECTION: Prevent race condition by setting flag immediately
     if (!formInitializedRef.current) {
-      console.log('⚡ Setting formInitialized to true to prevent reset race condition');
       formInitializedRef.current = true;
     }
     
@@ -318,20 +170,18 @@ const FormularioEmpresa = ({
     let dni = '';
     
     if (isPersonaNatural) {
-      // Persona natural - campos directos
       email = data.email || '';
       celular = data.telefono || '';
       direccion = data.direccion || '';
       dni = data.dni || '';
     } else {
-      // Persona jurídica - objeto contacto
       email = data.contacto?.email || '';
       
-      // FIXED: Limpiar el campo teléfono que viene con texto adicional
+      // Clean phone field
       let telefonoRaw = data.contacto?.telefono || '';
       celular = telefonoRaw.replace(/^[^:]*:\s*/, '').replace(/\n/g, '').trim();
       
-      // FIXED: Usar domicilio_fiscal como dirección principal
+      // Use fiscal address as main address
       direccion = data.contacto?.domicilio_fiscal || data.contacto?.direccion || '';
     }
     
@@ -359,39 +209,15 @@ const FormularioEmpresa = ({
       capacidad_contratacion: data.registro?.capacidad_contratacion
     };
 
-    console.log('📋 NEW FORM VALUES TO SET:', newFormData);
-
-    // CRITICAL FIX: Use React.startTransition to ensure proper batching and DOM updates
     React.startTransition(() => {
-      // First, update the form data
-      setFormData(prev => {
-        const updated = {
-          ...prev,
-          ...newFormData
-        };
-        console.log('📋 FORM DATA UPDATED TO:', updated);
-        return updated;
-      });
-      
-      // Then, update other states
+      setFormData(prev => ({ ...prev, ...newFormData }));
       setDatosObtenidos(true);
       setCurrentStep(2);
       setTipoConsultaRealizada('CONSOLIDADO');
       setError('');
-      
-      // Finally, trigger force re-render with a unique key
-      const newRenderKey = Date.now() + Math.random();
-      setRenderKey(newRenderKey);
-      console.log('🔑 RENDER KEY UPDATED TO:', newRenderKey);
+      setRenderKey(Date.now() + Math.random());
     });
-    
-    // Additional DOM sync after React updates
-    setTimeout(() => {
-      console.log('🔧 POST-UPDATE DOM SYNC EXECUTION');
-      forceDOMSync();
-    }, 50);
-    
-  }, [setFormData, setDatosObtenidos, setCurrentStep, setTipoConsultaRealizada, setError, setRenderKey, forceDOMSync]);
+  }, []);
   // =================================================================
   // FUNCIONES DE NEGOCIO
   // =================================================================
@@ -416,12 +242,10 @@ const FormularioEmpresa = ({
         // Para personas naturales, usar SOLO SUNAT
         endpoint = `${API_ENDPOINTS.consultaRuc}/${formData.ruc}`;
         tipoConsulta = 'SUNAT-ONLY';
-        console.log('🔍 Consultando persona natural (10) - SOLO SUNAT');
       } else {
         // Para personas jurídicas, usar endpoint consolidado (SUNAT + OSCE)
         endpoint = `${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`;
         tipoConsulta = 'CONSOLIDADO';
-        console.log('🔍 Consultando persona jurídica (20) - CONSOLIDADO (SUNAT + OSCE)');
       }
       const response = await fetch(endpoint);
       if (!response.ok) {
@@ -452,24 +276,14 @@ const FormularioEmpresa = ({
           setTipoConsultaRealizada('SUNAT');
           setError('');
           
-          console.log('✅ Datos SUNAT obtenidos para persona natural');
         } else {
           setError(result.message || 'No se pudo obtener información de SUNAT para este RUC');
         }
       } else {
         // Procesar respuesta consolidada para persona jurídica
-        console.log('📊 Respuesta consolidada recibida:', result);
-        console.log('📊 DEBUG - Claves del result:', Object.keys(result));
-        console.log('📊 DEBUG - result.sunat existe?', !!result.sunat);
-        console.log('📊 DEBUG - result.osce existe?', !!result.osce);  
-        console.log('📊 DEBUG - result.data existe?', !!result.data);
-        console.log('📊 DEBUG - result.success:', result.success);
-        console.log('📊 DEBUG - TIMESTAMP:', new Date().toISOString());
-        console.log('🚀 FORCE UPDATE - Build:', Date.now());
         
         // Verificar si la respuesta tiene la estructura anidada (sunat/osce)
         if (result.sunat || result.osce) {
-          console.log('📊 Procesando estructura anidada consolidada');
           
           // Extraer datos de las fuentes anidadas
           const sunatData = result.sunat || {};
@@ -511,45 +325,19 @@ const FormularioEmpresa = ({
           setTipoConsultaRealizada('CONSOLIDADO');
           setError('');
           
-          console.log('✅ Datos consolidados procesados desde estructura anidada');
           
         } else if (result.data) {
-          // NUEVO CODIGO - SI VES ESTE LOG, VERCEL YA DESPLEGO
-          console.log('🎯 NUEVO CODIGO ACTIVADO - FormularioEmpresa v2.1 - ENHANCED DEBUG');
-          
-          // Estructura consolidada original (fallback) - procesar incluso con success=false
+          // Estructura consolidada original
           const data: DatosConsolidados = result.data;
-          console.log('📊 Procesando datos consolidados (estructura original):', data);
-          console.log('📊 DEBUG - data.consolidacion_exitosa:', data.consolidacion_exitosa);
-          console.log('📊 DEBUG - data.ruc:', data.ruc);
-          console.log('📊 DEBUG - data.razon_social:', data.razon_social);
-          console.log('📊 DEBUG - data.contacto:', data.contacto);
-          console.log('📊 DEBUG - data.contacto?.email:', data.contacto?.email);
-          console.log('📊 DEBUG - data.contacto?.telefono:', data.contacto?.telefono);
-          console.log('📊 DEBUG - data.contacto?.direccion:', data.contacto?.direccion);
-          console.log('📊 DEBUG - data.contacto?.domicilio_fiscal:', data.contacto?.domicilio_fiscal);
-          console.log('📊 DEBUG - data.miembros:', data.miembros);
           
           // Use the enhanced form update function
           updateFormDataWithApiResponse(data, 'CONSOLIDADO_ESTRUCTURA_ORIGINAL');
-          
-          console.log('✅ Datos consolidados procesados correctamente');
-          
-          // Debug: mostrar el estado real
-          if (!data.consolidacion_exitosa) {
-            console.log('⚠️ Nota: consolidacion_exitosa es false, pero procesando datos de todas formas');
-          }
-          if (!result.success) {
-            console.log('⚠️ Nota: result.success es false, pero procesando datos de todas formas');
-          }
         } else {
-          console.error('❌ Estructura de respuesta no reconocida:', result);
           setError(result.message || 'Error en la respuesta del servidor');
         }
       }
     } catch (err) {
       setError('Error de conexión. Verifique que la API esté ejecutándose.');
-      console.error('Error:', err);
     } finally {
       setConsultando(false);
     }
@@ -602,7 +390,6 @@ const FormularioEmpresa = ({
       await onSubmit(apiData);
       onClose();
     } catch (error) {
-      console.error('❌ Error al guardar:', error);
       setError('Error al guardar la empresa');
     }
   };
@@ -844,21 +631,6 @@ const FormularioEmpresa = ({
   );
   if (!isOpen) return null;
   
-  // CRITICAL DEBUG: Log exact formData state during JSX render
-  console.log('🎯 RENDER DEBUG - EXACT formData at JSX render time:', {
-    timestamp: new Date().toISOString(),
-    renderKey,
-    datosObtenidos,
-    formData: {
-      ruc: formData.ruc,
-      razon_social: formData.razon_social,
-      email: formData.email,
-      celular: formData.celular,
-      direccion: formData.direccion,
-      representantes_count: formData.representantes?.length || 0
-    }
-  });
-  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
       <motion.div
@@ -969,49 +741,11 @@ const FormularioEmpresa = ({
                 <label className="block text-sm font-bold text-gray-700 mb-2">
                   {isPersonaNatural(formData.ruc) ? 'NOMBRE:' : 'Razón Social'} *
                 </label>
-                
-                {/* INPUT DEBUG MINIMAL */}
-                <div style={{border: '2px solid red', padding: '10px', margin: '10px'}}>
-                  <p>DEBUG - Estado actual: formData.razon_social = "{formData.razon_social}"</p>
-                  <p>DEBUG - Render key: {renderKey}</p>
-                  <p>DEBUG - datosObtenidos: {String(datosObtenidos)}</p>
-                  <p>DEBUG - JSX render timestamp: {new Date().toISOString()}</p>
-                  <input 
-                    ref={(input) => {
-                      if (input) {
-                        setTimeout(() => {
-                          const computedStyles = window.getComputedStyle(input);
-                          console.log('🔍 DEBUG INPUT CSS STYLES:', {
-                            color: computedStyles.color,
-                            backgroundColor: computedStyles.backgroundColor,
-                            fontSize: computedStyles.fontSize,
-                            opacity: computedStyles.opacity,
-                            visibility: computedStyles.visibility,
-                            display: computedStyles.display,
-                            zIndex: computedStyles.zIndex,
-                            textIndent: computedStyles.textIndent,
-                            value: input.value,
-                            placeholder: input.placeholder
-                          });
-                        }, 100);
-                      }
-                    }}
-                    style={{border: '2px solid blue', width: '100%', fontSize: '16px', color: 'black', backgroundColor: 'white'}}
-                    value={formData.razon_social || ''} 
-                    onChange={(e) => {
-                      console.log('🔧 DEBUG INPUT onChange:', e.target.value);
-                      setFormData(prev => ({...prev, razon_social: e.target.value}));
-                    }}
-                    placeholder="INPUT DEBUG SIMPLE"
-                  />
-                </div>
-
                 <input
                   key={`razon-social-${renderKey}`}
                   type="text"
                   value={formData.razon_social}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    console.log('🔄 RAZON SOCIAL INPUT CHANGED:', e.target.value);
                     setFormData(prev => ({ ...prev, razon_social: e.target.value }));
                   }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
@@ -1082,7 +816,6 @@ const FormularioEmpresa = ({
                       type="email"
                       value={formData.email}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        console.log('🔄 EMAIL INPUT CHANGED:', e.target.value);
                         setFormData(prev => ({ ...prev, email: e.target.value }));
                       }}
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500"
@@ -1101,7 +834,6 @@ const FormularioEmpresa = ({
                       type="text"
                       value={formData.celular}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        console.log('🔄 CELULAR INPUT CHANGED:', e.target.value);
                         setFormData(prev => ({ ...prev, celular: e.target.value }));
                       }}
                       className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500"
@@ -1120,7 +852,6 @@ const FormularioEmpresa = ({
                     key={`direccion-${renderKey}`}
                     value={formData.direccion}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      console.log('🔄 DIRECCION INPUT CHANGED:', e.target.value);
                       setFormData(prev => ({ ...prev, direccion: e.target.value }));
                     }}
                     rows={3}
