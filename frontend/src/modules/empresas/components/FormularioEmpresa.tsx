@@ -150,6 +150,7 @@ const FormularioEmpresa = ({
   const [tipoConsultaRealizada, setTipoConsultaRealizada] = useState<'SUNAT' | 'CONSOLIDADO' | ''>('');
   const [renderKey, setRenderKey] = useState(0); // Force re-render key
   const formInitializedRef = useRef(false); // Track if form was initialized using ref for synchronous updates
+  const latestFormDataRef = useRef(formData); // Keep latest form data reference to avoid stale closures
   
   // Reset form cuando se abre (solo si no fue inicializado)
   useEffect(() => {
@@ -189,6 +190,11 @@ const FormularioEmpresa = ({
     }
   }, [isOpen]);
 
+  // Keep ref updated with latest form data
+  useEffect(() => {
+    latestFormDataRef.current = formData;
+  }, [formData]);
+
   // CRITICAL DEBUG: Track form data changes
   useEffect(() => {
     console.log('🔄 FORM DATA CHANGED:', {
@@ -197,9 +203,30 @@ const FormularioEmpresa = ({
       email: formData.email,
       celular: formData.celular,
       direccion: formData.direccion,
-      representantes: formData.representantes?.length || 0
+      representantes: formData.representantes?.length || 0,
+      timestamp: new Date().toISOString()
     });
   }, [formData]);
+
+  // Additional verification effect to catch state updates
+  useEffect(() => {
+    if (datosObtenidos && formData.ruc) {
+      console.log('✅ FORM STATE VERIFICATION AFTER UPDATE:', {
+        hasRuc: !!formData.ruc,
+        hasRazonSocial: !!formData.razon_social,
+        hasEmail: !!formData.email,
+        hasCelular: !!formData.celular,
+        hasDireccion: !!formData.direccion,
+        values: {
+          ruc: formData.ruc,
+          razon_social: formData.razon_social,
+          email: formData.email,
+          celular: formData.celular,
+          direccion: formData.direccion
+        }
+      });
+    }
+  }, [datosObtenidos, formData.ruc, formData.razon_social, formData.email, formData.celular, formData.direccion]);
 
   // Enhanced form update function with race condition protection
   const updateFormDataWithApiResponse = useCallback((data: any, tipoRespuesta: string) => {
@@ -268,13 +295,46 @@ const FormularioEmpresa = ({
 
     console.log('📋 NEW FORM VALUES TO SET:', newFormData);
 
-    // Update form data - REMOVED React.startTransition to avoid priority delays
+    // Update form data and verify the update in the setState callback
     setFormData(prev => {
       const updated = {
         ...prev,
         ...newFormData
       };
       console.log('📋 FORM DATA UPDATED TO:', updated);
+      
+      // FIXED: Verification with actual updated state and ref for real-time data
+      setTimeout(() => {
+        const currentFormData = latestFormDataRef.current;
+        console.log('🕐 FORM UPDATE VERIFICATION (500ms delay):', {
+          fromUpdatedVariable: {
+            ruc: updated.ruc,
+            razon_social: updated.razon_social,
+            email: updated.email
+          },
+          fromLatestRef: {
+            ruc: currentFormData.ruc,
+            razon_social: currentFormData.razon_social,
+            email: currentFormData.email
+          },
+          shouldBe: {
+            ruc: data.ruc,
+            razon_social: data.razon_social,
+            email: data.contacto?.email || email
+          },
+          verificationPassed: {
+            ruc: currentFormData.ruc === (data.ruc || ''),
+            razonSocial: currentFormData.razon_social === (data.razon_social || ''),
+            email: currentFormData.email === email
+          },
+          matchesBetweenRefAndVariable: {
+            ruc: currentFormData.ruc === updated.ruc,
+            razonSocial: currentFormData.razon_social === updated.razon_social,
+            email: currentFormData.email === updated.email
+          }
+        });
+      }, 500);
+      
       return updated;
     });
     
@@ -283,21 +343,7 @@ const FormularioEmpresa = ({
     setTipoConsultaRealizada('CONSOLIDADO');
     setRenderKey(prev => prev + 1);
     setError('');
-
-    // Additional logging to verify update
-    setTimeout(() => {
-      console.log('🕐 FORM UPDATE VERIFICATION (500ms delay):', {
-        currentRuc: formData.ruc,
-        currentRazonSocial: formData.razon_social,
-        currentEmail: formData.email,
-        shouldBe: {
-          ruc: data.ruc,
-          razon_social: data.razon_social,
-          email: data.contacto?.email
-        }
-      });
-    }, 500);
-  }, [formData.ruc, formData.razon_social, formData.email]);
+  }, []); // FIXED: Removed stale closure dependencies
   // =================================================================
   // FUNCIONES DE NEGOCIO
   // =================================================================
