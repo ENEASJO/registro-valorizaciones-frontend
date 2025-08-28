@@ -149,10 +149,13 @@ const FormularioEmpresa = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [tipoConsultaRealizada, setTipoConsultaRealizada] = useState<'SUNAT' | 'CONSOLIDADO' | ''>('');
   const [renderKey, setRenderKey] = useState(0); // Force re-render key
-  // Reset form cuando se abre (solo si no hay datos)
+  const [formInitialized, setFormInitialized] = useState(false); // Track if form was initialized
+  
+  // Reset form cuando se abre (solo si no fue inicializado)
   useEffect(() => {
-    if (isOpen && !datosObtenidos && !formData.ruc) {
+    if (isOpen && !formInitialized) {
       console.log('🔄 FORM RESET - Dialog opened, resetting form data');
+      setFormInitialized(true);
       setFormData({
         ruc: '',
         razon_social: '',
@@ -172,6 +175,13 @@ const FormularioEmpresa = ({
       setCurrentStep(1);
       setTipoConsultaRealizada('');
       setRenderKey(0);
+    }
+  }, [isOpen]);
+
+  // Reset form initialized flag when dialog closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFormInitialized(false);
     }
   }, [isOpen]);
 
