@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
 import { 
@@ -149,13 +149,15 @@ const FormularioEmpresa = ({
   const [currentStep, setCurrentStep] = useState(1);
   const [tipoConsultaRealizada, setTipoConsultaRealizada] = useState<'SUNAT' | 'CONSOLIDADO' | ''>('');
   const [renderKey, setRenderKey] = useState(0); // Force re-render key
-  const [formInitialized, setFormInitialized] = useState(false); // Track if form was initialized
+  const formInitializedRef = useRef(false); // Track if form was initialized using ref for synchronous updates
   
   // Reset form cuando se abre (solo si no fue inicializado)
   useEffect(() => {
-    if (isOpen && !formInitialized) {
-      console.log('🔄 FORM RESET - Dialog opened, resetting form data');
-      setFormInitialized(true);
+    console.log('🔍 RESET EFFECT TRIGGERED - isOpen:', isOpen, 'formInitialized:', formInitializedRef.current);
+    
+    if (isOpen && !formInitializedRef.current) {
+      console.log('🔄 FORM RESET - Dialog opened, resetting form data (RACE CONDITION FIXED)');
+      formInitializedRef.current = true; // Set synchronously
       setFormData({
         ruc: '',
         razon_social: '',
@@ -175,13 +177,15 @@ const FormularioEmpresa = ({
       setCurrentStep(1);
       setTipoConsultaRealizada('');
       setRenderKey(0);
+    } else if (isOpen && formInitializedRef.current) {
+      console.log('✅ RESET PREVENTED - Form already initialized, skipping reset');
     }
   }, [isOpen]);
 
   // Reset form initialized flag when dialog closes
   useEffect(() => {
     if (!isOpen) {
-      setFormInitialized(false);
+      formInitializedRef.current = false; // Reset synchronously
     }
   }, [isOpen]);
 
@@ -197,10 +201,17 @@ const FormularioEmpresa = ({
     });
   }, [formData]);
 
-  // Enhanced form update function
+  // Enhanced form update function with race condition protection
   const updateFormDataWithApiResponse = useCallback((data: any, tipoRespuesta: string) => {
     console.log(`🚀 UPDATING FORM DATA - Tipo: ${tipoRespuesta}`);
     console.log('📋 Data to populate:', data);
+    console.log('🛡️ RACE CONDITION CHECK - formInitialized:', formInitializedRef.current);
+    
+    // PROTECTION: Prevent race condition by setting flag immediately
+    if (!formInitializedRef.current) {
+      console.log('⚡ Setting formInitialized to true to prevent reset race condition');
+      formInitializedRef.current = true;
+    }
     
     // FIXED: Manejar diferentes estructuras de respuesta
     // Persona natural: campos directos (email, telefono, direccion, dni)
@@ -257,23 +268,21 @@ const FormularioEmpresa = ({
 
     console.log('📋 NEW FORM VALUES TO SET:', newFormData);
 
-    // Update form data with React.startTransition for better performance
-    React.startTransition(() => {
-      setFormData(prev => {
-        const updated = {
-          ...prev,
-          ...newFormData
-        };
-        console.log('📋 FORM DATA UPDATED TO:', updated);
-        return updated;
-      });
-      
-      setDatosObtenidos(true);
-      setCurrentStep(2);
-      setTipoConsultaRealizada('CONSOLIDADO');
-      setRenderKey(prev => prev + 1);
-      setError('');
+    // Update form data - REMOVED React.startTransition to avoid priority delays
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        ...newFormData
+      };
+      console.log('📋 FORM DATA UPDATED TO:', updated);
+      return updated;
     });
+    
+    setDatosObtenidos(true);
+    setCurrentStep(2);
+    setTipoConsultaRealizada('CONSOLIDADO');
+    setRenderKey(prev => prev + 1);
+    setError('');
 
     // Additional logging to verify update
     setTimeout(() => {
