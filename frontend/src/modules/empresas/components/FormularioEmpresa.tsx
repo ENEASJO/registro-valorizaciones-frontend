@@ -152,6 +152,44 @@ const FormularioEmpresa = ({
   const formInitializedRef = useRef(false); // Track if form was initialized using ref for synchronous updates
   const latestFormDataRef = useRef(formData); // Keep latest form data reference to avoid stale closures
   
+  // CRITICAL FIX: Direct DOM synchronization function
+  const forceDOMSync = useCallback(() => {
+    console.log('🔄 FORCING DOM SYNC - Direct element manipulation');
+    
+    // Find all form inputs by their key attributes and update their values directly
+    const razonSocialInput = document.querySelector(`input[key*="razon-social"]`) as HTMLInputElement;
+    const emailInput = document.querySelector(`input[key*="email"]`) as HTMLInputElement;
+    const celularInput = document.querySelector(`input[key*="celular"]`) as HTMLInputElement;
+    const direccionInput = document.querySelector(`textarea[key*="direccion"]`) as HTMLTextAreaElement;
+    
+    const currentData = latestFormDataRef.current;
+    
+    if (razonSocialInput && currentData.razon_social !== razonSocialInput.value) {
+      console.log('🔧 DIRECT DOM UPDATE - Razon Social:', currentData.razon_social);
+      razonSocialInput.value = currentData.razon_social || '';
+      // Trigger input event to maintain React state sync
+      razonSocialInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    
+    if (emailInput && currentData.email !== emailInput.value) {
+      console.log('🔧 DIRECT DOM UPDATE - Email:', currentData.email);
+      emailInput.value = currentData.email || '';
+      emailInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    
+    if (celularInput && currentData.celular !== celularInput.value) {
+      console.log('🔧 DIRECT DOM UPDATE - Celular:', currentData.celular);
+      celularInput.value = currentData.celular || '';
+      celularInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    
+    if (direccionInput && currentData.direccion !== direccionInput.value) {
+      console.log('🔧 DIRECT DOM UPDATE - Direccion:', currentData.direccion);
+      direccionInput.value = currentData.direccion || '';
+      direccionInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }, []);
+  
   // Reset form cuando se abre (solo si no fue inicializado)
   useEffect(() => {
     console.log('🔍 RESET EFFECT TRIGGERED - isOpen:', isOpen, 'formInitialized:', formInitializedRef.current);
@@ -228,23 +266,38 @@ const FormularioEmpresa = ({
     }
   }, [datosObtenidos, formData.ruc, formData.razon_social, formData.email, formData.celular, formData.direccion]);
 
-  // CRITICAL FIX: Force input re-render when state changes with populated data
+  // CRITICAL FIX: Force DOM synchronization when form data is populated
   useEffect(() => {
-    if (datosObtenidos && formData.razon_social) {
-      console.log('🎯 CRITICAL UPDATE: Force re-render inputs with populated data');
-      const forceRenderKey = Date.now() + Math.random();
-      setRenderKey(forceRenderKey);
-      console.log('🔄 FORCED RENDER KEY:', forceRenderKey);
-      
-      // Additional forced update after a micro delay to ensure DOM updates
+    if (datosObtenidos && (formData.razon_social || formData.email || formData.celular)) {
+      console.log('🔄 DOM SYNC EFFECT TRIGGERED:', {
+        razon_social: formData.razon_social,
+        email: formData.email,
+        celular: formData.celular,
+        direccion: formData.direccion
+      });
+
+      // Force DOM sync by temporarily updating renderKey
+      const syncKey = Date.now();
+      console.log('🔄 FORCE DOM SYNC WITH KEY:', syncKey);
+      setRenderKey(syncKey);
+
+      // Force direct DOM synchronization as backup
       setTimeout(() => {
-        console.log('⚡ MICRO DELAY FORCE UPDATE - Ensuring DOM sync');
-        setRenderKey(prev => prev + 1);
-      }, 10);
+        forceDOMSync();
+        
+        // Additional verification that inputs show correct values
+        const inputs = document.querySelectorAll('input[value], textarea[value]');
+        console.log('🔍 DOM INPUT VALUES VERIFICATION:', Array.from(inputs).map(input => ({
+          type: input.getAttribute('type') || 'textarea',
+          key: input.getAttribute('key'),
+          value: (input as HTMLInputElement).value,
+          placeholder: input.getAttribute('placeholder')
+        })));
+      }, 100);
     }
   }, [datosObtenidos, formData.razon_social, formData.email, formData.celular, formData.direccion]);
 
-  // Enhanced form update function with race condition protection
+  // CRITICAL FIX: Enhanced form update function with proper dependencies and synchronized updates
   const updateFormDataWithApiResponse = useCallback((data: any, tipoRespuesta: string) => {
     console.log(`🚀 UPDATING FORM DATA - Tipo: ${tipoRespuesta}`);
     console.log('📋 Data to populate:', data);
@@ -256,15 +309,7 @@ const FormularioEmpresa = ({
       formInitializedRef.current = true;
     }
     
-    // CRITICAL: Force render key update BEFORE state update
-    const newRenderKey = Date.now();
-    setRenderKey(newRenderKey);
-    console.log('🔑 RENDER KEY UPDATED TO:', newRenderKey);
-    
-    // FIXED: Manejar diferentes estructuras de respuesta
-    // Persona natural: campos directos (email, telefono, direccion, dni)
-    // Persona jurídica: objeto contacto + miembros
-    
+    // Process data based on person type
     const isPersonaNatural = data.tipo_persona === 'NATURAL' || data.ruc?.startsWith('10');
     
     let email = '';
@@ -316,54 +361,37 @@ const FormularioEmpresa = ({
 
     console.log('📋 NEW FORM VALUES TO SET:', newFormData);
 
-    // Update form data and verify the update in the setState callback
-    setFormData(prev => {
-      const updated = {
-        ...prev,
-        ...newFormData
-      };
-      console.log('📋 FORM DATA UPDATED TO:', updated);
+    // CRITICAL FIX: Use React.startTransition to ensure proper batching and DOM updates
+    React.startTransition(() => {
+      // First, update the form data
+      setFormData(prev => {
+        const updated = {
+          ...prev,
+          ...newFormData
+        };
+        console.log('📋 FORM DATA UPDATED TO:', updated);
+        return updated;
+      });
       
-      // FIXED: Verification with actual updated state and ref for real-time data
-      setTimeout(() => {
-        const currentFormData = latestFormDataRef.current;
-        console.log('🕐 FORM UPDATE VERIFICATION (500ms delay):', {
-          fromUpdatedVariable: {
-            ruc: updated.ruc,
-            razon_social: updated.razon_social,
-            email: updated.email
-          },
-          fromLatestRef: {
-            ruc: currentFormData.ruc,
-            razon_social: currentFormData.razon_social,
-            email: currentFormData.email
-          },
-          shouldBe: {
-            ruc: data.ruc,
-            razon_social: data.razon_social,
-            email: data.contacto?.email || email
-          },
-          verificationPassed: {
-            ruc: currentFormData.ruc === (data.ruc || ''),
-            razonSocial: currentFormData.razon_social === (data.razon_social || ''),
-            email: currentFormData.email === email
-          },
-          matchesBetweenRefAndVariable: {
-            ruc: currentFormData.ruc === updated.ruc,
-            razonSocial: currentFormData.razon_social === updated.razon_social,
-            email: currentFormData.email === updated.email
-          }
-        });
-      }, 500);
+      // Then, update other states
+      setDatosObtenidos(true);
+      setCurrentStep(2);
+      setTipoConsultaRealizada('CONSOLIDADO');
+      setError('');
       
-      return updated;
+      // Finally, trigger force re-render with a unique key
+      const newRenderKey = Date.now() + Math.random();
+      setRenderKey(newRenderKey);
+      console.log('🔑 RENDER KEY UPDATED TO:', newRenderKey);
     });
     
-    setDatosObtenidos(true);
-    setCurrentStep(2);
-    setTipoConsultaRealizada('CONSOLIDADO');
-    setError('');
-  }, []); // FIXED: Removed stale closure dependencies
+    // Additional DOM sync after React updates
+    setTimeout(() => {
+      console.log('🔧 POST-UPDATE DOM SYNC EXECUTION');
+      forceDOMSync();
+    }, 50);
+    
+  }, [setFormData, setDatosObtenidos, setCurrentStep, setTipoConsultaRealizada, setError, setRenderKey, forceDOMSync]);
   // =================================================================
   // FUNCIONES DE NEGOCIO
   // =================================================================
@@ -422,11 +450,6 @@ const FormularioEmpresa = ({
           setDatosObtenidos(true);
           setCurrentStep(2);
           setTipoConsultaRealizada('SUNAT');
-          
-          // CRITICAL FIX: Force re-render of form inputs
-          setRenderKey(prev => prev + 1);
-          
-          // CRITICAL FIX: Explicitly clear error state after successful processing
           setError('');
           
           console.log('✅ Datos SUNAT obtenidos para persona natural');
@@ -486,11 +509,6 @@ const FormularioEmpresa = ({
           setDatosObtenidos(true);
           setCurrentStep(2);
           setTipoConsultaRealizada('CONSOLIDADO');
-          
-          // CRITICAL FIX: Force re-render of form inputs
-          setRenderKey(prev => prev + 1);
-          
-          // CRITICAL FIX: Explicitly clear error state after successful processing
           setError('');
           
           console.log('✅ Datos consolidados procesados desde estructura anidada');
@@ -936,10 +954,10 @@ const FormularioEmpresa = ({
                   {isPersonaNatural(formData.ruc) ? 'NOMBRE:' : 'Razón Social'} *
                 </label>
                 <input
-                  key={`razon-social-${renderKey}-${(formData.razon_social || '').substring(0,10)}`}
+                  key={`razon-social-${renderKey}`}
                   type="text"
-                  value={formData.razon_social || ''}
-                  onChange={(e: any) => {
+                  value={formData.razon_social}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     console.log('🔄 RAZON SOCIAL INPUT CHANGED:', e.target.value);
                     setFormData(prev => ({ ...prev, razon_social: e.target.value }));
                   }}
@@ -1007,10 +1025,10 @@ const FormularioEmpresa = ({
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
-                      key={`email-${renderKey}-${(formData.email || '').substring(0,10)}`}
+                      key={`email-${renderKey}`}
                       type="email"
-                      value={formData.email || ''}
-                      onChange={(e: any) => {
+                      value={formData.email}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         console.log('🔄 EMAIL INPUT CHANGED:', e.target.value);
                         setFormData(prev => ({ ...prev, email: e.target.value }));
                       }}
@@ -1026,10 +1044,10 @@ const FormularioEmpresa = ({
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
-                      key={`celular-${renderKey}-${(formData.celular || '').substring(0,10)}`}
+                      key={`celular-${renderKey}`}
                       type="text"
-                      value={formData.celular || ''}
-                      onChange={(e: any) => {
+                      value={formData.celular}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         console.log('🔄 CELULAR INPUT CHANGED:', e.target.value);
                         setFormData(prev => ({ ...prev, celular: e.target.value }));
                       }}
@@ -1046,9 +1064,9 @@ const FormularioEmpresa = ({
                 <div className="relative">
                   <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
                   <textarea
-                    key={`direccion-${renderKey}-${(formData.direccion || '').substring(0,10)}`}
-                    value={formData.direccion || ''}
-                    onChange={(e: any) => {
+                    key={`direccion-${renderKey}`}
+                    value={formData.direccion}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                       console.log('🔄 DIRECCION INPUT CHANGED:', e.target.value);
                       setFormData(prev => ({ ...prev, direccion: e.target.value }));
                     }}
