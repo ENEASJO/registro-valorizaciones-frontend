@@ -1,309 +1,193 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { 
-  ValorizacionEjecucion,
-  ValorizacionSupervision,
-  ValorizacionEjecucionForm,
-  ValorizacionSupervisionForm,
-  Partida,
-  PartidaDetalle,
-  EstadisticasValorizaciones,
-  FiltrosValorizacion,
-  CalculosValorizacion,
-  ValidacionValorizacion,
-  Normativa,
-  EstadoValorizacionEjecucion,
-} from '../types/valorizacion.types';
-import { CONFIG_MONEDA_PERUANA } from '../types/valorizacion.types';
-import type { Obra } from '../types/obra.types';
+import { useState, useCallback, useMemo } from 'react';
+import { API_ENDPOINTS, DEFAULT_HEADERS, API_TIMEOUT } from '../config/api';
 
 // =================================================================
-// DATOS MOCK PARA DESARROLLO
+// TIPOS E INTERFACES
 // =================================================================
 
-const mockNormativas: Normativa[] = [
-  {
-    id: 1,
-    codigo: 'LEY_30225',
-    nombre: 'Ley de Contrataciones del Estado - Ley N° 30225',
-    descripcion: 'Normativa vigente para contratos firmados antes del 22 de abril de 2025',
-    fecha_vigencia_inicio: '2014-07-11',
-    fecha_vigencia_fin: '2025-04-21',
-    porcentaje_adelanto_directo_max: 30.00,
-    porcentaje_adelanto_materiales_max: 20.00,
-    porcentaje_retencion_garantia: 5.00,
-    dias_pago_valorización: 30,
-    activo: true,
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z'
-  },
-  {
-    id: 2,
-    codigo: 'LEY_32069',
-    nombre: 'Nueva Ley de Contrataciones del Estado - Ley N° 32069',
-    descripcion: 'Normativa vigente para contratos firmados desde el 22 de abril de 2025',
-    fecha_vigencia_inicio: '2025-04-22',
-    porcentaje_adelanto_directo_max: 30.00,
-    porcentaje_adelanto_materiales_max: 20.00,
-    porcentaje_retencion_garantia: 5.00,
-    dias_pago_valorización: 25,
-    activo: true,
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z'
-  }
-];
+// Tipo base de Valorización desde backend Turso
+export interface ValorizacionResponse {
+  id: number;
+  codigo?: string;
+  obra_id: number;
+  numero_valorizacion: number;
+  periodo: string;  // YYYY-MM
+  fecha_inicio: string;
+  fecha_fin: string;
+  fecha_presentacion?: string;
+  fecha_aprobacion?: string;
+  tipo_valorizacion: string;
+  monto_ejecutado: number;
+  monto_materiales?: number;
+  monto_mano_obra?: number;
+  monto_equipos?: number;
+  monto_subcontratos?: number;
+  monto_gastos_generales?: number;
+  monto_utilidad?: number;
+  igv?: number;
+  monto_total: number;
+  porcentaje_avance_periodo?: number;
+  porcentaje_avance_acumulado?: number;
+  estado_valorizacion: string;
+  observaciones?: string;
+  archivos_adjuntos?: any[];
+  metrado_ejecutado?: any[];
+  partidas_ejecutadas?: any[];
+  activo: boolean;
+  created_at: string;
+  updated_at: string;
+  version: number;
+}
 
-const mockPartidas: Partida[] = [
-  {
-    id: 1,
-    obra_id: 1,
-    codigo_partida: '01.01.01',
-    numero_orden: 1,
-    descripcion: 'TRAZO Y REPLANTEO',
-    unidad_medida: 'm2',
-    metrado_contractual: 2500.00,
-    precio_unitario: 2.50,
-    monto_contractual: 6250.00,
-    categoria: 'OBRAS PRELIMINARES',
-    nivel_jerarquia: 1,
-    activo: true,
-    created_at: '2025-01-15T10:00:00Z',
-    updated_at: '2025-01-15T10:00:00Z'
-  },
-  {
-    id: 2,
-    obra_id: 1,
-    codigo_partida: '02.01.01',
-    numero_orden: 2,
-    descripcion: 'EXCAVACION MASIVA EN MATERIAL SUELTO',
-    unidad_medida: 'm3',
-    metrado_contractual: 1800.00,
-    precio_unitario: 15.80,
-    monto_contractual: 28440.00,
-    categoria: 'MOVIMIENTO DE TIERRAS',
-    nivel_jerarquia: 1,
-    activo: true,
-    created_at: '2025-01-15T10:00:00Z',
-    updated_at: '2025-01-15T10:00:00Z'
-  },
-  {
-    id: 3,
-    obra_id: 1,
-    codigo_partida: '03.01.01',
-    numero_orden: 3,
-    descripcion: 'CONCRETO fc=210 kg/cm2 PARA VEREDAS',
-    unidad_medida: 'm3',
-    metrado_contractual: 450.00,
-    precio_unitario: 280.00,
-    monto_contractual: 126000.00,
-    categoria: 'CONCRETO SIMPLE',
-    nivel_jerarquia: 1,
-    activo: true,
-    created_at: '2025-01-15T10:00:00Z',
-    updated_at: '2025-01-15T10:00:00Z'
-  }
-];
+// Tipo mapeado para frontend 
+export interface Valorizacion {
+  id: number;
+  codigo?: string;
+  obra_id: number;
+  numero_valorizacion: number;
+  periodo: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  fecha_presentacion?: string;
+  fecha_aprobacion?: string;
+  tipo_valorizacion: string;
+  monto_ejecutado: number;
+  monto_materiales?: number;
+  monto_mano_obra?: number;
+  monto_equipos?: number;
+  monto_subcontratos?: number;
+  monto_gastos_generales?: number;
+  monto_utilidad?: number;
+  igv?: number;
+  monto_total: number;
+  porcentaje_avance_periodo?: number;
+  porcentaje_avance_acumulado?: number;
+  estado: string;
+  observaciones?: string;
+  archivos_adjuntos?: any[];
+  metrado_ejecutado?: any[];
+  partidas_ejecutadas?: any[];
+  activo: boolean;
+  created_at: string;
+  updated_at: string;
+  version: number;
+}
 
-const mockValorizacionesEjecucion: ValorizacionEjecucion[] = [
-  {
-    id: 1,
-    obra_id: 1,
-    normativa_id: 2,
-    numero_valorización: 1,
-    codigo_valorización: '001-2025-02',
-    numero_expediente: 'EXP-2025-001-OBRAS',
-    numero_expediente_siaf: 'SIAF-2025-001',
-    periodo_inicio: '2025-02-01',
-    periodo_fin: '2025-02-28',
-    dias_periodo: 28,
-    monto_bruto: 125000.00,
-    monto_neto: 108750.00,
-    porcentaje_avance_fisico: 15.00,
-    monto_avance_economico: 125000.00,
-    porcentaje_avance_fisico_anterior: 0.00,
-    monto_avance_economico_anterior: 0.00,
-    porcentaje_avance_fisico_total: 15.00,
-    monto_avance_economico_total: 125000.00,
-    adelanto_directo_porcentaje: 10.00,
-    adelanto_directo_monto: 12500.00,
-    adelanto_materiales_porcentaje: 0.00,
-    adelanto_materiales_monto: 0.00,
-    penalidades_monto: 0.00,
-    retencion_garantia_porcentaje: 5.00,
-    retencion_garantia_monto: 6250.00,
-    otras_deducciones_monto: 0.00,
-    total_deducciones: 18750.00,
-    igv_porcentaje: 18.00,
-    igv_monto: 19575.00,
-    estado: 'APROBADA',
-    fecha_presentacion: '2025-03-03',
-    fecha_aprobacion: '2025-03-07',
-    fecha_pago: '2025-03-15',
-    fecha_limite_pago: '2025-04-06',
-    dias_atraso: 0,
-    residente_obra: 'Juan Carlos Mendoza Silva',
-    supervisor_obra: 'Carlos Alberto Ruiz',
-    responsable_entidad: 'María González',
-    activo: true,
-    created_at: '2025-02-01T10:00:00Z',
-    updated_at: '2025-03-07T15:30:00Z'
-  },
-  {
-    id: 2,
-    obra_id: 1,
-    normativa_id: 2,
-    numero_valorización: 2,
-    codigo_valorización: '002-2025-03',
-    numero_expediente: 'EXP-2025-002-OBRAS',
-    numero_expediente_siaf: 'SIAF-2025-002',
-    periodo_inicio: '2025-03-01',
-    periodo_fin: '2025-03-31',
-    dias_periodo: 31,
-    monto_bruto: 0.00,
-    monto_neto: 0.00,
-    porcentaje_avance_fisico: 0.00,
-    monto_avance_economico: 0.00,
-    porcentaje_avance_fisico_anterior: 15.00,
-    monto_avance_economico_anterior: 125000.00,
-    porcentaje_avance_fisico_total: 15.00,
-    monto_avance_economico_total: 125000.00,
-    adelanto_directo_porcentaje: 10.00,
-    adelanto_directo_monto: 0.00,
-    adelanto_materiales_porcentaje: 0.00,
-    adelanto_materiales_monto: 0.00,
-    penalidades_monto: 0.00,
-    retencion_garantia_porcentaje: 5.00,
-    retencion_garantia_monto: 0.00,
-    otras_deducciones_monto: 0.00,
-    total_deducciones: 0.00,
-    igv_porcentaje: 18.00,
-    igv_monto: 0.00,
-    estado: 'BORRADOR',
-    dias_atraso: 0,
-    activo: true,
-    created_at: '2025-03-01T10:00:00Z',
-    updated_at: '2025-03-01T10:00:00Z'
-  }
-];
+// Formulario para crear/editar valorización
+export interface ValorizacionForm {
+  obra_id: number;
+  numero_valorizacion?: number;
+  periodo: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  fecha_presentacion?: string;
+  tipo_valorizacion: string;
+  monto_ejecutado: number;
+  monto_materiales?: number;
+  monto_mano_obra?: number;
+  monto_equipos?: number;
+  monto_subcontratos?: number;
+  monto_gastos_generales?: number;
+  monto_utilidad?: number;
+  observaciones?: string;
+  archivos_adjuntos?: any[];
+  metrado_ejecutado?: any[];
+  partidas_ejecutadas?: any[];
+}
 
-const mockValorizacionesSupervision: ValorizacionSupervision[] = [
-  {
-    id: 1,
-    obra_id: 1,
-    valorizacion_ejecucion_id: 1,
-    normativa_id: 2,
-    numero_valorización: 1,
-    numero_expediente: 'EXP-2025-001-SUPERVISION',
-    numero_expediente_siaf: 'SIAF-2025-001-SUP',
-    periodo_inicio: '2025-02-01',
-    periodo_fin: '2025-02-28',
-    dias_calendario_periodo: 28,
-    dias_efectivos_trabajados: 26,
-    dias_no_trabajados: 2,
-    dias_lluvia: 1,
-    dias_feriados: 1,
-    dias_suspension_obra: 0,
-    dias_otros_motivos: 0,
-    tarifa_diaria_supervision: 450.00,
-    monto_bruto: 11700.00,
-    retencion_garantia_porcentaje: 5.00,
-    retencion_garantia_monto: 585.00,
-    penalidades_monto: 0.00,
-    otras_deducciones_monto: 0.00,
-    total_deducciones: 585.00,
-    monto_neto: 11115.00,
-    igv_porcentaje: 18.00,
-    igv_monto: 2000.70,
-    estado: 'APROBADA',
-    fecha_presentacion: '2025-03-03',
-    fecha_aprobacion: '2025-03-07',
-    fecha_pago: '2025-03-15',
-    dias_atraso: 0,
-    supervisor_responsable: 'Carlos Alberto Ruiz',
-    responsable_entidad: 'María González',
-    actividades_realizadas: 'Supervisión continua de obras, control de calidad, verificación de metrados',
-    observaciones_periodo: 'Periodo con 1 día de lluvia que impidió trabajos',
-    motivos_dias_no_trabajados: '1 día por lluvia, 1 día feriado nacional',
-    activo: true,
-    created_at: '2025-02-01T10:00:00Z',
-    updated_at: '2025-03-07T15:30:00Z'
-  }
-];
+// Filtros para búsqueda
+export interface FiltrosValorizacion {
+  obra_id?: number;
+  estado?: string;
+  fecha_desde?: string;
+  fecha_hasta?: string;
+  periodo?: string;
+  tipo_valorizacion?: string;
+  solo_con_atraso?: boolean;
+}
 
-const mockPartidasDetalle: PartidaDetalle[] = [
-  {
-    id: 1,
-    valorizacion_id: 1,
-    partida_id: 1,
-    metrado_anterior: 0.00,
-    metrado_actual: 2500.00,
-    metrado_acumulado: 2500.00,
-    porcentaje_anterior: 0.00,
-    porcentaje_actual: 100.00,
-    porcentaje_acumulado: 100.00,
-    monto_anterior: 0.00,
-    monto_actual: 6250.00,
-    monto_acumulado: 6250.00,
-    fecha_medicion: '2025-02-28',
-    responsable_medicion: 'María Elena Torres Rojas',
-    metodo_medicion: 'TOPOGRAFICO',
-    estado_medicion: 'APROBADO',
-    observaciones_medicion: 'Trazo y replanteo completo según planos',
-    activo: true,
-    created_at: '2025-02-28T10:00:00Z',
-    updated_at: '2025-03-05T14:00:00Z'
-  },
-  {
-    id: 2,
-    valorizacion_id: 1,
-    partida_id: 2,
-    metrado_anterior: 0.00,
-    metrado_actual: 900.00,
-    metrado_acumulado: 900.00,
-    porcentaje_anterior: 0.00,
-    porcentaje_actual: 50.00,
-    porcentaje_acumulado: 50.00,
-    monto_anterior: 0.00,
-    monto_actual: 14220.00,
-    monto_acumulado: 14220.00,
-    fecha_medicion: '2025-02-28',
-    responsable_medicion: 'Juan Carlos Mendoza Silva',
-    metodo_medicion: 'MANUAL',
-    estado_medicion: 'APROBADO',
-    observaciones_medicion: 'Excavación ejecutada en 50% del metrado total',
-    activo: true,
-    created_at: '2025-02-28T10:00:00Z',
-    updated_at: '2025-03-05T14:00:00Z'
-  }
-];
+// Estadísticas
+export interface EstadisticasValorizacion {
+  total_valorizaciones: number;
+  monto_total_valorizado: number;
+  monto_total_pagado: number;
+  por_estado: Record<string, number>;
+  por_mes: Array<{ mes: string; cantidad: number; monto: number }>;
+  promedio_dias_aprobacion: number;
+  con_atraso: number;
+}
 
 // =================================================================
-// FUNCIONES DE UTILIDAD
+// FUNCIONES DE UTILIDAD Y MAPEO
 // =================================================================
 
-const formatearMoneda = (monto: number): string => {
-  return new Intl.NumberFormat('es-PE', {
-    style: 'currency',
-    currency: 'PEN',
-    minimumFractionDigits: CONFIG_MONEDA_PERUANA.decimales,
-    maximumFractionDigits: CONFIG_MONEDA_PERUANA.decimales
-  }).format(monto).replace('PEN', CONFIG_MONEDA_PERUANA.simbolo);
+// Mapear respuesta del backend a tipo del frontend
+const mapearValorizacion = (backendData: ValorizacionResponse): Valorizacion => ({
+  ...backendData,
+  estado: backendData.estado_valorizacion,
+});
+
+// Mapear formulario del frontend a datos del backend
+const mapearFormulario = (formData: ValorizacionForm): Partial<ValorizacionResponse> => ({
+  obra_id: formData.obra_id,
+  numero_valorizacion: formData.numero_valorizacion,
+  periodo: formData.periodo,
+  fecha_inicio: formData.fecha_inicio,
+  fecha_fin: formData.fecha_fin,
+  fecha_presentacion: formData.fecha_presentacion,
+  tipo_valorizacion: formData.tipo_valorizacion,
+  monto_ejecutado: formData.monto_ejecutado,
+  monto_materiales: formData.monto_materiales,
+  monto_mano_obra: formData.monto_mano_obra,
+  monto_equipos: formData.monto_equipos,
+  monto_subcontratos: formData.monto_subcontratos,
+  monto_gastos_generales: formData.monto_gastos_generales,
+  monto_utilidad: formData.monto_utilidad,
+  observaciones: formData.observaciones,
+  archivos_adjuntos: formData.archivos_adjuntos,
+  metrado_ejecutado: formData.metrado_ejecutado,
+  partidas_ejecutadas: formData.partidas_ejecutadas,
+  estado_valorizacion: 'BORRADOR',
+  activo: true
+});
+
+// Calcular totales automáticamente
+const calcularTotales = (data: ValorizacionForm): ValorizacionForm => {
+  const montoBase = data.monto_ejecutado || 0;
+  const materiales = data.monto_materiales || 0;
+  const manoObra = data.monto_mano_obra || 0;
+  const equipos = data.monto_equipos || 0;
+  const subcontratos = data.monto_subcontratos || 0;
+  const gastosGenerales = data.monto_gastos_generales || 0;
+  const utilidad = data.monto_utilidad || 0;
+
+  // El monto ejecutado es la suma de componentes si no se especifica
+  const montoEjecutado = montoBase > 0 ? montoBase : (materiales + manoObra + equipos + subcontratos + gastosGenerales + utilidad);
+  const igv = montoEjecutado * 0.18;
+  const montoTotal = montoEjecutado + igv;
+
+  return {
+    ...data,
+    monto_ejecutado: montoEjecutado,
+    igv,
+    monto_total: montoTotal
+  };
 };
 
-const calcularDiasEntreFechas = (fechaInicio: string, fechaFin: string): number => {
-  const inicio = new Date(fechaInicio);
-  const fin = new Date(fechaFin);
-  const diferencia = fin.getTime() - inicio.getTime();
-  return Math.ceil(diferencia / (1000 * 60 * 60 * 24)) + 1;
+// Validar formato de período (YYYY-MM)
+const validarPeriodo = (periodo: string): boolean => {
+  if (!periodo) return false;
+  const regex = /^\d{4}-\d{2}$/;
+  if (!regex.test(periodo)) return false;
+  
+  const [year, month] = periodo.split('-').map(Number);
+  return year >= 2020 && year <= 2030 && month >= 1 && month <= 12;
 };
 
-const obtenerNormativaVigente = (fechaContrato: string): Normativa => {
-  const fecha = new Date(fechaContrato);
-  const normativa = mockNormativas.find(n => {
-    const inicio = new Date(n.fecha_vigencia_inicio);
-    const fin = n.fecha_vigencia_fin ? new Date(n.fecha_vigencia_fin) : new Date('2099-12-31');
-    return fecha >= inicio && fecha <= fin && n.activo;
-  });
-  return normativa || mockNormativas[0];
+// Validar fechas
+const validarFechas = (fechaInicio: string, fechaFin: string): boolean => {
+  if (!fechaInicio || !fechaFin) return false;
+  return new Date(fechaInicio) <= new Date(fechaFin);
 };
 
 // =================================================================
@@ -311,601 +195,384 @@ const obtenerNormativaVigente = (fechaContrato: string): Normativa => {
 // =================================================================
 
 export const useValorizaciones = () => {
-  const [valorizacionesEjecucion, setValorizacionesEjecucion] = useState<ValorizacionEjecucion[]>([]);
-  const [valorizacionesSupervision, setValorizacionesSupervision] = useState<ValorizacionSupervision[]>([]);
-  const [partidas, setPartidas] = useState<Partida[]>([]);
+  // Estados
+  const [valorizaciones, setValorizaciones] = useState<Valorizacion[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // =================================================================
-  // FUNCIONES DE CARGA DE DATOS
+  // FUNCIONES DE API
   // =================================================================
 
-  const cargarValorizaciones = useCallback(async (filtros?: FiltrosValorizacion) => {
-    setLoading(true);
-    setError(null);
-    
+  // Función helper para hacer requests
+  const apiRequest = async (
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<any> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      let ejecucionFiltradas = [...mockValorizacionesEjecucion];
-      let supervisionFiltradas = [...mockValorizacionesSupervision];
-      
-      if (filtros?.obra_id) {
-        ejecucionFiltradas = ejecucionFiltradas.filter(v => v.obra_id === filtros.obra_id);
-        supervisionFiltradas = supervisionFiltradas.filter(v => v.obra_id === filtros.obra_id);
-      }
-      
-      if (filtros?.estado) {
-        ejecucionFiltradas = ejecucionFiltradas.filter(v => v.estado === filtros.estado);
-        supervisionFiltradas = supervisionFiltradas.filter(v => v.estado === filtros.estado);
-      }
-      
-      if (filtros?.fecha_desde) {
-        ejecucionFiltradas = ejecucionFiltradas.filter(v => v.periodo_inicio >= filtros.fecha_desde!);
-        supervisionFiltradas = supervisionFiltradas.filter(v => v.periodo_inicio >= filtros.fecha_desde!);
-      }
-      
-      if (filtros?.fecha_hasta) {
-        ejecucionFiltradas = ejecucionFiltradas.filter(v => v.periodo_fin <= filtros.fecha_hasta!);
-        supervisionFiltradas = supervisionFiltradas.filter(v => v.periodo_fin <= filtros.fecha_hasta!);
-      }
-      
-      if (filtros?.solo_con_atraso) {
-        ejecucionFiltradas = ejecucionFiltradas.filter(v => v.dias_atraso > 0);
-      }
-      
-      setValorizacionesEjecucion(ejecucionFiltradas);
-      setValorizacionesSupervision(supervisionFiltradas);
-    } catch (err) {
-      setError('Error al cargar valorizaciones');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const cargarPartidasPorObra = useCallback(async (obraId: number) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      const partidasObra = mockPartidas.filter(p => p.obra_id === obraId);
-      setPartidas(partidasObra);
-    } catch (err) {
-      setError('Error al cargar partidas');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // =================================================================
-  // FUNCIONES DE CÁLCULO
-  // =================================================================
-
-  const calcularMontos = useCallback((
-    partidasValorizadas: Array<{ partida_id: number; metrado_actual: number }>,
-    deducciones: {
-      adelanto_directo_porcentaje?: number;
-      adelanto_materiales_porcentaje?: number;
-      penalidades_monto?: number;
-      otras_deducciones_monto?: number;
-    },
-    normativa?: Normativa
-  ): CalculosValorizacion => {
-    const norm = normativa || mockNormativas[0];
-    const errores: string[] = [];
-    const advertencias: string[] = [];
-
-    // Calcular monto bruto desde partidas
-    let monto_bruto = 0;
-    let porcentaje_avance_fisico = 0;
-    let metrado_total_contractual = 0;
-    let metrado_total_ejecutado = 0;
-
-    partidasValorizadas.forEach(pv => {
-      const partida = partidas.find(p => p.id === pv.partida_id);
-      if (partida) {
-        const monto_partida = pv.metrado_actual * partida.precio_unitario;
-        monto_bruto += monto_partida;
-        
-        metrado_total_contractual += partida.metrado_contractual;
-        metrado_total_ejecutado += pv.metrado_actual;
-        
-        // Validar que no exceda metrado contractual (con 5% de tolerancia)
-        if (pv.metrado_actual > partida.metrado_contractual * 1.05) {
-          errores.push(`La partida ${partida.codigo_partida} excede el metrado contractual`);
-        } else if (pv.metrado_actual > partida.metrado_contractual) {
-          advertencias.push(`La partida ${partida.codigo_partida} está en tolerancia del 5%`);
-        }
-      }
-    });
-
-    // Calcular porcentaje de avance físico
-    if (metrado_total_contractual > 0) {
-      porcentaje_avance_fisico = (metrado_total_ejecutado / metrado_total_contractual) * 100;
-    }
-
-    // Validar deducciones contra límites de normativa
-    const adelanto_directo_porcentaje = deducciones.adelanto_directo_porcentaje || 0;
-    const adelanto_materiales_porcentaje = deducciones.adelanto_materiales_porcentaje || 0;
-
-    if (adelanto_directo_porcentaje > norm.porcentaje_adelanto_directo_max) {
-      errores.push(`El adelanto directo (${adelanto_directo_porcentaje}%) excede el máximo permitido (${norm.porcentaje_adelanto_directo_max}%)`);
-    }
-
-    if (adelanto_materiales_porcentaje > norm.porcentaje_adelanto_materiales_max) {
-      errores.push(`El adelanto de materiales (${adelanto_materiales_porcentaje}%) excede el máximo permitido (${norm.porcentaje_adelanto_materiales_max}%)`);
-    }
-
-    // Calcular deducciones
-    const adelanto_directo_monto = monto_bruto * adelanto_directo_porcentaje / 100;
-    const adelanto_materiales_monto = monto_bruto * adelanto_materiales_porcentaje / 100;
-    const retencion_garantia_monto = monto_bruto * norm.porcentaje_retencion_garantia / 100;
-    const penalidades_monto = deducciones.penalidades_monto || 0;
-    const otras_deducciones_monto = deducciones.otras_deducciones_monto || 0;
-
-    const total_deducciones = adelanto_directo_monto + adelanto_materiales_monto + 
-                             retencion_garantia_monto + penalidades_monto + otras_deducciones_monto;
-
-    const monto_neto = monto_bruto - total_deducciones;
-    const igv_monto = monto_neto * 0.18; // IGV 18%
-    const monto_total_con_igv = monto_neto + igv_monto;
-
-    if (monto_neto < 0) {
-      errores.push('El monto neto no puede ser negativo');
-    }
-
-    return {
-      monto_bruto,
-      total_deducciones,
-      monto_neto,
-      igv_monto,
-      monto_total_con_igv,
-      porcentaje_avance_fisico,
-      porcentaje_avance_economico: porcentaje_avance_fisico, // Simplificado
-      errores_calculo: errores,
-      advertencias
-    };
-  }, [partidas]);
-
-  const validarValorizacion = useCallback((
-    form: ValorizacionEjecucionForm,
-    obra: Obra
-  ): ValidacionValorizacion => {
-    const errores: Array<{ campo: string; mensaje: string; tipo: 'error' | 'warning' }> = [];
-
-    // Validar obra
-    if (!form.obra_id) {
-      errores.push({ campo: 'obra_id', mensaje: 'Debe seleccionar una obra', tipo: 'error' });
-    }
-
-    // Validar fechas
-    if (!form.periodo_inicio || !form.periodo_fin) {
-      errores.push({ campo: 'periodo', mensaje: 'Debe especificar el periodo de valorización', tipo: 'error' });
-    } else {
-      const inicio = new Date(form.periodo_inicio);
-      const fin = new Date(form.periodo_fin);
-      
-      if (inicio > fin) {
-        errores.push({ campo: 'periodo_fin', mensaje: 'La fecha fin no puede ser anterior al inicio', tipo: 'error' });
-      }
-      
-      // Verificar que esté dentro del plazo de la obra
-      const obraInicio = new Date(obra.fecha_inicio);
-      const obraFin = new Date(obra.fecha_fin_prevista);
-      
-      if (inicio < obraInicio) {
-        errores.push({ campo: 'periodo_inicio', mensaje: 'El periodo no puede ser anterior al inicio de la obra', tipo: 'error' });
-      }
-      
-      if (fin > obraFin) {
-        errores.push({ campo: 'periodo_fin', mensaje: 'El periodo no puede ser posterior a la fecha prevista de fin', tipo: 'warning' });
-      }
-    }
-
-    // Validar partidas
-    if (!form.partidas || form.partidas.length === 0) {
-      errores.push({ campo: 'partidas', mensaje: 'Debe incluir al menos una partida', tipo: 'error' });
-    } else {
-      form.partidas.forEach((partida, index) => {
-        if (partida.metrado_actual <= 0) {
-          errores.push({ 
-            campo: `partidas.${index}.metrado_actual`, 
-            mensaje: 'El metrado debe ser mayor a cero', 
-            tipo: 'error' 
-          });
-        }
+      const response = await fetch(endpoint, {
+        ...options,
+        headers: {
+          ...DEFAULT_HEADERS,
+          ...options.headers,
+        },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.detail || 
+          errorData.message || 
+          `HTTP ${response.status}: ${response.statusText}`
+        );
+      }
+
+      return await response.json();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw new Error('Request timeout - El servidor tardó demasiado en responder');
+      }
+      throw err;
     }
-
-    const tieneErrores = errores.some(e => e.tipo === 'error');
-
-    return {
-      valida: !tieneErrores,
-      errores,
-      puede_presentar: !tieneErrores,
-      puede_aprobar: !tieneErrores && errores.length === 0
-    };
-  }, []);
+  };
 
   // =================================================================
   // FUNCIONES CRUD
   // =================================================================
 
-  const crearValorizacionEjecucion = useCallback(async (
-    form: ValorizacionEjecucionForm,
-    obra: Obra
-  ): Promise<ValorizacionEjecucion | null> => {
+  const cargarValorizaciones = useCallback(async (filtros?: FiltrosValorizacion) => {
     setLoading(true);
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      // Construir query parameters
+      const params = new URLSearchParams();
+      if (filtros?.obra_id) params.append('obra_id', filtros.obra_id.toString());
+      if (filtros?.estado) params.append('estado', filtros.estado);
+      if (filtros?.fecha_desde) params.append('fecha_desde', filtros.fecha_desde);
+      if (filtros?.fecha_hasta) params.append('fecha_hasta', filtros.fecha_hasta);
+      if (filtros?.periodo) params.append('periodo', filtros.periodo);
+      if (filtros?.tipo_valorizacion) params.append('tipo_valorizacion', filtros.tipo_valorizacion);
+      if (filtros?.solo_con_atraso) params.append('solo_con_atraso', 'true');
 
-      const normativa = obtenerNormativaVigente(obra.fecha_inicio);
-      const validacion = validarValorizacion(form, obra);
+      const queryString = params.toString();
+      const endpoint = queryString ? `${API_ENDPOINTS.valorizaciones}?${queryString}` : API_ENDPOINTS.valorizaciones;
 
-      if (!validacion.valida) {
-        const erroresTexto = validacion.errores
-          .filter(e => e.tipo === 'error')
-          .map(e => e.mensaje)
-          .join(', ');
-        throw new Error(`Errores de validación: ${erroresTexto}`);
+      const response = await apiRequest(endpoint);
+      const valorizacionesMapeadas = response.map(mapearValorizacion);
+      
+      setValorizaciones(valorizacionesMapeadas);
+      return valorizacionesMapeadas;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al cargar valorizaciones';
+      setError(errorMessage);
+      console.error('Error cargando valorizaciones:', err);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const crearValorizacion = useCallback(async (data: ValorizacionForm): Promise<Valorizacion> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Validaciones
+      if (!data.obra_id) {
+        throw new Error('ID de obra es requerido');
+      }
+      
+      if (!validarPeriodo(data.periodo)) {
+        throw new Error('Período debe estar en formato YYYY-MM');
+      }
+      
+      if (!validarFechas(data.fecha_inicio, data.fecha_fin)) {
+        throw new Error('Las fechas no son válidas');
       }
 
-      // Obtener siguiente número de valorización
-      const valorizacionesObra = mockValorizacionesEjecucion.filter(v => v.obra_id === form.obra_id);
-      const siguienteNumero = Math.max(0, ...valorizacionesObra.map(v => v.numero_valorización)) + 1;
+      // Calcular totales antes de enviar
+      const dataConTotales = calcularTotales(data);
+      const datosBackend = mapearFormulario(dataConTotales);
 
-      // Calcular montos
-      const calculos = calcularMontos(
-        form.partidas.map(p => ({ partida_id: p.partida_id, metrado_actual: p.metrado_actual })),
-        {
-          adelanto_directo_porcentaje: form.adelanto_directo_porcentaje,
-          adelanto_materiales_porcentaje: form.adelanto_materiales_porcentaje,
-          penalidades_monto: form.penalidades_monto,
-          otras_deducciones_monto: form.otras_deducciones_monto
-        },
-        normativa
-      );
-
-      if (calculos.errores_calculo.length > 0) {
-        throw new Error(`Errores de cálculo: ${calculos.errores_calculo.join(', ')}`);
-      }
-
-      const nuevaValorizacion: ValorizacionEjecucion = {
-        id: Math.max(...mockValorizacionesEjecucion.map(v => v.id)) + 1,
-        obra_id: form.obra_id,
-        normativa_id: normativa.id,
-        numero_valorización: siguienteNumero,
-        codigo_valorización: `${String(siguienteNumero).padStart(3, '0')}-${new Date(form.periodo_inicio).getFullYear()}-${String(new Date(form.periodo_inicio).getMonth() + 1).padStart(2, '0')}`,
-        numero_expediente: form.numero_expediente,
-        numero_expediente_siaf: form.numero_expediente_siaf,
-        periodo_inicio: form.periodo_inicio,
-        periodo_fin: form.periodo_fin,
-        dias_periodo: calcularDiasEntreFechas(form.periodo_inicio, form.periodo_fin),
-        monto_bruto: calculos.monto_bruto,
-        monto_neto: calculos.monto_neto,
-        porcentaje_avance_fisico: calculos.porcentaje_avance_fisico,
-        monto_avance_economico: calculos.monto_bruto,
-        porcentaje_avance_fisico_anterior: 0, // TODO: Calcular desde valorizaciones anteriores
-        monto_avance_economico_anterior: 0,
-        porcentaje_avance_fisico_total: calculos.porcentaje_avance_fisico,
-        monto_avance_economico_total: calculos.monto_bruto,
-        adelanto_directo_porcentaje: form.adelanto_directo_porcentaje || 0,
-        adelanto_directo_monto: calculos.monto_bruto * (form.adelanto_directo_porcentaje || 0) / 100,
-        adelanto_materiales_porcentaje: form.adelanto_materiales_porcentaje || 0,
-        adelanto_materiales_monto: calculos.monto_bruto * (form.adelanto_materiales_porcentaje || 0) / 100,
-        penalidades_monto: form.penalidades_monto || 0,
-        retencion_garantia_porcentaje: normativa.porcentaje_retencion_garantia,
-        retencion_garantia_monto: calculos.monto_bruto * normativa.porcentaje_retencion_garantia / 100,
-        otras_deducciones_monto: form.otras_deducciones_monto || 0,
-        total_deducciones: calculos.total_deducciones,
-        igv_porcentaje: 18.00,
-        igv_monto: calculos.igv_monto,
-        estado: 'BORRADOR',
-        dias_atraso: 0,
-        residente_obra: form.residente_obra,
-        supervisor_obra: form.supervisor_obra,
-        observaciones_residente: form.observaciones_residente,
-        observaciones_supervisor: form.observaciones_supervisor,
-        activo: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      mockValorizacionesEjecucion.push(nuevaValorizacion);
-
-      // Crear detalles de partidas
-      form.partidas.forEach(partidaForm => {
-        const partida = partidas.find(p => p.id === partidaForm.partida_id);
-        if (partida) {
-          const nuevoDetalle: PartidaDetalle = {
-            id: Math.max(0, ...mockPartidasDetalle.map(pd => pd.id)) + 1,
-            valorizacion_id: nuevaValorizacion.id,
-            partida_id: partidaForm.partida_id,
-            metrado_anterior: 0, // TODO: Calcular desde valorizaciones anteriores
-            metrado_actual: partidaForm.metrado_actual,
-            metrado_acumulado: partidaForm.metrado_actual,
-            porcentaje_anterior: 0,
-            porcentaje_actual: (partidaForm.metrado_actual / partida.metrado_contractual) * 100,
-            porcentaje_acumulado: (partidaForm.metrado_actual / partida.metrado_contractual) * 100,
-            monto_anterior: 0,
-            monto_actual: partidaForm.metrado_actual * partida.precio_unitario,
-            monto_acumulado: partidaForm.metrado_actual * partida.precio_unitario,
-            fecha_medicion: partidaForm.fecha_medicion,
-            responsable_medicion: partidaForm.responsable_medicion,
-            metodo_medicion: partidaForm.metodo_medicion,
-            estado_medicion: 'PENDIENTE',
-            observaciones_medicion: partidaForm.observaciones_medicion,
-            activo: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          mockPartidasDetalle.push(nuevoDetalle);
-        }
+      const response = await apiRequest(API_ENDPOINTS.valorizaciones, {
+        method: 'POST',
+        body: JSON.stringify(datosBackend),
       });
 
-      setValorizacionesEjecucion([...mockValorizacionesEjecucion]);
+      const nuevaValorizacion = mapearValorizacion(response);
+      
+      // Actualizar estado local
+      setValorizaciones(prev => [nuevaValorizacion, ...prev]);
+      
       return nuevaValorizacion;
-
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al crear valorización';
       setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [partidas, calcularMontos, validarValorizacion]);
-
-  const crearValorizacionSupervision = useCallback(async (
-    form: ValorizacionSupervisionForm,
-    obra: Obra,
-    valorizacionEjecucionId: number
-  ): Promise<ValorizacionSupervision | null> => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      const normativa = obtenerNormativaVigente(obra.fecha_inicio);
-      const diasPeriodo = calcularDiasEntreFechas(form.periodo_inicio, form.periodo_fin);
-
-      // Validaciones básicas
-      if (form.dias_efectivos_trabajados > diasPeriodo) {
-        throw new Error('Los días trabajados no pueden exceder los días del periodo');
-      }
-
-      const diasNoTrabajados = (form.dias_lluvia || 0) + (form.dias_feriados || 0) + 
-                              (form.dias_suspension_obra || 0) + (form.dias_otros_motivos || 0);
-
-      if (form.dias_efectivos_trabajados + diasNoTrabajados > diasPeriodo) {
-        throw new Error('La suma de días trabajados y no trabajados excede el periodo');
-      }
-
-      // Obtener tarifa de supervisión del contrato (mock)
-      const tarifaSupervision = obra.monto_supervision / obra.plazo_ejecucion_dias;
-
-      const montoBruto = form.dias_efectivos_trabajados * tarifaSupervision;
-      const retencionMonto = montoBruto * normativa.porcentaje_retencion_garantia / 100;
-      const totalDeducciones = retencionMonto + (form.penalidades_monto || 0) + (form.otras_deducciones_monto || 0);
-      const montoNeto = montoBruto - totalDeducciones;
-      const igvMonto = montoNeto * 0.18;
-
-      const siguienteNumero = Math.max(0, ...mockValorizacionesSupervision
-        .filter(v => v.obra_id === form.obra_id)
-        .map(v => v.numero_valorización)) + 1;
-
-      const nuevaValorizacion: ValorizacionSupervision = {
-        id: Math.max(...mockValorizacionesSupervision.map(v => v.id)) + 1,
-        obra_id: form.obra_id,
-        valorizacion_ejecucion_id: valorizacionEjecucionId,
-        normativa_id: normativa.id,
-        numero_valorización: siguienteNumero,
-        numero_expediente: form.numero_expediente,
-        numero_expediente_siaf: form.numero_expediente_siaf,
-        periodo_inicio: form.periodo_inicio,
-        periodo_fin: form.periodo_fin,
-        dias_calendario_periodo: diasPeriodo,
-        dias_efectivos_trabajados: form.dias_efectivos_trabajados,
-        dias_no_trabajados: diasNoTrabajados,
-        dias_lluvia: form.dias_lluvia || 0,
-        dias_feriados: form.dias_feriados || 0,
-        dias_suspension_obra: form.dias_suspension_obra || 0,
-        dias_otros_motivos: form.dias_otros_motivos || 0,
-        tarifa_diaria_supervision: tarifaSupervision,
-        monto_bruto: montoBruto,
-        retencion_garantia_porcentaje: normativa.porcentaje_retencion_garantia,
-        retencion_garantia_monto: retencionMonto,
-        penalidades_monto: form.penalidades_monto || 0,
-        otras_deducciones_monto: form.otras_deducciones_monto || 0,
-        total_deducciones: totalDeducciones,
-        monto_neto: montoNeto,
-        igv_porcentaje: 18.00,
-        igv_monto: igvMonto,
-        estado: 'BORRADOR',
-        dias_atraso: 0,
-        supervisor_responsable: form.supervisor_responsable,
-        responsable_entidad: form.supervisor_responsable, // Temporal
-        actividades_realizadas: form.actividades_realizadas,
-        observaciones_periodo: form.observaciones_periodo,
-        motivos_dias_no_trabajados: form.motivos_dias_no_trabajados,
-        activo: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-
-      mockValorizacionesSupervision.push(nuevaValorizacion);
-      setValorizacionesSupervision([...mockValorizacionesSupervision]);
-      return nuevaValorizacion;
-
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al crear valorización de supervisión';
-      setError(errorMessage);
-      throw err;
+      console.error('Error creando valorización:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const cambiarEstadoValorizacion = useCallback(async (
-    id: number,
-    nuevoEstado: EstadoValorizacionEjecucion,
-    observaciones?: string
-  ): Promise<boolean> => {
+  const actualizarValorizacion = useCallback(async (
+    id: number, 
+    data: Partial<ValorizacionForm>
+  ): Promise<Valorizacion> => {
     setLoading(true);
     setError(null);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 600));
+      if (!id) {
+        throw new Error('ID de valorización es requerido');
+      }
 
-      const valorizacionIndex = mockValorizacionesEjecucion.findIndex(v => v.id === id);
-      if (valorizacionIndex === -1) {
+      // Obtener valorización actual
+      const valorizacionActual = valorizaciones.find(v => v.id === id);
+      if (!valorizacionActual) {
         throw new Error('Valorización no encontrada');
       }
 
-      const valorizacion = { ...mockValorizacionesEjecucion[valorizacionIndex] };
-      const fechaActual = new Date().toISOString().split('T')[0];
-
-      valorizacion.estado = nuevoEstado;
-      valorizacion.updated_at = new Date().toISOString();
-
-      // Actualizar fechas según el estado
-      switch (nuevoEstado) {
-        case 'PRESENTADA':
-          valorizacion.fecha_presentacion = fechaActual;
-          break;
-        case 'EN_REVISION':
-          valorizacion.fecha_revision = fechaActual;
-          break;
-        case 'OBSERVADA':
-          valorizacion.fecha_observacion = fechaActual;
-          valorizacion.observaciones_entidad = observaciones;
-          break;
-        case 'APROBADA':
-          valorizacion.fecha_aprobacion = fechaActual;
-          // Calcular fecha límite de pago
-          const normativa = mockNormativas.find(n => n.id === valorizacion.normativa_id);
-          if (normativa) {
-            const fechaAprobacion = new Date(fechaActual);
-            fechaAprobacion.setDate(fechaAprobacion.getDate() + normativa.dias_pago_valorización);
-            valorizacion.fecha_limite_pago = fechaAprobacion.toISOString().split('T')[0];
-          }
-          break;
-        case 'PAGADA':
-          valorizacion.fecha_pago = fechaActual;
-          break;
-        case 'RECHAZADA':
-          valorizacion.motivo_rechazo = observaciones;
-          break;
+      // Combinar datos actuales con actualizaciones
+      const datosCompletos = { ...valorizacionActual, ...data };
+      
+      // Validar período si se está actualizando
+      if (data.periodo && !validarPeriodo(data.periodo)) {
+        throw new Error('Período debe estar en formato YYYY-MM');
       }
 
-      mockValorizacionesEjecucion[valorizacionIndex] = valorizacion;
-      setValorizacionesEjecucion([...mockValorizacionesEjecucion]);
-      return true;
+      // Validar fechas si se están actualizando
+      if (data.fecha_inicio || data.fecha_fin) {
+        const fechaInicio = data.fecha_inicio || valorizacionActual.fecha_inicio;
+        const fechaFin = data.fecha_fin || valorizacionActual.fecha_fin;
+        if (!validarFechas(fechaInicio, fechaFin)) {
+          throw new Error('Las fechas no son válidas');
+        }
+      }
 
+      // Recalcular totales si hay cambios en montos
+      const recalcular = ['monto_ejecutado', 'monto_materiales', 'monto_mano_obra', 'monto_equipos', 
+                         'monto_subcontratos', 'monto_gastos_generales', 'monto_utilidad']
+                         .some(campo => campo in data);
+
+      let datosFinales = datosCompletos;
+      if (recalcular) {
+        datosFinales = calcularTotales(datosCompletos as ValorizacionForm);
+      }
+
+      const datosBackend = mapearFormulario(datosFinales as ValorizacionForm);
+
+      const response = await apiRequest(`${API_ENDPOINTS.valorizaciones}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(datosBackend),
+      });
+
+      const valorizacionActualizada = mapearValorizacion(response);
+      
+      // Actualizar estado local
+      setValorizaciones(prev => 
+        prev.map(v => v.id === id ? valorizacionActualizada : v)
+      );
+      
+      return valorizacionActualizada;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al cambiar estado';
+      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar valorización';
       setError(errorMessage);
-      throw err;
+      console.error('Error actualizando valorización:', err);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [valorizaciones]);
+
+  const eliminarValorizacion = useCallback(async (id: number): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (!id) {
+        throw new Error('ID de valorización es requerido');
+      }
+
+      await apiRequest(`${API_ENDPOINTS.valorizaciones}/${id}`, {
+        method: 'DELETE',
+      });
+
+      // Actualizar estado local
+      setValorizaciones(prev => prev.filter(v => v.id !== id));
+      
+      return true;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al eliminar valorización';
+      setError(errorMessage);
+      console.error('Error eliminando valorización:', err);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const obtenerValorizacionPorId = useCallback(async (id: number): Promise<Valorizacion> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (!id) {
+        throw new Error('ID de valorización es requerido');
+      }
+
+      // Primero buscar en estado local
+      const valorizacionLocal = valorizaciones.find(v => v.id === id);
+      if (valorizacionLocal) {
+        setLoading(false);
+        return valorizacionLocal;
+      }
+
+      // Si no está en local, hacer request al backend
+      const response = await apiRequest(`${API_ENDPOINTS.valorizaciones}/${id}`);
+      const valorizacion = mapearValorizacion(response);
+      
+      // Actualizar estado local
+      setValorizaciones(prev => {
+        const existe = prev.find(v => v.id === id);
+        if (existe) return prev;
+        return [valorizacion, ...prev];
+      });
+      
+      return valorizacion;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al obtener valorización';
+      setError(errorMessage);
+      console.error('Error obteniendo valorización:', err);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [valorizaciones]);
+
+  const obtenerEstadisticas = useCallback(async (): Promise<EstadisticasValorizacion> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await apiRequest(`${API_ENDPOINTS.valorizaciones}/stats`);
+      
+      // El backend debe retornar las estadísticas en el formato esperado
+      // Si no, mapear según la estructura esperada
+      const estadisticas: EstadisticasValorizacion = {
+        total_valorizaciones: response.total_valorizaciones || 0,
+        monto_total_valorizado: response.monto_total_valorizado || 0,
+        monto_total_pagado: response.monto_total_pagado || 0,
+        por_estado: response.por_estado || {},
+        por_mes: response.por_mes || [],
+        promedio_dias_aprobacion: response.promedio_dias_aprobacion || 0,
+        con_atraso: response.con_atraso || 0
+      };
+      
+      return estadisticas;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al obtener estadísticas';
+      setError(errorMessage);
+      console.error('Error obteniendo estadísticas:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
   }, []);
 
   // =================================================================
-  // ESTADÍSTICAS Y REPORTES
+  // FUNCIONES DE UTILIDAD EXPUESTAS
   // =================================================================
 
-  const obtenerEstadisticas = useCallback(async (): Promise<EstadisticasValorizaciones> => {
-    await new Promise(resolve => setTimeout(resolve, 400));
-
-    const estadisticas: EstadisticasValorizaciones = {
-      total_valorizaciones_ejecucion: mockValorizacionesEjecucion.length,
-      total_valorizaciones_supervision: mockValorizacionesSupervision.length,
-      monto_total_valorizado: mockValorizacionesEjecucion.reduce((sum, v) => sum + v.monto_bruto, 0),
-      monto_total_pagado: mockValorizacionesEjecucion
-        .filter(v => v.estado === 'PAGADA')
-        .reduce((sum, v) => sum + v.monto_neto, 0),
-      valorizaciones_por_estado: mockValorizacionesEjecucion.reduce((acc, v) => {
-        acc[v.estado] = (acc[v.estado] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-      valorizaciones_por_mes: [],
-      top_obras_valorizadas: [],
-      promedio_dias_aprobacion: 0,
-      promedio_dias_pago: 0,
-      valorizaciones_con_atraso: mockValorizacionesEjecucion.filter(v => v.dias_atraso > 0).length
-    };
-
-    return estadisticas;
+  const calcularTotalesValorizacion = useCallback((data: ValorizacionForm): ValorizacionForm => {
+    return calcularTotales(data);
   }, []);
 
-  // =================================================================
-  // EFECTOS
-  // =================================================================
-
-  useEffect(() => {
-    cargarValorizaciones();
-  }, [cargarValorizaciones]);
+  const validarPeriodoValorizacion = useCallback((periodo: string): boolean => {
+    return validarPeriodo(periodo);
+  }, []);
 
   // =================================================================
   // VALORES CALCULADOS
   // =================================================================
 
-  const estadisticasDashboard = useMemo(() => {
-    const totalValorizado = valorizacionesEjecucion.reduce((sum, v) => sum + v.monto_bruto, 0);
-    const totalPagado = valorizacionesEjecucion
-      .filter(v => v.estado === 'PAGADA')
-      .reduce((sum, v) => sum + v.monto_neto, 0);
+  const estadisticasLocales = useMemo(() => {
+    if (!valorizaciones.length) {
+      return {
+        total: 0,
+        montoTotal: 0,
+        porEstado: {},
+        promedioDias: 0
+      };
+    }
+
+    const total = valorizaciones.length;
+    const montoTotal = valorizaciones.reduce((sum, v) => sum + (v.monto_total || 0), 0);
     
-    const estadosCounts = valorizacionesEjecucion.reduce((acc, v) => {
-      acc[v.estado] = (acc[v.estado] || 0) + 1;
+    const porEstado = valorizaciones.reduce((acc, v) => {
+      const estado = v.estado || 'BORRADOR';
+      acc[estado] = (acc[estado] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
+    // Calcular promedio de días para aprobación (simplificado)
+    const conFechaAprobacion = valorizaciones.filter(v => 
+      v.fecha_aprobacion && v.fecha_presentacion
+    );
+    
+    let promedioDias = 0;
+    if (conFechaAprobacion.length > 0) {
+      const totalDias = conFechaAprobacion.reduce((sum, v) => {
+        const inicio = new Date(v.fecha_presentacion!).getTime();
+        const fin = new Date(v.fecha_aprobacion!).getTime();
+        return sum + Math.ceil((fin - inicio) / (1000 * 60 * 60 * 24));
+      }, 0);
+      promedioDias = totalDias / conFechaAprobacion.length;
+    }
+
     return {
-      totalValorizado: formatearMoneda(totalValorizado),
-      totalPagado: formatearMoneda(totalPagado),
-      pendientes: estadosCounts['BORRADOR'] || 0 + estadosCounts['PRESENTADA'] || 0 + estadosCounts['EN_REVISION'] || 0,
-      aprobadas: estadosCounts['APROBADA'] || 0,
-      pagadas: estadosCounts['PAGADA'] || 0,
-      conAtraso: valorizacionesEjecucion.filter(v => v.dias_atraso > 0).length
+      total,
+      montoTotal,
+      porEstado,
+      promedioDias
     };
-  }, [valorizacionesEjecucion]);
+  }, [valorizaciones]);
+
+  // =================================================================
+  // RETURN DEL HOOK
+  // =================================================================
 
   return {
     // Estados
-    valorizacionesEjecucion,
-    valorizacionesSupervision,
-    partidas,
+    valorizaciones,
     loading,
     error,
-    estadisticasDashboard,
-    
-    // Funciones de carga
-    cargarValorizaciones,
-    cargarPartidasPorObra,
-    
+
     // Funciones CRUD
-    crearValorizacionEjecucion,
-    crearValorizacionSupervision,
-    cambiarEstadoValorizacion,
-    
-    // Funciones de cálculo
-    calcularMontos,
-    validarValorizacion,
-    
-    // Estadísticas
+    cargarValorizaciones,
+    crearValorizacion,
+    actualizarValorizacion,
+    eliminarValorizacion,
+    obtenerValorizacionPorId,
     obtenerEstadisticas,
-    
-    // Utilities
-    formatearMoneda,
-    obtenerNormativaVigente
+
+    // Funciones de utilidad
+    calcularTotales: calcularTotalesValorizacion,
+    validarPeriodo: validarPeriodoValorizacion,
+
+    // Estadísticas locales
+    estadisticasLocales,
+
+    // Funciones de validación
+    validarFechas: (inicio: string, fin: string) => validarFechas(inicio, fin),
   };
 };
 

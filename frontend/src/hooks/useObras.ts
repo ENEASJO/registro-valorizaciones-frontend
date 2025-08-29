@@ -15,198 +15,171 @@ import type {
   ConflictoProfesional,
 } from '../types/obra.types';
 import { CONFIG_NUMERO_CONTRATO } from '../types/obra.types';
+import { API_ENDPOINTS, DEFAULT_HEADERS, API_TIMEOUT } from '../config/api';
 
-// Mock data temporal hasta implementar la API
-const mockProfesiones: Profesion[] = [
-  {
-    id: 1,
-    codigo: 'ING_CIVIL',
-    nombre: 'Ingeniero Civil',
-    abreviatura: 'Ing. Civil',
-    area_especialidad: 'Construcción y Estructuras',
-    activo: true,
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z'
-  },
-  {
-    id: 2,
-    codigo: 'ARQUITECTO',
-    nombre: 'Arquitecto',
-    abreviatura: 'Arq.',
-    area_especialidad: 'Diseño Arquitectónico',
-    activo: true,
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z'
-  },
-  {
-    id: 3,
-    codigo: 'ING_SANITARIO',
-    nombre: 'Ingeniero Sanitario',
-    abreviatura: 'Ing. Sanit.',
-    area_especialidad: 'Saneamiento e Hidráulica',
-    activo: true,
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z'
-  },
-  {
-    id: 4,
-    codigo: 'TOPOGRAFO',
-    nombre: 'Topógrafo',
-    abreviatura: 'Top.',
-    area_especialidad: 'Topografía y Geodesia',
-    activo: true,
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z'
-  },
-  {
-    id: 5,
-    codigo: 'SEGURIDAD',
-    nombre: 'Ingeniero de Seguridad',
-    abreviatura: 'Ing. Seg.',
-    area_especialidad: 'Seguridad y Salud Ocupacional',
-    activo: true,
-    created_at: '2024-01-01T10:00:00Z',
-    updated_at: '2024-01-01T10:00:00Z'
-  }
-];
+// Interfaces para respuesta del backend
+interface ObraResponse {
+  id: number;
+  codigo?: string;
+  nombre: string;
+  descripcion?: string;
+  empresa_id: number;
+  cliente?: string;
+  ubicacion?: string;
+  distrito?: string;
+  provincia?: string;
+  departamento?: string;
+  modalidad_ejecucion?: string;
+  sistema_contratacion?: string;
+  tipo_obra?: string;
+  monto_contractual?: number;
+  monto_adicionales?: number;
+  monto_total?: number;
+  fecha_inicio?: string;
+  fecha_fin_contractual?: string;
+  fecha_fin_real?: string;
+  plazo_contractual?: number;
+  estado_obra: string;
+  porcentaje_avance?: number;
+  observaciones?: string;
+  activo: boolean;
+  created_at: string;
+  updated_at: string;
+  version: number;
+}
 
-const mockObras: Obra[] = [
-  {
-    id: 1,
-    numero_contrato: 'N.º 01-2025-MDSM/GM',
-    nombre: 'MEJORAMIENTO DE LA INFRAESTRUCTURA VIAL DE LA AV. PRINCIPAL',
-    codigo_interno: 'OBR001',
-    entidad_ejecutora_id: 1,
-    entidad_supervisora_id: 2,
-    monto_ejecucion: 850000,
-    monto_supervision: 85000,
-    monto_total: 935000,
-    plazo_ejecucion_dias: 180,
-    numero_valorizaciones: 6,
-    fecha_inicio: '2025-02-01',
-    fecha_fin_prevista: '2025-07-30',
-    fecha_termino: '2025-07-28',
-    ubicacion: 'Av. Principal del distrito',
-    distrito: 'San Martín de Porres',
-    provincia: 'Lima',
-    departamento: 'Lima',
-    tipo_obra: 'VEREDAS_PISTAS',
-    modalidad_ejecucion: 'CONTRATA',
-    sistema_contratacion: 'SUMA_ALZADA',
-    estado: 'EN_EJECUCION',
-    descripcion: 'Mejoramiento integral de infraestructura vial incluyendo pavimento, veredas y señalización',
-    activo: true,
-    created_at: '2025-01-15T10:00:00Z',
-    updated_at: '2025-01-15T10:00:00Z',
-    version: 1
-  },
-  {
-    id: 2,
-    numero_contrato: 'N.º 02-2025-MDSM/GM',
-    nombre: 'CONSTRUCCION DE PARQUE RECREACIONAL EN EL AA.HH. LOS JARDINES',
-    codigo_interno: 'OBR002',
-    entidad_ejecutora_id: 2,
-    entidad_supervisora_id: 1,
-    monto_ejecucion: 450000,
-    monto_supervision: 45000,
-    monto_total: 495000,
-    plazo_ejecucion_dias: 120,
-    numero_valorizaciones: 4,
-    fecha_inicio: '2025-03-01',
-    fecha_fin_prevista: '2025-06-29',
-    fecha_termino: '2025-06-25',
-    ubicacion: 'AA.HH. Los Jardines',
-    distrito: 'San Martín de Porres',
-    provincia: 'Lima',
-    departamento: 'Lima',
-    tipo_obra: 'PARQUES_JARDINES',
-    modalidad_ejecucion: 'CONTRATA',
-    sistema_contratacion: 'PRECIOS_UNITARIOS',
-    estado: 'REGISTRADA',
-    descripcion: 'Construcción de parque recreacional con áreas verdes, juegos infantiles y área de ejercicios',
-    activo: true,
-    created_at: '2025-01-20T14:00:00Z',
-    updated_at: '2025-01-20T14:00:00Z',
-    version: 1
-  }
-];
+interface EstadisticasObrasResponse {
+  total_obras: number;
+  obras_activas: number;
+  obras_terminadas: number;
+  obras_paralizadas: number;
+  monto_total: number;
+  monto_ejecutado: number;
+  obras_por_estado: Record<string, number>;
+  obras_por_tipo: Record<string, number>;
+}
 
-const mockProfesionales: ObraProfesional[] = [
-  {
-    id: 1,
-    obra_id: 1,
-    profesion_id: 1,
-    nombre_completo: 'Juan Carlos Mendoza Silva',
-    numero_colegiatura: 'CIP-12345',
-    dni: '12345678',
-    telefono: '987654321',
-    email: 'jmendoza@email.com',
-    porcentaje_participacion: 100,
-    fecha_inicio_participacion: '2025-02-01',
-    cargo: 'Residente de Obra',
-    responsabilidades: ['Dirección técnica', 'Control de calidad', 'Supervisión de personal'],
-    estado: 'ACTIVO',
-    activo: true,
-    created_at: '2025-01-15T10:00:00Z',
-    updated_at: '2025-01-15T10:00:00Z'
-  },
-  {
-    id: 2,
-    obra_id: 1,
-    profesion_id: 4,
-    nombre_completo: 'María Elena Torres Rojas',
-    numero_colegiatura: 'CTP-98765',
-    dni: '87654321',
-    telefono: '912345678',
-    email: 'mtorres@email.com',
-    porcentaje_participacion: 50,
-    fecha_inicio_participacion: '2025-02-01',
-    cargo: 'Topógrafa',
-    responsabilidades: ['Levantamientos topográficos', 'Control de cotas'],
-    estado: 'ACTIVO',
-    activo: true,
-    created_at: '2025-01-15T10:00:00Z',
-    updated_at: '2025-01-15T10:00:00Z'
-  }
-];
+// Función para mapear respuesta del backend a tipo frontend
+const mapearObraResponse = (response: ObraResponse): Obra => ({
+  id: response.id,
+  numero_contrato: response.codigo || `OBR-${response.id}`, // Mapear codigo a numero_contrato
+  nombre: response.nombre,
+  codigo_interno: response.codigo,
+  entidad_ejecutora_id: response.empresa_id, // Mapear empresa_id a entidad_ejecutora_id
+  entidad_supervisora_id: 0, // Default, se puede ajustar según necesidades
+  monto_ejecucion: response.monto_contractual || 0,
+  monto_supervision: response.monto_adicionales || 0,
+  monto_total: response.monto_total || 0,
+  plazo_ejecucion_dias: response.plazo_contractual || 0,
+  numero_valorizaciones: response.plazo_contractual ? Math.ceil(response.plazo_contractual / 30) : 0,
+  fecha_inicio: response.fecha_inicio || new Date().toISOString().split('T')[0],
+  fecha_fin_prevista: response.fecha_fin_contractual || new Date().toISOString().split('T')[0],
+  fecha_termino: response.fecha_fin_real,
+  ubicacion: response.ubicacion || '',
+  distrito: response.distrito || '',
+  provincia: response.provincia || '',
+  departamento: response.departamento || '',
+  tipo_obra: response.tipo_obra as any || 'OTROS',
+  modalidad_ejecucion: response.modalidad_ejecucion as any || 'CONTRATA',
+  sistema_contratacion: response.sistema_contratacion as any || 'SUMA_ALZADA',
+  estado: response.estado_obra as any || 'REGISTRADA',
+  descripcion: response.descripcion || '',
+  activo: response.activo,
+  created_at: response.created_at,
+  updated_at: response.updated_at,
+  version: response.version
+});
 
-const mockValorizaciones: ObraValorizacion[] = [
-  {
-    id: 1,
-    obra_id: 1,
-    numero_valorizacion: 1,
-    periodo_inicio: '2025-02-01',
-    periodo_fin: '2025-02-28',
-    monto_ejecutado: 125000,
-    porcentaje_avance: 15,
-    monto_acumulado: 125000,
-    porcentaje_acumulado: 15,
-    estado: 'APROBADA',
-    fecha_programada: '2025-03-05',
-    fecha_presentacion: '2025-03-03',
-    fecha_aprobacion: '2025-03-07',
-    fecha_pago: '2025-03-15',
-    activo: true,
-    created_at: '2025-02-01T10:00:00Z',
-    updated_at: '2025-03-07T15:30:00Z'
-  },
-  {
-    id: 2,
-    obra_id: 1,
-    numero_valorizacion: 2,
-    periodo_inicio: '2025-03-01',
-    periodo_fin: '2025-03-31',
-    monto_ejecutado: 0,
-    porcentaje_avance: 0,
-    monto_acumulado: 125000,
-    porcentaje_acumulado: 15,
-    estado: 'PROGRAMADA',
-    fecha_programada: '2025-04-05',
-    activo: true,
-    created_at: '2025-02-01T10:00:00Z',
-    updated_at: '2025-02-01T10:00:00Z'
+// Función para mapear formulario frontend a payload del backend
+const mapearObraFormAPayload = (form: ObraForm) => ({
+  codigo: form.numero_contrato,
+  nombre: form.nombre,
+  descripcion: form.descripcion || '',
+  empresa_id: form.entidad_ejecutora_id,
+  cliente: '', // Se puede agregar al formulario si es necesario
+  ubicacion: form.ubicacion || '',
+  distrito: form.distrito || '',
+  provincia: form.provincia || '',
+  departamento: form.departamento || '',
+  modalidad_ejecucion: form.modalidad_ejecucion,
+  sistema_contratacion: form.sistema_contratacion,
+  tipo_obra: form.tipo_obra,
+  monto_contractual: form.monto_ejecucion,
+  monto_adicionales: form.monto_supervision,
+  monto_total: form.monto_ejecucion + form.monto_supervision,
+  fecha_inicio: form.fecha_inicio,
+  fecha_fin_contractual: form.fecha_termino,
+  plazo_contractual: form.plazo_ejecucion_dias,
+  estado_obra: form.estado || 'REGISTRADA',
+  observaciones: ''
+});
+
+// Función helper para manejar errores de API
+const manejarErrorAPI = (error: any): string => {
+  if (error instanceof Error) {
+    return error.message;
   }
-];
+  
+  if (typeof error === 'object' && error?.message) {
+    return error.message;
+  }
+  
+  if (typeof error === 'string') {
+    return error;
+  }
+  
+  return 'Error desconocido en la operación';
+};
+
+// Función helper para realizar peticiones HTTP
+const realizarPeticionHTTP = async (
+  url: string,
+  options: RequestInit = {}
+): Promise<any> => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...DEFAULT_HEADERS,
+        ...options.headers,
+      },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      let errorMessage = `Error ${response.status}: ${response.statusText}`;
+      
+      try {
+        const errorData = await response.json();
+        if (errorData.detail) {
+          errorMessage = errorData.detail;
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        }
+      } catch {
+        // Si no se puede parsear el error, usar el mensaje por defecto
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('La operación tardó demasiado tiempo');
+    }
+    
+    throw error;
+  }
+};
 
 // Hook principal para gestión de obras
 export const useObras = () => {
@@ -220,44 +193,43 @@ export const useObras = () => {
     setError(null);
     
     try {
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      let obrasFiltradas = [...mockObras];
+      // Construir parámetros de consulta para filtros
+      const params = new URLSearchParams();
       
       if (filtros?.search) {
-        const searchTerm = filtros.search.toLowerCase();
-        obrasFiltradas = obrasFiltradas.filter(obra =>
-          obra.nombre.toLowerCase().includes(searchTerm) ||
-          obra.numero_contrato.toLowerCase().includes(searchTerm) ||
-          obra.codigo_interno?.toLowerCase().includes(searchTerm)
-        );
+        params.append('search', filtros.search);
       }
       
       if (filtros?.estado) {
-        obrasFiltradas = obrasFiltradas.filter(obra => obra.estado === filtros.estado);
+        params.append('estado_obra', filtros.estado);
       }
       
       if (filtros?.entidad_ejecutora_id) {
-        obrasFiltradas = obrasFiltradas.filter(obra => 
-          obra.entidad_ejecutora_id === filtros.entidad_ejecutora_id
-        );
-      }
-      
-      if (filtros?.entidad_supervisora_id) {
-        obrasFiltradas = obrasFiltradas.filter(obra => 
-          obra.entidad_supervisora_id === filtros.entidad_supervisora_id
-        );
+        params.append('empresa_id', filtros.entidad_ejecutora_id.toString());
       }
       
       if (filtros?.tipo_obra) {
-        obrasFiltradas = obrasFiltradas.filter(obra => obra.tipo_obra === filtros.tipo_obra);
+        params.append('tipo_obra', filtros.tipo_obra);
       }
+
+      // Realizar petición al endpoint
+      const url = params.toString() 
+        ? `${API_ENDPOINTS.obras}?${params.toString()}`
+        : API_ENDPOINTS.obras;
       
-      setObras(obrasFiltradas);
+      const data = await realizarPeticionHTTP(url);
+      
+      // Mapear respuestas del backend al tipo frontend
+      const obrasMapeadas = Array.isArray(data) 
+        ? data.map(mapearObraResponse)
+        : [];
+      
+      setObras(obrasMapeadas);
     } catch (err) {
-      setError('Error al cargar obras');
-      console.error(err);
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al cargar obras: ${errorMessage}`);
+      console.error('Error cargando obras:', err);
+      setObras([]);
     } finally {
       setLoading(false);
     }
@@ -269,59 +241,37 @@ export const useObras = () => {
     setError(null);
     
     try {
-      // Simular delay de API
-      await new Promise(resolve => setTimeout(resolve, 1200));
+      // Mapear los datos del formulario al payload del backend
+      const payload = mapearObraFormAPayload(params.obra);
       
-      // Validar número de contrato único
-      const contratoExistente = mockObras.find(o => o.numero_contrato === params.obra.numero_contrato);
-      if (contratoExistente) {
-        throw new Error('Ya existe una obra con este número de contrato');
-      }
+      // Realizar petición POST al endpoint
+      const data = await realizarPeticionHTTP(API_ENDPOINTS.obras, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
       
-      const nuevaObra: Obra = {
-        id: Math.max(...mockObras.map(o => o.id)) + 1,
-        ...params.obra,
-        monto_total: params.obra.monto_ejecucion + params.obra.monto_supervision,
-        numero_valorizaciones: Math.ceil(params.obra.plazo_ejecucion_dias / 30),
-        fecha_fin_prevista: new Date(
-          new Date(params.obra.fecha_inicio).getTime() + 
-          params.obra.plazo_ejecucion_dias * 24 * 60 * 60 * 1000
-        ).toISOString().split('T')[0],
-        estado: 'REGISTRADA',
-        activo: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        version: 1
-      };
+      // Mapear la respuesta del backend al tipo frontend
+      const obraNueva = mapearObraResponse(data);
       
-      mockObras.push(nuevaObra);
-      
-      // Crear profesionales del plantel
+      // TODO: Implementar creación del plantel profesional
+      // Nota: Esto requerirá endpoints adicionales para profesionales
       if (params.plantel_profesional.length > 0) {
-        params.plantel_profesional.forEach(prof => {
-          const nuevoProfesional: ObraProfesional = {
-            id: Math.max(0, ...mockProfesionales.map(p => p.id)) + 1,
-            obra_id: nuevaObra.id,
-            ...prof,
-            estado: 'ACTIVO',
-            activo: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          mockProfesionales.push(nuevoProfesional);
-        });
+        console.warn('Creación de plantel profesional no implementada aún. Endpoints de profesionales pendientes.');
       }
       
-      setObras([...mockObras]);
-      return nuevaObra;
+      // Recargar la lista de obras para mantener sincronización
+      await cargarObras();
+      
+      return obraNueva;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al crear obra';
-      setError(errorMessage);
-      throw err;
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al crear obra: ${errorMessage}`);
+      console.error('Error creando obra:', err);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [cargarObras]);
 
   // Actualizar obra
   const actualizarObra = useCallback(async (id: number, obraData: Partial<ObraForm>): Promise<Obra | null> => {
@@ -329,91 +279,187 @@ export const useObras = () => {
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Crear payload parcial con solo los campos que se van a actualizar
+      const payload: Partial<ReturnType<typeof mapearObraFormAPayload>> = {};
       
-      const obraIndex = mockObras.findIndex(o => o.id === id);
-      if (obraIndex === -1) {
-        throw new Error('Obra no encontrada');
+      if (obraData.numero_contrato !== undefined) payload.codigo = obraData.numero_contrato;
+      if (obraData.nombre !== undefined) payload.nombre = obraData.nombre;
+      if (obraData.descripcion !== undefined) payload.descripcion = obraData.descripcion;
+      if (obraData.entidad_ejecutora_id !== undefined) payload.empresa_id = obraData.entidad_ejecutora_id;
+      if (obraData.ubicacion !== undefined) payload.ubicacion = obraData.ubicacion;
+      if (obraData.distrito !== undefined) payload.distrito = obraData.distrito;
+      if (obraData.provincia !== undefined) payload.provincia = obraData.provincia;
+      if (obraData.departamento !== undefined) payload.departamento = obraData.departamento;
+      if (obraData.modalidad_ejecucion !== undefined) payload.modalidad_ejecucion = obraData.modalidad_ejecucion;
+      if (obraData.sistema_contratacion !== undefined) payload.sistema_contratacion = obraData.sistema_contratacion;
+      if (obraData.tipo_obra !== undefined) payload.tipo_obra = obraData.tipo_obra;
+      if (obraData.monto_ejecucion !== undefined) payload.monto_contractual = obraData.monto_ejecucion;
+      if (obraData.monto_supervision !== undefined) payload.monto_adicionales = obraData.monto_supervision;
+      if (obraData.fecha_inicio !== undefined) payload.fecha_inicio = obraData.fecha_inicio;
+      if (obraData.fecha_termino !== undefined) payload.fecha_fin_contractual = obraData.fecha_termino;
+      if (obraData.plazo_ejecucion_dias !== undefined) payload.plazo_contractual = obraData.plazo_ejecucion_dias;
+      if (obraData.estado !== undefined) payload.estado_obra = obraData.estado;
+      
+      // Calcular monto total si se proporcionan los montos
+      if (obraData.monto_ejecucion !== undefined || obraData.monto_supervision !== undefined) {
+        const montoEjecucion = obraData.monto_ejecucion ?? 0;
+        const montoSupervision = obraData.monto_supervision ?? 0;
+        payload.monto_total = montoEjecucion + montoSupervision;
       }
       
-      const obraActualizada: Obra = {
-        ...mockObras[obraIndex],
-        ...obraData,
-        monto_total: (obraData.monto_ejecucion || mockObras[obraIndex].monto_ejecucion) +
-                     (obraData.monto_supervision || mockObras[obraIndex].monto_supervision),
-        numero_valorizaciones: obraData.plazo_ejecucion_dias ? 
-          Math.ceil(obraData.plazo_ejecucion_dias / 30) : 
-          mockObras[obraIndex].numero_valorizaciones,
-        updated_at: new Date().toISOString(),
-        version: (mockObras[obraIndex]?.version ?? 0) + 1
-      };
+      // Realizar petición PUT al endpoint
+      const data = await realizarPeticionHTTP(`${API_ENDPOINTS.obras}/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
       
-      if (obraData.fecha_inicio && obraData.plazo_ejecucion_dias) {
-        obraActualizada.fecha_fin_prevista = new Date(
-          new Date(obraData.fecha_inicio).getTime() + 
-          obraData.plazo_ejecucion_dias * 24 * 60 * 60 * 1000
-        ).toISOString().split('T')[0];
-      }
+      // Mapear la respuesta del backend al tipo frontend
+      const obraActualizada = mapearObraResponse(data);
       
-      mockObras[obraIndex] = obraActualizada;
-      setObras([...mockObras]);
+      // Recargar la lista de obras para mantener sincronización
+      await cargarObras();
       
       return obraActualizada;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al actualizar obra';
-      setError(errorMessage);
-      throw err;
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al actualizar obra: ${errorMessage}`);
+      console.error('Error actualizando obra:', err);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [cargarObras]);
+
+  // Eliminar obra
+  const eliminarObra = useCallback(async (id: number): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Realizar petición DELETE al endpoint
+      await realizarPeticionHTTP(`${API_ENDPOINTS.obras}/${id}`, {
+        method: 'DELETE',
+      });
+      
+      // Recargar la lista de obras para mantener sincronización
+      await cargarObras();
+      
+      return true;
+    } catch (err) {
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al eliminar obra: ${errorMessage}`);
+      console.error('Error eliminando obra:', err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, [cargarObras]);
+
+  // Obtener obra por ID con detalles
+  const obtenerObraPorId = useCallback(async (id: number): Promise<Obra | null> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Realizar petición GET al endpoint específico
+      const data = await realizarPeticionHTTP(`${API_ENDPOINTS.obras}/${id}`);
+      
+      // Mapear la respuesta del backend al tipo frontend
+      return mapearObraResponse(data);
+    } catch (err) {
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al obtener obra: ${errorMessage}`);
+      console.error('Error obteniendo obra por ID:', err);
+      return null;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Obtener obra por ID con detalles
-  const obtenerObraPorId = useCallback((id: number): Obra | null => {
-    return mockObras.find(o => o.id === id) || null;
-  }, []);
-
   // Obtener estadísticas
   const obtenerEstadisticas = useCallback(async (): Promise<EstadisticasObras> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
+    setLoading(true);
+    setError(null);
     
-    const estadisticas: EstadisticasObras = {
-      obras_totales: mockObras.length,
-      obras_activas: mockObras.filter(o => o.estado === 'EN_EJECUCION').length,
-      obras_terminadas: mockObras.filter(o => o.estado === 'TERMINADA').length,
-      obras_paralizadas: mockObras.filter(o => o.estado === 'PARALIZADA').length,
-      monto_total_obras: mockObras.reduce((sum, o) => sum + o.monto_total, 0),
-      monto_ejecutado_total: mockValorizaciones
-        .filter(v => v.estado === 'APROBADA')
-        .reduce((sum, v) => sum + v.monto_ejecutado, 0),
-      obras_por_estado: {
-        REGISTRADA: mockObras.filter(o => o.estado === 'REGISTRADA').length,
-        EN_EJECUCION: mockObras.filter(o => o.estado === 'EN_EJECUCION').length,
-        PARALIZADA: mockObras.filter(o => o.estado === 'PARALIZADA').length,
-        TERMINADA: mockObras.filter(o => o.estado === 'TERMINADA').length,
-        LIQUIDADA: mockObras.filter(o => o.estado === 'LIQUIDADA').length,
-        CANCELADA: mockObras.filter(o => o.estado === 'CANCELADA').length
-      },
-      obras_por_tipo: {
-        CARRETERA: mockObras.filter(o => o.tipo_obra === 'CARRETERA').length,
-        EDIFICACION: mockObras.filter(o => o.tipo_obra === 'EDIFICACION').length,
-        SANEAMIENTO: mockObras.filter(o => o.tipo_obra === 'SANEAMIENTO').length,
-        ELECTRICIDAD: mockObras.filter(o => o.tipo_obra === 'ELECTRICIDAD').length,
-        PUENTE: mockObras.filter(o => o.tipo_obra === 'PUENTE').length,
-        VEREDAS_PISTAS: mockObras.filter(o => o.tipo_obra === 'VEREDAS_PISTAS').length,
-        PARQUES_JARDINES: mockObras.filter(o => o.tipo_obra === 'PARQUES_JARDINES').length,
-        DRENAJE_PLUVIAL: mockObras.filter(o => o.tipo_obra === 'DRENAJE_PLUVIAL').length,
-        OTROS: mockObras.filter(o => o.tipo_obra === 'OTROS').length
-      },
-      valorizaciones_pendientes: mockValorizaciones.filter(v => v.estado === 'PROGRAMADA').length,
-      valorizaciones_vencidas: mockValorizaciones.filter(v => 
-        v.estado === 'PROGRAMADA' && new Date(v.fecha_programada) < new Date()
-      ).length,
-      profesionales_con_conflictos: 0,
-      top_ejecutoras: []
-    };
-    
-    return estadisticas;
+    try {
+      // Realizar petición GET al endpoint de estadísticas
+      const data = await realizarPeticionHTTP(`${API_ENDPOINTS.obras}/stats`);
+      
+      // Mapear respuesta del backend al formato frontend
+      const estadisticas: EstadisticasObras = {
+        obras_totales: data.total_obras || 0,
+        obras_activas: data.obras_activas || 0,
+        obras_terminadas: data.obras_terminadas || 0,
+        obras_paralizadas: data.obras_paralizadas || 0,
+        monto_total_obras: data.monto_total || 0,
+        monto_ejecutado_total: data.monto_ejecutado || 0,
+        obras_por_estado: {
+          REGISTRADA: data.obras_por_estado?.REGISTRADA || 0,
+          EN_EJECUCION: data.obras_por_estado?.EN_EJECUCION || 0,
+          PARALIZADA: data.obras_por_estado?.PARALIZADA || 0,
+          TERMINADA: data.obras_por_estado?.TERMINADA || 0,
+          LIQUIDADA: data.obras_por_estado?.LIQUIDADA || 0,
+          CANCELADA: data.obras_por_estado?.CANCELADA || 0
+        },
+        obras_por_tipo: {
+          CARRETERA: data.obras_por_tipo?.CARRETERA || 0,
+          EDIFICACION: data.obras_por_tipo?.EDIFICACION || 0,
+          SANEAMIENTO: data.obras_por_tipo?.SANEAMIENTO || 0,
+          ELECTRICIDAD: data.obras_por_tipo?.ELECTRICIDAD || 0,
+          PUENTE: data.obras_por_tipo?.PUENTE || 0,
+          VEREDAS_PISTAS: data.obras_por_tipo?.VEREDAS_PISTAS || 0,
+          PARQUES_JARDINES: data.obras_por_tipo?.PARQUES_JARDINES || 0,
+          DRENAJE_PLUVIAL: data.obras_por_tipo?.DRENAJE_PLUVIAL || 0,
+          OTROS: data.obras_por_tipo?.OTROS || 0
+        },
+        // Valores por defecto para campos que podrían no estar en el backend
+        valorizaciones_pendientes: data.valorizaciones_pendientes || 0,
+        valorizaciones_vencidas: data.valorizaciones_vencidas || 0,
+        profesionales_con_conflictos: data.profesionales_con_conflictos || 0,
+        top_ejecutoras: data.top_ejecutoras || []
+      };
+      
+      return estadisticas;
+    } catch (err) {
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al obtener estadísticas: ${errorMessage}`);
+      console.error('Error obteniendo estadísticas:', err);
+      
+      // Devolver estadísticas vacías en caso de error
+      return {
+        obras_totales: 0,
+        obras_activas: 0,
+        obras_terminadas: 0,
+        obras_paralizadas: 0,
+        monto_total_obras: 0,
+        monto_ejecutado_total: 0,
+        obras_por_estado: {
+          REGISTRADA: 0,
+          EN_EJECUCION: 0,
+          PARALIZADA: 0,
+          TERMINADA: 0,
+          LIQUIDADA: 0,
+          CANCELADA: 0
+        },
+        obras_por_tipo: {
+          CARRETERA: 0,
+          EDIFICACION: 0,
+          SANEAMIENTO: 0,
+          ELECTRICIDAD: 0,
+          PUENTE: 0,
+          VEREDAS_PISTAS: 0,
+          PARQUES_JARDINES: 0,
+          DRENAJE_PLUVIAL: 0,
+          OTROS: 0
+        },
+        valorizaciones_pendientes: 0,
+        valorizaciones_vencidas: 0,
+        profesionales_con_conflictos: 0,
+        top_ejecutoras: []
+      };
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -427,26 +473,28 @@ export const useObras = () => {
     cargarObras,
     crearObra,
     actualizarObra,
+    eliminarObra,
     obtenerObraPorId,
     obtenerEstadisticas
   };
 };
 
 // Hook para gestión de profesionales
+// NOTA: Funcionalidad reducida hasta implementar endpoints de profesionales
 export const useProfesionales = () => {
   const [profesionales, setProfesionales] = useState<ObraProfesional[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar profesionales de una obra
+  // Placeholder: Cargar profesionales de una obra
   const cargarProfesionalesPorObra = useCallback(async (obraId: number) => {
     setLoading(true);
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      const profesionalesObra = mockProfesionales.filter(p => p.obra_id === obraId);
-      setProfesionales(profesionalesObra);
+      // TODO: Implementar cuando estén disponibles los endpoints de profesionales
+      console.warn(`Carga de profesionales para obra ${obraId} no implementada aún. Endpoints pendientes.`);
+      setProfesionales([]);
     } catch (err) {
       setError('Error al cargar profesionales');
       console.error(err);
@@ -455,83 +503,37 @@ export const useProfesionales = () => {
     }
   }, []);
 
-  // Agregar profesional a obra
+  // Placeholder: Agregar profesional a obra
   const agregarProfesional = useCallback(async (obraId: number, profesional: ProfesionalForm): Promise<ObraProfesional | null> => {
     setLoading(true);
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      const nuevoProfesional: ObraProfesional = {
-        id: Math.max(0, ...mockProfesionales.map(p => p.id)) + 1,
-        obra_id: obraId,
-        ...profesional,
-        estado: 'ACTIVO',
-        activo: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      mockProfesionales.push(nuevoProfesional);
-      setProfesionales([...mockProfesionales.filter(p => p.obra_id === obraId)]);
-      
-      return nuevoProfesional;
+      // TODO: Implementar cuando estén disponibles los endpoints de profesionales
+      console.warn(`Agregar profesional a obra ${obraId} no implementado aún. Endpoints pendientes.`);
+      return null;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al agregar profesional';
-      setError(errorMessage);
-      throw err;
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al agregar profesional: ${errorMessage}`);
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Verificar disponibilidad de profesional
+  // Placeholder: Verificar disponibilidad de profesional
   const verificarDisponibilidad = useCallback(async (
     nombreCompleto: string,
     fechaInicio: string,
     fechaFin: string,
     obraIdExcluir?: number
   ): Promise<ResultadoDisponibilidadProfesional> => {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    const conflictos: ConflictoProfesional[] = [];
-    
-    // Buscar conflictos con profesionales que tengan 100% en otras obras activas
-    mockProfesionales.forEach(prof => {
-      if (prof.nombre_completo === nombreCompleto && 
-          prof.porcentaje_participacion === 100 && 
-          prof.estado === 'ACTIVO' &&
-          prof.obra_id !== obraIdExcluir) {
-        
-        const obra = mockObras.find(o => o.id === prof.obra_id);
-        if (obra && (obra.estado === 'REGISTRADA' || obra.estado === 'EN_EJECUCION')) {
-          // Verificar superposición de fechas
-          const fechaInicioProf = new Date(prof.fecha_inicio_participacion);
-          const fechaFinProf = prof.fecha_fin_participacion ? 
-            new Date(prof.fecha_fin_participacion) : 
-            new Date(obra.fecha_fin_prevista);
-          
-          const fechaInicioNueva = new Date(fechaInicio);
-          const fechaFinNueva = new Date(fechaFin);
-          
-          if (fechaInicioNueva <= fechaFinProf && fechaFinNueva >= fechaInicioProf) {
-            conflictos.push({
-              obra_id: obra.id,
-              obra_nombre: obra.nombre,
-              numero_contrato: obra.numero_contrato,
-              fecha_inicio: obra.fecha_inicio,
-              fecha_fin_prevista: obra.fecha_fin_prevista,
-              porcentaje_participacion: prof.porcentaje_participacion
-            });
-          }
-        }
-      }
-    });
+    // TODO: Implementar cuando estén disponibles los endpoints de profesionales
+    console.warn(`Verificación de disponibilidad para ${nombreCompleto} no implementada aún. Endpoints pendientes.`);
     
     return {
-      disponible: conflictos.length === 0,
-      conflictos
+      disponible: true,
+      conflictos: []
     };
   }, []);
 
@@ -546,8 +548,9 @@ export const useProfesionales = () => {
 };
 
 // Hook para gestión de profesiones
+// NOTA: Funcionalidad reducida hasta implementar endpoints de profesiones
 export const useProfesiones = () => {
-  const [profesiones, setProfesiones] = useState<Profesion[]>(mockProfesiones);
+  const [profesiones, setProfesiones] = useState<Profesion[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -556,10 +559,12 @@ export const useProfesiones = () => {
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 200));
-      setProfesiones(mockProfesiones);
+      // TODO: Implementar cuando estén disponibles los endpoints de profesiones
+      console.warn('Carga de profesiones no implementada aún. Endpoints pendientes.');
+      setProfesiones([]);
     } catch (err) {
-      setError('Error al cargar profesiones');
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al cargar profesiones: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
@@ -755,6 +760,7 @@ export const useValidacionesObra = () => {
 };
 
 // Hook para gestión de valorizaciones
+// NOTA: Funcionalidad reducida hasta implementar endpoints de valorizaciones
 export const useValorizaciones = () => {
   const [valorizaciones, setValorizaciones] = useState<ObraValorizacion[]>([]);
   const [loading, setLoading] = useState(false);
@@ -765,11 +771,12 @@ export const useValorizaciones = () => {
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 300));
-      const valorizacionesObra = mockValorizaciones.filter(v => v.obra_id === obraId);
-      setValorizaciones(valorizacionesObra);
+      // TODO: Implementar cuando estén disponibles los endpoints de valorizaciones
+      console.warn(`Carga de valorizaciones para obra ${obraId} no implementada aún. Endpoints pendientes.`);
+      setValorizaciones([]);
     } catch (err) {
-      setError('Error al cargar valorizaciones');
+      const errorMessage = manejarErrorAPI(err);
+      setError(`Error al cargar valorizaciones: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

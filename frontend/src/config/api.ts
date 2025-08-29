@@ -45,14 +45,17 @@ export const API_ENDPOINTS = {
   consultaRuc: `${API_BASE_URL}/consulta-ruc`,
   consultaRucConsolidada: `${API_BASE_URL}/consulta-ruc-consolidada`,
   
-  // Empresas - Endpoint temporal funcionando
-  empresas: `${API_BASE_URL}/api/empresas`,
+  // Empresas - Endpoints Turso integrados
+  empresas: `${API_BASE_URL}/api/v1/empresas`,              // CRUD completo
+  empresasGuardadas: `${API_BASE_URL}/api/empresas-guardadas`, // Listar guardadas
+  empresasSearch: `${API_BASE_URL}/api/empresas-guardadas/search`, // Buscar
+  empresasStats: `${API_BASE_URL}/api/empresas-guardadas/stats`,   // Estadísticas
   
-  // Obras
-  obras: `${API_BASE_URL}/api/v1/obras`,
+  // Obras - Turso integrado
+  obras: `${API_BASE_URL}/obras`,
   
-  // Valorizaciones
-  valorizaciones: `${API_BASE_URL}/api/v1/valorizaciones`,
+  // Valorizaciones - Turso integrado
+  valorizaciones: `${API_BASE_URL}/valorizaciones`,
   
   // Health check
   health: `${API_BASE_URL}/health`,

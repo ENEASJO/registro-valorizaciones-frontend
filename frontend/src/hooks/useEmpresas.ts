@@ -10,215 +10,120 @@ import type {
   ConsorcioCompleto
 } from '../types/empresa.types';
 
-// Mock data temporal hasta implementar la API
-const mockEmpresas: Empresa[] = [
-  {
-    id: 1,
-    codigo: 'EMP001',
-    ruc: '20123456789',
-    razon_social: 'CONSTRUCTORA ABC SOCIEDAD ANONIMA CERRADA',
-    nombre_comercial: 'Constructora ABC',
-    email: 'contacto@abc.com',
-    telefono: '987654321',
-    direccion: 'Av. Principal 123, Lima',
-    distrito: 'Lima',
-    provincia: 'Lima',
-    departamento: 'Lima',
-    representante_legal: 'Juan Pérez García',
-    dni_representante: '12345678',
-    estado: 'ACTIVO',
-    tipo_empresa: 'SAC',
-    categoria_contratista: 'A',
-    especialidades: ['EDIFICACIONES', 'CARRETERAS'],
-    activo: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z'
-  },
-  {
-    id: 2,
-    codigo: 'EMP002',
-    ruc: '20987654321',
-    razon_social: 'INGENIERIA XYZ EMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA',
-    nombre_comercial: 'Ingeniería XYZ',
-    email: 'info@xyz.com',
-    telefono: '912345678',
-    direccion: 'Jr. Secundario 456, Cusco',
-    distrito: 'Cusco',
-    provincia: 'Cusco',
-    departamento: 'Cusco',
-    representante_legal: 'María López Silva',
-    dni_representante: '87654321',
-    estado: 'ACTIVO',
-    tipo_empresa: 'EIRL',
-    categoria_contratista: 'B',
-    especialidades: ['SANEAMIENTO', 'ELECTRICIDAD'],
-    activo: true,
-    created_at: '2024-01-20T14:30:00Z',
-    updated_at: '2024-01-20T14:30:00Z'
-  },
-  {
-    id: 3,
-    codigo: 'EMP003',
-    ruc: '20456789123',
-    razon_social: 'GRUPO CONSTRUCTOR PERU SOCIEDAD ANONIMA',
-    nombre_comercial: 'GCP',
-    email: 'ventas@gcp.pe',
-    telefono: '998877665',
-    direccion: 'Calle Comercial 789, Arequipa',
-    distrito: 'Arequipa',
-    provincia: 'Arequipa',
-    departamento: 'Arequipa',
-    representante_legal: 'Carlos Rodriguez Mendoza',
-    dni_representante: '11223344',
-    estado: 'ACTIVO',
-    tipo_empresa: 'SA',
-    categoria_contratista: 'A',
-    especialidades: ['EDIFICACIONES', 'PUENTES', 'CARRETERAS'],
-    activo: true,
-    created_at: '2024-02-10T09:15:00Z',
-    updated_at: '2024-02-10T09:15:00Z'
-  }
-];
+// Interfaces para respuestas de la API de Turso
+interface TursoApiResponse<T> {
+  success: boolean;
+  data: T;
+  timestamp: string;
+  message?: string;
+}
 
-const mockConsorcios: ConsorcioCompleto[] = [
-  {
-    id: 1,
-    codigo: 'CON001',
-    nombre: 'CONSORCIO OBRAS PUBLICAS 2024',
-    descripcion: 'Consorcio para ejecución de obras de infraestructura pública',
-    fecha_constitucion: '2024-01-15',
-    empresa_lider_id: 1,
-    representante_consorcio: 'Juan Pérez García',
-    estado: 'ACTIVO',
-    especialidades: ['EDIFICACIONES', 'CARRETERAS', 'SANEAMIENTO'],
-    activo: true,
-    created_at: '2024-01-15T10:00:00Z',
-    updated_at: '2024-01-15T10:00:00Z',
-    empresa_lider: mockEmpresas[0],
-    empresas_participantes: [
-      {
-        empresa: mockEmpresas[0],
-        participacion: {
-          id: 1,
-          consorcio_id: 1,
-          empresa_id: 1,
-          porcentaje_participacion: 60,
-          es_lider: true,
-          responsabilidades: ['EJECUCIÓN', 'DIRECCIÓN_TÉCNICA'],
-          fecha_ingreso: '2024-01-15',
-          estado: 'ACTIVO',
-          activo: true,
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z'
-        }
-      },
-      {
-        empresa: mockEmpresas[1],
-        participacion: {
-          id: 2,
-          consorcio_id: 1,
-          empresa_id: 2,
-          porcentaje_participacion: 40,
-          es_lider: false,
-          responsabilidades: ['SUPERVISIÓN', 'CONTROL_CALIDAD'],
-          fecha_ingreso: '2024-01-15',
-          estado: 'ACTIVO',
-          activo: true,
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z'
-        }
-      }
-    ],
-    total_empresas: 2,
-    suma_porcentajes: 100,
-    estado_porcentajes: 'CORRECTO'
-  }
-];
+interface EmpresaTursoResponse {
+  id: number;
+  codigo: string;
+  ruc: string;
+  razon_social: string;
+  email?: string;
+  celular?: string;
+  direccion?: string;
+  representante_legal?: string;
+  dni_representante?: string;
+  estado: string;
+  especialidades?: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface EstadisticasEmpresas {
+  total_empresas: number;
+  empresas_activas: number;
+  empresas_inactivas: number;
+  por_estado: Record<string, number>;
+}
+
+// Función auxiliar para mapear respuesta de API a tipo Empresa
+const mapearEmpresaFromAPI = (apiEmpresa: EmpresaTursoResponse): Empresa => ({
+  id: apiEmpresa.id,
+  codigo: apiEmpresa.codigo || `EMP${apiEmpresa.id.toString().padStart(3, '0')}`,
+  ruc: apiEmpresa.ruc,
+  razon_social: apiEmpresa.razon_social,
+  nombre_comercial: apiEmpresa.razon_social, // Usar razón social como nombre comercial por defecto
+  email: apiEmpresa.email,
+  telefono: apiEmpresa.celular,
+  direccion: apiEmpresa.direccion,
+  distrito: undefined,
+  provincia: undefined,
+  departamento: undefined,
+  representante_legal: apiEmpresa.representante_legal,
+  dni_representante: apiEmpresa.dni_representante,
+  estado: apiEmpresa.estado || 'ACTIVO',
+  tipo_empresa: 'SAC', // Valor por defecto, podría mejorarse
+  categoria_contratista: undefined,
+  especialidades: apiEmpresa.especialidades || [],
+  activo: true,
+  created_at: apiEmpresa.created_at,
+  updated_at: apiEmpresa.updated_at
+});
 
 export const useEmpresas = () => {
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar empresas
+  // Cargar empresas guardadas desde Turso
   const cargarEmpresas = useCallback(async (filtros?: FiltrosEntidadContratista) => {
     setLoading(true);
     setError(null);
     
     try {
-      // Call the real API to get empresas
-      const response = await fetch(API_ENDPOINTS.empresas);
+      const response = await fetch(API_ENDPOINTS.empresasGuardadas);
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
+      const result: TursoApiResponse<EmpresaTursoResponse[]> = await response.json();
       
       if (result.success && result.data) {
-        // Convert API response to Empresa format
-        const empresasFromAPI: Empresa[] = result.data.map((apiEmpresa: any) => ({
-          id: apiEmpresa.id,
-          codigo: apiEmpresa.codigo,
-          ruc: apiEmpresa.ruc,
-          razon_social: apiEmpresa.razon_social,
-          nombre_comercial: apiEmpresa.razon_social,
-          email: apiEmpresa.email,
-          telefono: apiEmpresa.celular,
-          direccion: apiEmpresa.direccion,
-          distrito: undefined,
-          provincia: undefined,
-          departamento: undefined,
-          representante_legal: apiEmpresa.representante_legal,
-          dni_representante: apiEmpresa.dni_representante,
-          estado: apiEmpresa.estado,
-          tipo_empresa: 'SAC',
-          categoria_contratista: undefined,
-          especialidades: apiEmpresa.especialidades || [],
-          activo: true,
-          created_at: apiEmpresa.created_at,
-          updated_at: apiEmpresa.updated_at
-        }));
-
-        let empresasFiltradas = [...empresasFromAPI];
+        // Convertir respuesta de API a formato Empresa
+        let empresasFromAPI: Empresa[] = result.data.map(mapearEmpresaFromAPI);
       
-      if (filtros?.search) {
-        const searchTerm = filtros.search.toLowerCase();
-        empresasFiltradas = empresasFiltradas.filter(empresa =>
-          empresa.razon_social.toLowerCase().includes(searchTerm) ||
-          empresa.nombre_comercial?.toLowerCase().includes(searchTerm) ||
-          empresa.ruc.includes(searchTerm)
-        );
-      }
-      
-      if (filtros?.estado) {
-        empresasFiltradas = empresasFiltradas.filter(empresa => 
-          empresa.estado === filtros.estado
-        );
-      }
-      
-      if (filtros?.categoria) {
-        empresasFiltradas = empresasFiltradas.filter(empresa => 
-          empresa.categoria_contratista === filtros.categoria
-        );
-      }
-      
+        // Aplicar filtros localmente
+        if (filtros?.search) {
+          const searchTerm = filtros.search.toLowerCase();
+          empresasFromAPI = empresasFromAPI.filter(empresa =>
+            empresa.razon_social.toLowerCase().includes(searchTerm) ||
+            empresa.nombre_comercial?.toLowerCase().includes(searchTerm) ||
+            empresa.ruc.includes(searchTerm)
+          );
+        }
+        
+        if (filtros?.estado) {
+          empresasFromAPI = empresasFromAPI.filter(empresa => 
+            empresa.estado === filtros.estado
+          );
+        }
+        
+        if (filtros?.categoria) {
+          empresasFromAPI = empresasFromAPI.filter(empresa => 
+            empresa.categoria_contratista === filtros.categoria
+          );
+        }
+        
         if (filtros?.especialidades && filtros.especialidades.length > 0) {
-          empresasFiltradas = empresasFiltradas.filter(empresa =>
+          empresasFromAPI = empresasFromAPI.filter(empresa =>
             empresa.especialidades?.some(esp => 
               filtros.especialidades!.includes(esp)
             )
           );
         }
         
-        setEmpresas(empresasFiltradas);
+        setEmpresas(empresasFromAPI);
       } else {
-        // If no data from API, fall back to empty array
         setEmpresas([]);
       }
     } catch (err) {
-      // If API fails, show empty list instead of mock data
-      console.error('Error loading empresas from API:', err);
+      console.error('Error loading empresas from Turso:', err);
       setError('Error al cargar empresas desde el servidor');
       setEmpresas([]);
     } finally {
@@ -226,13 +131,12 @@ export const useEmpresas = () => {
     }
   }, []);
 
-  // Crear nueva empresa
+  // Crear nueva empresa usando el endpoint de Turso
   const crearEmpresa = useCallback(async (empresaData: EmpresaForm): Promise<Empresa | null> => {
     setLoading(true);
     setError(null);
     
     try {
-      // Call the real API endpoint
       const response = await fetch(API_ENDPOINTS.empresas, {
         method: 'POST',
         headers: {
@@ -245,34 +149,12 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
+      const result: TursoApiResponse<EmpresaTursoResponse> = await response.json();
       
       if (result.success && result.data) {
-        // Convert API response to Empresa format
-        const nuevaEmpresa: Empresa = {
-          id: result.data.id,
-          codigo: result.data.codigo,
-          ruc: result.data.ruc,
-          razon_social: result.data.razon_social,
-          nombre_comercial: result.data.razon_social, // Use same as razon_social if not provided
-          email: result.data.email || undefined,
-          telefono: result.data.celular || undefined,
-          direccion: result.data.direccion || undefined,
-          distrito: undefined, // Not provided by API
-          provincia: undefined,
-          departamento: undefined,
-          representante_legal: result.data.representante_legal || undefined,
-          dni_representante: result.data.dni_representante || undefined,
-          estado: result.data.estado,
-          tipo_empresa: 'SAC', // Default, could be improved
-          categoria_contratista: undefined,
-          especialidades: result.data.especialidades || [],
-          activo: true,
-          created_at: result.data.created_at,
-          updated_at: result.data.updated_at
-        };
+        const nuevaEmpresa = mapearEmpresaFromAPI(result.data);
         
-        // Refresh the list after successful creation
+        // Refrescar la lista después de la creación exitosa
         await cargarEmpresas();
         
         return nuevaEmpresa;
@@ -287,78 +169,196 @@ export const useEmpresas = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [cargarEmpresas]);
 
-  // Actualizar empresa
+  // Actualizar empresa usando PUT al endpoint de Turso
   const actualizarEmpresa = useCallback(async (id: number, empresaData: Partial<EmpresaForm>): Promise<Empresa | null> => {
     setLoading(true);
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const empresaIndex = mockEmpresas.findIndex(e => e.id === id);
-      if (empresaIndex === -1) {
-        throw new Error('Empresa no encontrada');
+      const response = await fetch(`${API_ENDPOINTS.empresas}/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(empresaData),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Empresa no encontrada');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+
+      const result: TursoApiResponse<EmpresaTursoResponse> = await response.json();
       
-      const empresaActualizada = {
-        ...mockEmpresas[empresaIndex],
-        ...empresaData,
-        updated_at: new Date().toISOString()
-      };
-      
-      mockEmpresas[empresaIndex] = empresaActualizada;
-      setEmpresas([...mockEmpresas]);
-      
-      return empresaActualizada;
+      if (result.success && result.data) {
+        const empresaActualizada = mapearEmpresaFromAPI(result.data);
+        
+        // Refrescar la lista después de la actualización
+        await cargarEmpresas();
+        
+        return empresaActualizada;
+      } else {
+        throw new Error(result.message || 'Error en la respuesta del servidor');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al actualizar empresa';
       setError(errorMessage);
+      console.error('Error updating empresa:', err);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [cargarEmpresas]);
 
-  // Eliminar empresa
+  // Eliminar empresa por RUC usando el endpoint de Turso
   const eliminarEmpresa = useCallback(async (id: number): Promise<boolean> => {
     setLoading(true);
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      const empresaIndex = mockEmpresas.findIndex(e => e.id === id);
-      if (empresaIndex === -1) {
+      // Primero obtener el RUC de la empresa
+      const empresa = empresas.find(e => e.id === id);
+      if (!empresa) {
         throw new Error('Empresa no encontrada');
       }
       
-      // Verificar si la empresa participa en consorcios activos
-      const participaEnConsorcios = mockConsorcios.some(consorcio =>
-        consorcio.empresas_participantes.some(ep => ep.empresa.id === id && ep.participacion.estado === 'ACTIVO')
-      );
-      
-      if (participaEnConsorcios) {
-        throw new Error('No se puede eliminar la empresa porque participa en consorcios activos');
+      const response = await fetch(`${API_ENDPOINTS.empresasGuardadas}/${empresa.ruc}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('Empresa no encontrada');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+
+      const result: TursoApiResponse<{ deleted: boolean }> = await response.json();
       
-      mockEmpresas.splice(empresaIndex, 1);
-      setEmpresas([...mockEmpresas]);
-      
-      return true;
+      if (result.success) {
+        // Refrescar la lista después de la eliminación
+        await cargarEmpresas();
+        return true;
+      } else {
+        throw new Error(result.message || 'Error al eliminar empresa');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al eliminar empresa';
       setError(errorMessage);
+      console.error('Error deleting empresa:', err);
       throw err;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [empresas, cargarEmpresas]);
 
-  // Obtener empresa por ID
-  const obtenerEmpresaPorId = useCallback((id: number): Empresa | null => {
-    return mockEmpresas.find(e => e.id === id) || null;
+  // Obtener empresa por RUC usando el endpoint de Turso
+  const obtenerEmpresaPorId = useCallback(async (id: number): Promise<Empresa | null> => {
+    // Primero buscar en la lista local
+    const empresaLocal = empresas.find(e => e.id === id);
+    if (empresaLocal) {
+      return empresaLocal;
+    }
+    
+    // Si no está en la lista local, buscar por RUC en el servidor
+    // Nota: Esta función necesitaría el RUC, pero mantenemos la interfaz por compatibilidad
+    console.warn('obtenerEmpresaPorId: Empresa no encontrada en lista local, considere usar obtenerEmpresaPorRuc');
+    return null;
+  }, [empresas]);
+  
+  // Obtener empresa por RUC (nuevo método)
+  const obtenerEmpresaPorRuc = useCallback(async (ruc: string): Promise<Empresa | null> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${API_ENDPOINTS.empresasGuardadas}/${ruc}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Empresa no encontrada
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result: TursoApiResponse<EmpresaTursoResponse> = await response.json();
+      
+      if (result.success && result.data) {
+        return mapearEmpresaFromAPI(result.data);
+      }
+      
+      return null;
+    } catch (err) {
+      console.error('Error getting empresa by RUC:', err);
+      setError('Error al obtener empresa por RUC');
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
+  // Buscar empresas usando el endpoint de búsqueda de Turso
+  const buscarEmpresas = useCallback(async (query: string): Promise<Empresa[]> => {
+    if (!query.trim()) {
+      return [];
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`${API_ENDPOINTS.empresasSearch}?q=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result: TursoApiResponse<EmpresaTursoResponse[]> = await response.json();
+      
+      if (result.success && result.data) {
+        return result.data.map(mapearEmpresaFromAPI);
+      }
+      
+      return [];
+    } catch (err) {
+      console.error('Error searching empresas:', err);
+      setError('Error al buscar empresas');
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  
+  // Obtener estadísticas usando el endpoint de Turso
+  const obtenerEstadisticas = useCallback(async (): Promise<EstadisticasEmpresas | null> => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(API_ENDPOINTS.empresasStats);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result: TursoApiResponse<EstadisticasEmpresas> = await response.json();
+      
+      if (result.success && result.data) {
+        return result.data;
+      }
+      
+      return null;
+    } catch (err) {
+      console.error('Error getting empresas stats:', err);
+      setError('Error al obtener estadísticas de empresas');
+      return null;
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -373,40 +373,30 @@ export const useEmpresas = () => {
     crearEmpresa,
     actualizarEmpresa,
     eliminarEmpresa,
-    obtenerEmpresaPorId
+    obtenerEmpresaPorId,
+    obtenerEmpresaPorRuc,
+    buscarEmpresas,
+    obtenerEstadisticas
   };
 };
+
+// Mock data temporal para consorcios (mantenido para compatibilidad)
+const mockConsorcios: ConsorcioCompleto[] = [];
 
 export const useConsorcios = () => {
   const [consorcios, setConsorcios] = useState<ConsorcioCompleto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar consorcios
+  // Cargar consorcios (actualmente usando mock - pendiente de implementación en Turso)
   const cargarConsorcios = useCallback(async (filtros?: FiltrosEntidadContratista) => {
     setLoading(true);
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      let consorciosFiltrados = [...mockConsorcios];
-      
-      if (filtros?.search) {
-        const searchTerm = filtros.search.toLowerCase();
-        consorciosFiltrados = consorciosFiltrados.filter(consorcio =>
-          consorcio.nombre.toLowerCase().includes(searchTerm) ||
-          consorcio.codigo.toLowerCase().includes(searchTerm)
-        );
-      }
-      
-      if (filtros?.estado) {
-        consorciosFiltrados = consorciosFiltrados.filter(consorcio => 
-          consorcio.estado === filtros.estado
-        );
-      }
-      
-      setConsorcios(consorciosFiltrados);
+      // TODO: Implementar endpoint de consorcios en Turso
+      // Por ahora retornamos lista vacía
+      setConsorcios([]);
     } catch (err) {
       setError('Error al cargar consorcios');
       console.error(err);
@@ -415,67 +405,14 @@ export const useConsorcios = () => {
     }
   }, []);
 
-  // Crear nuevo consorcio
+  // Crear nuevo consorcio (pendiente de implementación)
   const crearConsorcio = useCallback(async (params: CrearConsorcioParams): Promise<ConsorcioCompleto | null> => {
     setLoading(true);
     setError(null);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      // Validar que la suma de porcentajes sea 100%
-      const sumaPortcentajes = params.empresas_participacion.reduce((sum, ep) => sum + ep.porcentaje, 0);
-      if (Math.abs(sumaPortcentajes - 100) > 0.01) {
-        throw new Error(`La suma de porcentajes debe ser 100%. Actual: ${sumaPortcentajes}%`);
-      }
-      
-      // Validar que todas las empresas existan
-      const empresasValidas = params.empresas_participacion.every(ep =>
-        mockEmpresas.find(e => e.id === ep.empresa_id)
-      );
-      if (!empresasValidas) {
-        throw new Error('Una o más empresas especificadas no existen');
-      }
-      
-      // Encontrar empresa líder
-      const empresaLider = mockEmpresas.find(e => e.id === params.consorcio.empresa_lider_id);
-      if (!empresaLider) {
-        throw new Error('La empresa líder especificada no existe');
-      }
-      
-      const nuevoConsorcio: ConsorcioCompleto = {
-        id: Math.max(...mockConsorcios.map(c => c.id)) + 1,
-        codigo: params.consorcio.codigo || `CON${Date.now().toString().slice(-3)}`,
-        ...params.consorcio,
-        activo: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-        empresa_lider: empresaLider,
-        empresas_participantes: params.empresas_participacion.map((ep, index) => ({
-          empresa: mockEmpresas.find(e => e.id === ep.empresa_id)!,
-          participacion: {
-            id: index + 1,
-            consorcio_id: mockConsorcios.length + 1,
-            empresa_id: ep.empresa_id,
-            porcentaje_participacion: ep.porcentaje,
-            es_lider: ep.empresa_id === params.consorcio.empresa_lider_id,
-            responsabilidades: ep.responsabilidades,
-            fecha_ingreso: new Date().toISOString().split('T')[0],
-            estado: 'ACTIVO',
-            activo: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        })),
-        total_empresas: params.empresas_participacion.length,
-        suma_porcentajes: 100,
-        estado_porcentajes: 'CORRECTO'
-      };
-      
-      mockConsorcios.push(nuevoConsorcio);
-      setConsorcios([...mockConsorcios]);
-      
-      return nuevoConsorcio;
+      // TODO: Implementar creación de consorcios en Turso
+      throw new Error('Funcionalidad de consorcios no implementada aún');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al crear consorcio';
       setError(errorMessage);
@@ -485,9 +422,9 @@ export const useConsorcios = () => {
     }
   }, []);
 
-  // Obtener consorcio por ID
+  // Obtener consorcio por ID (pendiente de implementación)
   const obtenerConsorcioPorId = useCallback((id: number): ConsorcioCompleto | null => {
-    return mockConsorcios.find(c => c.id === id) || null;
+    return null; // TODO: Implementar búsqueda de consorcios en Turso
   }, []);
 
   useEffect(() => {
