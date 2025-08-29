@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { API_ENDPOINTS, DEFAULT_HEADERS, API_TIMEOUT } from '../config/api';
+import '../types/valorizacion-extended.types'; // Importar extensiones de tipos
 
 // =================================================================
 // TIPOS E INTERFACES
@@ -591,7 +592,14 @@ export const useValorizaciones = () => {
     // Compatibilidad con componentes legacy
     valorizacionesEjecucion: valorizaciones, // Para componentes que esperan esta propiedad
     valorizacionesSupervision: valorizaciones.filter(v => v.tipo_valorizacion === 'SUPERVISION'),
-    estadisticasDashboard: estadisticasLocales,
+    estadisticasDashboard: {
+      ...estadisticasLocales,
+      totalValorizado: estadisticasLocales.montoTotal,
+      aprobadas: estadisticasLocales.porEstado.APROBADA || 0,
+      pendientes: estadisticasLocales.porEstado.PRESENTADA || 0,
+      pagadas: estadisticasLocales.porEstado.PAGADA || 0,
+      conAtraso: 0 // Placeholder
+    },
     cambiarEstadoValorizacion: async (id: number, nuevoEstado: string) => {
       return await actualizarValorizacion(id, { estado_valorizacion: nuevoEstado });
     },
