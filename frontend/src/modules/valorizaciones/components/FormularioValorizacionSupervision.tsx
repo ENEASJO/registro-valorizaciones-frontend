@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useCallback } from 'react';
 import type { ValorizacionSupervisionForm } from '../../../types/valorizacion.types';
+import type { ValorizacionForm } from '../../../hooks/useValorizaciones';
 import { useObras } from '../../../hooks/useObras';
 import {
   ArrowLeft,

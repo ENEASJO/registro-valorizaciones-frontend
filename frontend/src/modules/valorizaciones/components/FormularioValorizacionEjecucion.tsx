@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useCallback } from 'react';
 import type { Partida, PartidaDetalleForm, ValorizacionEjecucionForm, CalculosValorizacion } from '../../../types/valorizacion.types';
+import type { ValorizacionForm } from '../../../hooks/useValorizaciones';
 import { useObras } from '../../../hooks/useObras';
 import {
   ArrowLeft,
