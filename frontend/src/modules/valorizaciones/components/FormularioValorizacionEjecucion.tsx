@@ -102,7 +102,7 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
         otras_deducciones_monto: otrasDeduccciones
       };
       const nuevosCalculos = calcularMontos(formData);
-      setCalculos(nuevosCalculos);
+      setCalculos(nuevosCalculos as any);
       setErrores([]);
     } else {
       setCalculos(null);
@@ -149,10 +149,14 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
       setErrores(['Debe seleccionar una obra']);
       return;
     }
-    const form: ValorizacionEjecucionForm = {
+    const form: ValorizacionForm = {
       obra_id: obraActual.id,
-      periodo_inicio: fechaInicio,
-      periodo_fin: fechaFin,
+      numero_valorizacion: 1,
+      periodo: '2024-01',
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin,
+      tipo_valorizacion: 'EJECUCION',
+      monto_ejecutado: partidasSeleccionadas.reduce((sum, p) => sum + (p.metrado_actual * 100), 0),
       numero_expediente: numeroExpediente || undefined,
       numero_expediente_siaf: numeroExpedienteSiaf || undefined,
       adelanto_directo_porcentaje: adelantoDirecto,
@@ -162,9 +166,8 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
       residente_obra: residente,
       supervisor_obra: supervisor,
       observaciones_residente: observacionesResidente,
-      observaciones_supervisor: observacionesSupervisor,
-      partidas: partidasSeleccionadas
-    };
+      observaciones_supervisor: observacionesSupervisor
+    } as ValorizacionForm;
     try {
       const validacion = validarValorizacion(form);
       if (!validacion.valido) {

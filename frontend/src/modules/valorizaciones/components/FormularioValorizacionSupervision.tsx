@@ -190,24 +190,19 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
       setErrores(['No se encontró una valorización de ejecución para el mismo periodo']);
       return;
     }
-    const form: ValorizacionSupervisionForm = {
+    const form: ValorizacionForm = {
       obra_id: obraActual.id,
-      periodo_inicio: fechaInicio,
-      periodo_fin: fechaFin,
+      numero_valorizacion: 1,
+      periodo: '2024-01',
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin,
+      tipo_valorizacion: 'SUPERVISION',
+      monto_ejecutado: calculos.montoBruto,
       numero_expediente: numeroExpediente || undefined,
       numero_expediente_siaf: numeroExpedienteSiaf || undefined,
-      dias_efectivos_trabajados: diasEfectivos,
-      dias_lluvia: diasLluvia,
-      dias_feriados: diasFeriados,
-      dias_suspension_obra: diasSuspension,
-      dias_otros_motivos: diasOtros,
       penalidades_monto: penalidades,
-      otras_deducciones_monto: otrasDeduccciones,
-      supervisor_responsable: supervisorResponsable,
-      actividades_realizadas: actividadesRealizadas,
-      observaciones_periodo: observacionesPeriodo,
-      motivos_dias_no_trabajados: motivosDiasNoTrabajados
-    };
+      otras_deducciones_monto: otrasDeduccciones
+    } as ValorizacionForm;
     try {
       await crearValorizacionSupervision(form);
       onSuccess();
