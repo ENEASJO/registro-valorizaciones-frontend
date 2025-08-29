@@ -65,7 +65,21 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
     o.entidad_supervisora_id
   );
   // Obra actual
-  const obraActual = obraSeleccionada ? obtenerObraPorId(obraSeleccionada) : null;
+  const [obraActual, setObraActual] = useState<any>(null);
+  
+  // Cargar obra seleccionada
+  useEffect(() => {
+    if (obraSeleccionada) {
+      obtenerObraPorId(obraSeleccionada).then(obra => {
+        setObraActual(obra);
+      }).catch(error => {
+        console.error('Error cargando obra:', error);
+        setObraActual(null);
+      });
+    } else {
+      setObraActual(null);
+    }
+  }, [obraSeleccionada, obtenerObraPorId]);
   // Calcular días del periodo
   const diasPeriodo = useMemo(() => {
     if (!fechaInicio || !fechaFin) return 0;
@@ -135,8 +149,8 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
     }
     // Validar fechas dentro del plazo de la obra
     if (obraActual && fechaInicio && fechaFin) {
-      const obraInicio = new Date(obraActual.fecha_inicio);
-      const obraFin = new Date(obraActual.fecha_fin_prevista);
+      const obraInicio = new Date(obraActual.fecha_inicio || '2024-01-01');
+      const obraFin = new Date(obraActual.fecha_fin_prevista || '2024-12-31');
       const periodoInicio = new Date(fechaInicio);
       const periodoFin = new Date(fechaFin);
       if (periodoInicio < obraInicio) {
@@ -195,7 +209,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
       motivos_dias_no_trabajados: motivosDiasNoTrabajados
     };
     try {
-      await crearValorizacionSupervision(form, obraActual, valorizacionEjecucion.id);
+      await crearValorizacionSupervision(form);
       onSuccess();
     } catch (error) {
       console.error('Error al crear valorización de supervisión:', error);

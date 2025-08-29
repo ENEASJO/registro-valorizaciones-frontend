@@ -63,7 +63,21 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
   // Obras activas (en ejecución)
   const obrasActivas = obras.filter(o => o.estado === 'EN_EJECUCION' || o.estado === 'REGISTRADA');
   // Obra actual
-  const obraActual = obraSeleccionada ? obtenerObraPorId(obraSeleccionada) : null;
+  const [obraActual, setObraActual] = useState<any>(null);
+  
+  // Cargar obra seleccionada
+  useEffect(() => {
+    if (obraSeleccionada) {
+      obtenerObraPorId(obraSeleccionada).then(obra => {
+        setObraActual(obra);
+      }).catch(error => {
+        console.error('Error cargando obra:', error);
+        setObraActual(null);
+      });
+    } else {
+      setObraActual(null);
+    }
+  }, [obraSeleccionada, obtenerObraPorId]);
   // Cargar partidas cuando se selecciona una obra
   useEffect(() => {
     if (obraSeleccionada) {
@@ -74,20 +88,22 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
   // Recalcular montos cuando cambian las partidas o deducciones
   useEffect(() => {
     if (partidasSeleccionadas.length > 0 && obraActual) {
-      const nuevosCalculos = calcularMontos(
-        partidasSeleccionadas.map(p => ({
-          partida_id: p.partida_id,
-          metrado_actual: p.metrado_actual
-        })),
-        {
-          adelanto_directo_porcentaje: adelantoDirecto,
-          adelanto_materiales_porcentaje: adelantoMateriales,
-          penalidades_monto: penalidades,
-          otras_deducciones_monto: otrasDeduccciones
-        }
-      );
+      const formData = {
+        obra_id: obraActual.id || 0,
+        numero_valorizacion: 1,
+        periodo: '2024-01',
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        tipo_valorizacion: 'EJECUCION',
+        monto_ejecutado: partidasSeleccionadas.reduce((sum, p) => sum + (p.metrado_actual * 100), 0),
+        adelanto_directo_porcentaje: adelantoDirecto,
+        adelanto_materiales_porcentaje: adelantoMateriales,
+        penalidades_monto: penalidades,
+        otras_deducciones_monto: otrasDeduccciones
+      };
+      const nuevosCalculos = calcularMontos(formData);
       setCalculos(nuevosCalculos);
-      setErrores(nuevosCalculos.errores_calculo);
+      setErrores([]);
     } else {
       setCalculos(null);
       setErrores([]);
@@ -150,12 +166,12 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
       partidas: partidasSeleccionadas
     };
     try {
-      const validacion = validarValorizacion(form, obraActual);
-      if (!validacion.valida) {
-        setErrores(validacion.errores.filter(e => e.tipo === 'error').map(e => e.mensaje));
+      const validacion = validarValorizacion(form);
+      if (!validacion.valido) {
+        setErrores(validacion.errores);
         return;
       }
-      await crearValorizacionEjecucion(form, obraActual);
+      await crearValorizacionEjecucion(form);
       onSuccess();
     } catch (error) {
       console.error('Error al crear valorización:', error);

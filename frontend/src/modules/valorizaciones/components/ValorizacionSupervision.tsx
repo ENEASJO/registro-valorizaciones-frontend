@@ -461,7 +461,7 @@ const ValorizacionSupervision = () => {
                         {new Date(val.periodo_fin).toLocaleDateString('es-PE')}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {'dias_calendario_periodo' in val ? val.dias_calendario_periodo : 0} días calendario
+                        {String('dias_calendario_periodo' in val ? val.dias_calendario_periodo : 0)} días calendario
                       </div>
                     </td>
                     
@@ -476,10 +476,10 @@ const ValorizacionSupervision = () => {
                     
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">
-                        {'dias_efectivos_trabajados' in val ? val.dias_efectivos_trabajados : 0} días
+                        {String('dias_efectivos_trabajados' in val ? val.dias_efectivos_trabajados : 0)} días
                       </div>
                       <div className="text-xs text-gray-500">
-                        de {'dias_calendario_periodo' in val ? val.dias_calendario_periodo : 0} calendario
+                        de {String('dias_calendario_periodo' in val ? val.dias_calendario_periodo : 0)} calendario
                       </div>
                     </td>
                     
