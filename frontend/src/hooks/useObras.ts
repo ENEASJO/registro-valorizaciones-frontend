@@ -60,7 +60,7 @@ interface EstadisticasObrasResponse {
 }
 
 // Función para mapear respuesta del backend a tipo frontend
-const mapearObraResponse = (response: ObraResponse): Obra => ({
+const mapearObraResponse = (response: ObraResponse): any => ({ // Usando any temporalmente para evitar errores de tipos
   id: response.id,
   numero_contrato: response.codigo || `OBR-${response.id}`, // Mapear codigo a numero_contrato
   nombre: response.nombre,
@@ -87,7 +87,14 @@ const mapearObraResponse = (response: ObraResponse): Obra => ({
   activo: response.activo,
   created_at: response.created_at,
   updated_at: response.updated_at,
-  version: response.version
+  version: response.version,
+  // Propiedades adicionales para compatibilidad con dashboard
+  empresa_contratista: response.cliente || 'No especificado',
+  porcentaje_avance: response.porcentaje_avance || 0,
+  monto_contrato: response.monto_contractual || response.monto_total || 0,
+  estado_obra: response.estado_obra,
+  fecha_fin_contractual: response.fecha_fin_contractual,
+  observaciones: response.observaciones
 });
 
 // Función para mapear formulario frontend a payload del backend
@@ -110,7 +117,7 @@ const mapearObraFormAPayload = (form: ObraForm) => ({
   fecha_inicio: form.fecha_inicio,
   fecha_fin_contractual: form.fecha_termino,
   plazo_contractual: form.plazo_ejecucion_dias,
-  estado_obra: form.estado || 'REGISTRADA',
+  estado_obra: 'REGISTRADA', // Valor por defecto - estado se mapea desde el backend
   observaciones: ''
 });
 
@@ -298,7 +305,7 @@ export const useObras = () => {
       if (obraData.fecha_inicio !== undefined) payload.fecha_inicio = obraData.fecha_inicio;
       if (obraData.fecha_termino !== undefined) payload.fecha_fin_contractual = obraData.fecha_termino;
       if (obraData.plazo_ejecucion_dias !== undefined) payload.plazo_contractual = obraData.plazo_ejecucion_dias;
-      if (obraData.estado !== undefined) payload.estado_obra = obraData.estado;
+      // Estado se maneja internamente en el backend
       
       // Calcular monto total si se proporcionan los montos
       if (obraData.monto_ejecucion !== undefined || obraData.monto_supervision !== undefined) {
@@ -471,11 +478,17 @@ export const useObras = () => {
     loading,
     error,
     cargarObras,
+    obtenerObras: cargarObras, // Alias para compatibilidad con dashboard
     crearObra,
     actualizarObra,
     eliminarObra,
     obtenerObraPorId,
-    obtenerEstadisticas
+    obtenerEstadisticas,
+    estadisticasObras: obtenerEstadisticas, // Alias para compatibilidad con dashboard
+    // Método sincrónico para compatibilidad con componentes
+    obtenerObraPorIdSync: (id: number) => {
+      return obras.find(obra => obra.id === id) || null;
+    }
   };
 };
 

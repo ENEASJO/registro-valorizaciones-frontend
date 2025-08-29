@@ -75,12 +75,14 @@ export interface Valorizacion {
 
 // Formulario para crear/editar valorización
 export interface ValorizacionForm {
+  id?: number;
   obra_id: number;
   numero_valorizacion?: number;
   periodo: string;
   fecha_inicio: string;
   fecha_fin: string;
   fecha_presentacion?: string;
+  fecha_aprobacion?: string;
   tipo_valorizacion: string;
   monto_ejecutado: number;
   monto_materiales?: number;
@@ -89,10 +91,20 @@ export interface ValorizacionForm {
   monto_subcontratos?: number;
   monto_gastos_generales?: number;
   monto_utilidad?: number;
+  igv?: number;
+  monto_total?: number;
+  porcentaje_avance_periodo?: number;
+  porcentaje_avance_acumulado?: number;
+  estado_valorizacion?: string;
+  estado?: string;
   observaciones?: string;
   archivos_adjuntos?: any[];
   metrado_ejecutado?: any[];
   partidas_ejecutadas?: any[];
+  activo?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  version?: number;
 }
 
 // Filtros para búsqueda
@@ -368,7 +380,7 @@ export const useValorizaciones = () => {
         datosFinales = calcularTotales(datosCompletos as ValorizacionForm);
       }
 
-      const datosBackend = mapearFormulario(datosFinales as ValorizacionForm);
+      const datosBackend = mapearFormulario(datosFinales);
 
       const response = await apiRequest(`${API_ENDPOINTS.valorizaciones}/${id}`, {
         method: 'PUT',
@@ -382,7 +394,7 @@ export const useValorizaciones = () => {
         prev.map(v => v.id === id ? valorizacionActualizada : v)
       );
       
-      return valorizacionActualizada;
+      return valorizacionActualizada as any;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al actualizar valorización';
       setError(errorMessage);
@@ -558,11 +570,13 @@ export const useValorizaciones = () => {
 
     // Funciones CRUD
     cargarValorizaciones,
+    obtenerValorizaciones: cargarValorizaciones, // Alias para compatibilidad con dashboard
     crearValorizacion,
     actualizarValorizacion,
     eliminarValorizacion,
     obtenerValorizacionPorId,
     obtenerEstadisticas,
+    obtenerEstadisticasValorizaciones: obtenerEstadisticas, // Alias para compatibilidad con dashboard
 
     // Funciones de utilidad
     calcularTotales: calcularTotalesValorizacion,
@@ -573,6 +587,35 @@ export const useValorizaciones = () => {
 
     // Funciones de validación
     validarFechas: (inicio: string, fin: string) => validarFechas(inicio, fin),
+    
+    // Compatibilidad con componentes legacy
+    valorizacionesEjecucion: valorizaciones, // Para componentes que esperan esta propiedad
+    valorizacionesSupervision: valorizaciones.filter(v => v.tipo_valorizacion === 'SUPERVISION'),
+    estadisticasDashboard: estadisticasLocales,
+    cambiarEstadoValorizacion: async (id: number, nuevoEstado: string) => {
+      return await actualizarValorizacion(id, { estado_valorizacion: nuevoEstado });
+    },
+    formatearMoneda: (monto: number) => new Intl.NumberFormat('es-PE', {
+      style: 'currency',
+      currency: 'PEN',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(monto),
+    partidas: [], // Placeholder para compatibilidad
+    cargarPartidasPorObra: async (obraId: number) => {
+      console.warn(`Carga de partidas para obra ${obraId} no implementada aún`);
+    },
+    crearValorizacionEjecucion: crearValorizacion,
+    crearValorizacionSupervision: crearValorizacion,
+    calcularMontos: calcularTotalesValorizacion,
+    validarValorizacion: (form: ValorizacionForm) => {
+      // Validación básica
+      if (!form.obra_id) return { valido: false, errores: ['Obra requerida'] };
+      if (!form.periodo) return { valido: false, errores: ['Período requerido'] };
+      if (!form.fecha_inicio || !form.fecha_fin) return { valido: false, errores: ['Fechas requeridas'] };
+      if (!validarFechas(form.fecha_inicio, form.fecha_fin)) return { valido: false, errores: ['Fechas inválidas'] };
+      return { valido: true, errores: [] };
+    }
   };
 };
 

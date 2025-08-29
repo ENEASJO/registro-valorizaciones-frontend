@@ -7,7 +7,9 @@ import type {
   FiltrosEntidadContratista,
   ErrorValidacion,
   CrearConsorcioParams,
-  ConsorcioCompleto
+  ConsorcioCompleto,
+  EstadoGeneral,
+  EspecialidadEmpresa
 } from '../types/empresa.types';
 
 // Interfaces para respuestas de la API de Turso
@@ -56,10 +58,10 @@ const mapearEmpresaFromAPI = (apiEmpresa: EmpresaTursoResponse): Empresa => ({
   departamento: undefined,
   representante_legal: apiEmpresa.representante_legal,
   dni_representante: apiEmpresa.dni_representante,
-  estado: apiEmpresa.estado || 'ACTIVO',
+  estado: (apiEmpresa.estado as EstadoGeneral) || 'ACTIVO',
   tipo_empresa: 'SAC', // Valor por defecto, podría mejorarse
   categoria_contratista: undefined,
-  especialidades: apiEmpresa.especialidades || [],
+  especialidades: (apiEmpresa.especialidades as EspecialidadEmpresa[]) || [],
   activo: true,
   created_at: apiEmpresa.created_at,
   updated_at: apiEmpresa.updated_at

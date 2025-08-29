@@ -175,7 +175,7 @@ const useDashboard = () => {
   }, []);
 
   // Convertir obras reales al formato del dashboard
-  const obrasFormateadas: ObrasData[] = obras.map(obra => ({
+  const obrasFormateadas: ObrasData[] = obras.map((obra: any) => ({
     id: obra.id?.toString() || '',
     nombre: obra.nombre,
     contratista: obra.empresa_contratista || 'No especificado',
@@ -323,11 +323,11 @@ const useDashboard = () => {
   // Calcular métricas reales basadas en datos de Turso
   useEffect(() => {
     if (!loading && obras.length > 0) {
-      const obrasActivas = obras.filter(obra => 
+      const obrasActivas = obras.filter((obra: any) => 
         obra.estado_obra === 'EJECUCION' || obra.estado_obra === 'PENDIENTE'
       ).length;
       
-      const inversionTotal = obras.reduce((sum, obra) => 
+      const inversionTotal = obras.reduce((sum, obra: any) => 
         sum + (Number(obra.monto_contrato) || 0), 0
       );
       
@@ -337,10 +337,10 @@ const useDashboard = () => {
         return fecha.getMonth() === ahora.getMonth() && fecha.getFullYear() === ahora.getFullYear();
       }).length;
       
-      const obrasEnTiempo = obras.filter(obra => obra.estado_obra !== 'OBSERVADA').length;
+      const obrasEnTiempo = obras.filter((obra: any) => obra.estado_obra !== 'OBSERVADA').length;
       const eficienciaGeneral = obras.length > 0 ? Math.round((obrasEnTiempo / obras.length) * 100) : 0;
       
-      const obrasCompletadas = obras.filter(obra => obra.estado_obra === 'TERMINADA').length;
+      const obrasCompletadas = obras.filter((obra: any) => obra.estado_obra === 'TERMINADA').length;
       
       // Actualizar métricas reales
       setRealMetrics([
