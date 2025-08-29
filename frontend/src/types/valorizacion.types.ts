@@ -145,8 +145,8 @@ export interface ValorizacionEjecucion extends AuditoriaBase {
   normativa_id: number;
   
   // Identificación
-  numero_valorización: number;
-  codigo_valorización: string;
+  numero_valorizacion: number;
+  codigo_valorizacion: string;
   
   // Expediente
   numero_expediente?: string;
@@ -232,7 +232,7 @@ export interface ValorizacionSupervision extends AuditoriaBase {
   normativa_id: number;
   
   // Identificación
-  numero_valorización: number;
+  numero_valorizacion: number;
   
   // Expediente
   numero_expediente?: string;

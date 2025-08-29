@@ -72,6 +72,36 @@ export interface Valorizacion {
   created_at: string;
   updated_at: string;
   version: number;
+
+  // Propiedades adicionales para compatibilidad con componentes
+  periodo_inicio?: string;
+  periodo_fin?: string;
+  monto_bruto?: number;
+  monto_neto?: number;
+  dias_atraso?: number;
+  residente_obra?: string;
+  supervisor_obra?: string;
+  responsable_entidad?: string;
+  observaciones_residente?: string;
+  observaciones_supervisor?: string;
+  observaciones_entidad?: string;
+  motivo_rechazo?: string;
+  actividades_realizadas?: string;
+  motivos_dias_no_trabajados?: string;
+  total_deducciones?: number;
+  igv_monto?: number;
+  adelanto_directo_monto?: number;
+  adelanto_directo_porcentaje?: number;
+  adelanto_materiales_monto?: number;
+  adelanto_materiales_porcentaje?: number;
+  retencion_garantia_monto?: number;
+  retencion_garantia_porcentaje?: number;
+  penalidades_monto?: number;
+  otras_deducciones_monto?: number;
+  fecha_pago?: string;
+  fecha_limite_pago?: string;
+  monto_avance_economico_total?: number;
+  porcentaje_avance_fisico_total?: number;
 }
 
 // Formulario para crear/editar valorización
@@ -378,7 +408,7 @@ export const useValorizaciones = () => {
 
       let datosFinales = datosCompletos;
       if (recalcular) {
-        datosFinales = calcularTotales(datosCompletos as ValorizacionForm);
+        datosFinales = calcularTotales(datosCompletos as ValorizacionForm) as typeof datosCompletos;
       }
 
       const datosBackend = mapearFormulario(datosFinales);

@@ -434,10 +434,10 @@ const Valorizaciones = () => {
                         {getEstadoIcon(val.estado)}
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            N° {val.numero_valorización}
+                            N° {val.numero_valorizacion}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {'codigo_valorización' in val ? val.codigo_valorización : `SUP-${val.numero_valorización}`}
+                            {'codigo_valorización' in val ? String(val.codigo_valorización) : `SUP-${val.numero_valorizacion}`}
                           </div>
                         </div>
                       </div>
@@ -456,7 +456,7 @@ const Valorizaciones = () => {
                         {new Date(val.periodo_fin).toLocaleDateString('es-PE')}
                       </div>
                       <div className="text-xs text-gray-500">
-                        {('dias_periodo' in val ? val.dias_periodo : 'dias_calendario_periodo' in val ? val.dias_calendario_periodo : 0)} días
+                        {('dias_periodo' in val ? String(val.dias_periodo) : 'dias_calendario_periodo' in val ? String(val.dias_calendario_periodo) : '0')} días
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -474,17 +474,17 @@ const Valorizaciones = () => {
                             <div
                               className="bg-primary-500 h-2 rounded-full"
                               style={{ 
-                                width: `${Math.min('porcentaje_avance_fisico_total' in val ? val.porcentaje_avance_fisico_total : 0, 100)}%` 
+                                width: `${Math.min('porcentaje_avance_fisico_total' in val ? Number(val.porcentaje_avance_fisico_total) : 0, 100)}%` 
                               }}
                             />
                           </div>
                           <span className="text-sm font-medium text-gray-700">
-                            {'porcentaje_avance_fisico_total' in val ? val.porcentaje_avance_fisico_total.toFixed(1) : '0.0'}%
+                            {'porcentaje_avance_fisico_total' in val ? Number(val.porcentaje_avance_fisico_total).toFixed(1) : '0.0'}%
                           </span>
                         </div>
                       ) : (
                         <div className="text-sm text-gray-900">
-                          {'dias_efectivos_trabajados' in val ? val.dias_efectivos_trabajados : 0} días
+                          {'dias_efectivos_trabajados' in val ? String(val.dias_efectivos_trabajados) : '0'} días
                         </div>
                       )}
                     </td>

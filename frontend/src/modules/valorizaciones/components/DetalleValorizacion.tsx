@@ -49,11 +49,23 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
   } = useValorizaciones();
   const { obtenerObraPorId } = useObras();
   const { entidades } = useEntidadesContratistas();
+  const [obra, setObra] = useState<any>(null);
+  
   // Buscar la valorización
   const valorizacion = tipo === 'ejecucion' 
     ? valorizacionesEjecucion.find(v => v.id === valorizacionId)
     : valorizacionesSupervision.find(v => v.id === valorizacionId);
-  const obra = valorizacion ? obtenerObraPorId(valorizacion.obra_id) : null;
+
+  // Cargar obra
+  useEffect(() => {
+    if (valorizacion) {
+      obtenerObraPorId(valorizacion.obra_id).then(obraData => {
+        setObra(obraData);
+      }).catch(error => {
+        console.error('Error cargando obra:', error);
+      });
+    }
+  }, [valorizacion, obtenerObraPorId]);
   // Cargar partidas si es valorización de ejecución
   useEffect(() => {
     if (valorizacion && tipo === 'ejecucion') {
@@ -109,8 +121,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
     try {
       await cambiarEstadoValorizacion(
         valorizacion.id, 
-        nuevoEstado as EstadoValorizacionEjecucion, 
-        observaciones
+        nuevoEstado as EstadoValorizacionEjecucion
       );
       setShowCambioEstado(false);
       setNuevoEstado('');
@@ -178,7 +189,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              Valorización N° {valorizacion.numero_valorización}
+              Valorización N° {valorizacion.numero_valorizacion}
               <span className={`px-3 py-1 text-sm font-medium rounded-full border ${getEstadoColor(valorizacion.estado)}`}>
                 {getEstadoIcon(valorizacion.estado)}
                 <span className="ml-2">{valorizacion.estado.replace('_', ' ')}</span>
@@ -344,19 +355,19 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Días del Periodo</label>
                   <p className="mt-1 text-sm text-gray-900">
-                    {'dias_periodo' in valorizacion 
+                    {String('dias_periodo' in valorizacion 
                       ? valorizacion.dias_periodo 
                       : 'dias_calendario_periodo' in valorizacion
                       ? valorizacion.dias_calendario_periodo
                       : 0
-                    } días
+                    )} días
                   </p>
                 </div>
                 {tipo === 'supervision' && 'dias_efectivos_trabajados' in valorizacion && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Días Efectivos</label>
                     <p className="mt-1 text-sm text-gray-900 font-semibold">
-                      {valorizacion.dias_efectivos_trabajados} días
+                      {String(valorizacion.dias_efectivos_trabajados || 0)} días
                     </p>
                   </div>
                 )}
@@ -389,7 +400,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Supervisor Responsable</label>
                     <p className="mt-1 text-sm text-gray-900">
-                      {valorizacion.supervisor_responsable || 'No especificado'}
+                      {String(valorizacion.supervisor_responsable || 'No especificado')}
                     </p>
                   </div>
                 )}
@@ -450,7 +461,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                       <div>
                         <label className="block text-sm font-medium text-gray-700">Observaciones del Periodo</label>
                         <p className="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-lg">
-                          {valorizacion.observaciones_periodo}
+                          {String(valorizacion.observaciones_periodo)}
                         </p>
                       </div>
                     )}
@@ -595,7 +606,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-600">Revisión</span>
                     <span className="font-medium text-gray-900">
-                      {new Date(valorizacion.fecha_revision).toLocaleDateString('es-PE')}
+                      {new Date(String(valorizacion.fecha_revision)).toLocaleDateString('es-PE')}
                     </span>
                   </div>
                 )}
@@ -611,11 +622,11 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-600">Límite de Pago</span>
                     <span className={`font-medium ${
-                      new Date(valorizacion.fecha_limite_pago) < new Date() && !valorizacion.fecha_pago
+                      new Date(String(valorizacion.fecha_limite_pago)) < new Date() && !valorizacion.fecha_pago
                         ? 'text-red-600'
                         : 'text-gray-900'
                     }`}>
-                      {new Date(valorizacion.fecha_limite_pago).toLocaleDateString('es-PE')}
+                      {new Date(String(valorizacion.fecha_limite_pago)).toLocaleDateString('es-PE')}
                     </span>
                   </div>
                 )}
@@ -641,13 +652,13 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-sm text-gray-600">Avance Físico Total</span>
                       <span className="font-semibold text-gray-900">
-                        {valorizacion.porcentaje_avance_fisico_total.toFixed(2)}%
+                        {Number(valorizacion.porcentaje_avance_fisico_total || 0).toFixed(2)}%
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
                       <div
                         className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full"
-                        style={{ width: `${Math.min(valorizacion.porcentaje_avance_fisico_total, 100)}%` }}
+                        style={{ width: `${Math.min(Number(valorizacion.porcentaje_avance_fisico_total || 0), 100)}%` }}
                       />
                     </div>
                   </div>
@@ -655,7 +666,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-sm text-gray-600">Avance Económico</span>
                       <span className="font-semibold text-gray-900">
-                        {formatearMoneda(valorizacion.monto_avance_economico_total)}
+                        {formatearMoneda(Number(valorizacion.monto_avance_economico_total || 0))}
                       </span>
                     </div>
                     <div className="text-xs text-gray-500">

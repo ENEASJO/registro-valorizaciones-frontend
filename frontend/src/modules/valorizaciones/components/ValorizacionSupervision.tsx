@@ -437,10 +437,10 @@ const ValorizacionSupervision = () => {
                         {getEstadoIcon(val.estado)}
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            N° {val.numero_valorización}
+                            N° {val.numero_valorizacion}
                           </div>
                           <div className="text-xs text-gray-500">
-                            SUP-{val.numero_valorización}
+                            SUP-{val.numero_valorizacion}
                           </div>
                         </div>
                       </div>

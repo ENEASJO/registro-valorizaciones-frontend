@@ -61,8 +61,11 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
     if (obraId && isOpen) {
       setLoading(true);
       
-      const obraData = obtenerObraPorId(obraId);
-      setObra(obraData);
+      obtenerObraPorId(obraId).then(obraData => {
+        setObra(obraData);
+      }).catch(error => {
+        console.error('Error cargando obra:', error);
+      });
       
       // Cargar datos relacionados
       cargarProfesionalesPorObra(obraId);

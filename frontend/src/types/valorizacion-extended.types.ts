@@ -3,7 +3,7 @@
 // Sistema de Valorizaciones - Frontend
 // =================================================================
 
-import { Valorizacion } from '../hooks/useValorizaciones';
+import type { Valorizacion } from '../hooks/useValorizaciones';
 
 // Extensión de Valorizacion con todas las propiedades que necesitan los componentes
 export interface ValorizacionExtended extends Valorizacion {

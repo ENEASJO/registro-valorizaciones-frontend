@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.app.json",
   "compilerOptions": {
     "noImplicitAny": false,
     "strictNullChecks": false,
@@ -8,7 +8,13 @@
     "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": false,
     "noImplicitThis": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "target": "ES2022",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "noEmit": true
   },
   "include": [
     "src/**/*"
