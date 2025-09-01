@@ -253,15 +253,16 @@ const FormularioEmpresa = ({
           body: JSON.stringify({ ruc: formData.ruc })
         };
       } else {
-        // Para personas jurídicas, usar GET /consulta-ruc-consolidada/{ruc}
-        endpoint = `${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`;
-        tipoConsulta = 'CONSOLIDADO';
+        // Para personas jurídicas, usar POST /consultar-ruc (más confiable) 
+        endpoint = API_ENDPOINTS.consultaRuc;
+        tipoConsulta = 'SUNAT';
         fetchOptions = {
-          method: 'GET',
+          method: 'POST',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-          }
+          },
+          body: JSON.stringify({ ruc: formData.ruc })
         };
       }
       
@@ -303,46 +304,77 @@ const FormularioEmpresa = ({
           setError(result.message || 'No se pudo obtener información de SUNAT para este RUC');
         }
       } else {
-        // Procesar respuesta consolidada para persona jurídica
-        console.log('🔍 Procesando datos consolidados:', data);
+        // Procesar respuesta SUNAT para persona jurídica
+        console.log('🔍 Procesando datos SUNAT para persona jurídica:', data);
         
-        if (data.ruc) {
-          // Extraer información de contacto del array de contactos
-          const contacto = data.contactos ? data.contactos[0] : {};
-          const telefono = contacto.telefono ? contacto.telefono.replace(/Teléfono\(\*\)\s*:\s*/, '').trim() : '';
-          
-          // Procesar representantes
-          const representantesProcesados = (data.representantes || []).map(rep => ({
-            nombre: rep.nombre || '',
-            cargo: rep.cargo || 'SOCIO',
-            numero_documento: rep.documento || rep.numero_documento || '',
-            tipo_documento: 'DNI' as 'DNI' | 'CE' | 'PASSPORT',
-            fuente: (rep.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'OECE',
-            es_principal: false,
-            activo: true
-          }));
+        if (data.ruc && data.razon_social) {
+          // Para personas jurídicas usando SUNAT, no tenemos representantes aún
+          // Podríamos llamar a la API consolidada posteriormente para obtener representantes
           
           setFormData(prev => ({
             ...prev,
             ruc: data.ruc,
-            razon_social: data.razon_social || 'EMPRESA CONSULTADA',
-            email: contacto.email || '',
-            celular: telefono,
-            direccion: data.direccion || '',
-            representantes: representantesProcesados,
+            razon_social: data.razon_social,
+            email: '',
+            celular: '',
+            direccion: data.direccion || data.domicilio_fiscal || '',
+            representantes: [], // Sin representantes por ahora
             representante_principal_id: 0,
-            especialidades_oece: data.especialidades || [],
+            especialidades_oece: [],
             estado_sunat: 'ACTIVO' as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
-            estado_osce: data.estado || '',
-            fuentes_consultadas: data.fuentes || ['CONSOLIDADO'],
-            capacidad_contratacion: data.capacidad_contratacion || ''
+            estado_osce: '',
+            fuentes_consultadas: ['SUNAT'],
+            capacidad_contratacion: ''
           }));
           setDatosObtenidos(true);
           setCurrentStep(2);
-          setTipoConsultaRealizada('CONSOLIDADO');
+          setTipoConsultaRealizada('SUNAT');
           setError('');
+          
+          // Llamar consolidada en segundo plano para obtener representantes y contactos adicionales
+          try {
+            console.log('🔍 Obteniendo datos adicionales de OSCE...');
+            const consolidadaResponse = await fetch(`${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`);
+            if (consolidadaResponse.ok) {
+              const consolidadaResult = await consolidadaResponse.json();
+              const consolidadaData = consolidadaResult.success ? consolidadaResult.data : consolidadaResult;
+              
+              if (consolidadaData.representantes && consolidadaData.representantes.length > 0) {
+                // Agregar representantes de OSCE
+                const representantesProcesados = consolidadaData.representantes.map(rep => ({
+                  nombre: rep.nombre || '',
+                  cargo: rep.cargo || 'SOCIO',
+                  numero_documento: rep.documento || rep.numero_documento || '',
+                  tipo_documento: 'DNI' as 'DNI' | 'CE' | 'PASSPORT',
+                  fuente: (rep.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'OECE',
+                  es_principal: false,
+                  activo: true
+                }));
+                
+                // Información de contacto adicional
+                const contacto = consolidadaData.contactos ? consolidadaData.contactos[0] : {};
+                const telefono = contacto.telefono ? contacto.telefono.replace(/Teléfono\(\*\)\s*:\s*/, '').trim() : '';
+                
+                setFormData(prev => ({
+                  ...prev,
+                  email: contacto.email || prev.email,
+                  celular: telefono || prev.celular,
+                  representantes: representantesProcesados,
+                  especialidades_oece: consolidadaData.especialidades || [],
+                  fuentes_consultadas: ['SUNAT', 'OSCE'],
+                  capacidad_contratacion: consolidadaData.capacidad_contratacion || ''
+                }));
+                
+                console.log('✅ Datos adicionales de OSCE agregados exitosamente');
+              }
+            }
+          } catch (osceError) {
+            console.warn('⚠️ No se pudieron obtener datos adicionales de OSCE:', osceError);
+            // No es crítico, continuar con los datos de SUNAT
+          }
+          
         } else {
-          setError(result.message || 'No se pudieron obtener datos consolidados para este RUC');
+          setError(result.message || 'No se pudo obtener información de SUNAT para este RUC');
         }
       }
     } catch (err) {
