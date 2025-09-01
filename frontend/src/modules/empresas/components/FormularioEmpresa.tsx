@@ -816,6 +816,10 @@ const FormularioEmpresa = ({
                 <div className="text-xs text-green-500 mt-1">
                   DEBUG: razon_social = {JSON.stringify(formData.razon_social || 'VACÍO')}
                 </div>
+                {/* Debug adicional: estado del formulario */}
+                <div className="text-xs text-purple-500 mt-1">
+                  DEBUG: datosObtenidos = {JSON.stringify(datosObtenidos)}, currentStep = {currentStep}
+                </div>
               </div>
               {/* DNI field for natural persons */}
               {isPersonaNatural(formData.ruc) && datosObtenidos && (
