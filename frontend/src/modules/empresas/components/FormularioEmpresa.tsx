@@ -221,6 +221,8 @@ const FormularioEmpresa = ({
   // FUNCIONES DE NEGOCIO
   // =================================================================
   const handleObtenerDatosV2V2 = async () => {
+    console.log('🚀 INICIANDO CONSULTA RUC:', formData.ruc);
+    
     if (!formData.ruc || formData.ruc.length !== 11) {
       setError('Ingrese un RUC válido de 11 dígitos');
       return;
