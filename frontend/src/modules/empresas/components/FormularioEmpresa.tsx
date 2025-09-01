@@ -215,7 +215,6 @@ const FormularioEmpresa = ({
       setCurrentStep(2);
       setTipoConsultaRealizada('CONSOLIDADO');
       setError('');
-      setRenderKey(Date.now() + Math.random());
     });
   }, []);
   // =================================================================
@@ -799,7 +798,6 @@ const FormularioEmpresa = ({
                   {isPersonaNatural(formData.ruc) ? 'NOMBRE:' : 'Razón Social'} *
                 </label>
                 <input
-                  key={`razon-social-${renderKey}`}
                   type="text"
                   value={formData.razon_social}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -911,7 +909,6 @@ const FormularioEmpresa = ({
                 <div className="relative">
                   <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
                   <textarea
-                    key={`direccion-${renderKey}`}
                     value={formData.direccion}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                       console.log('🔧 Usuario modificó direccion:', e.target.value);
