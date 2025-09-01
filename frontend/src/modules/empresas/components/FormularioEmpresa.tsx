@@ -814,7 +814,7 @@ const FormularioEmpresa = ({
                 />
                 {/* Debug: mostrar valor actual */}
                 <div className="text-xs text-green-500 mt-1">
-                  DEBUG: razon_social = "{formData.razon_social || 'VACÍO'}"
+                  DEBUG: razon_social = {JSON.stringify(formData.razon_social || 'VACÍO')}
                 </div>
               </div>
               {/* DNI field for natural persons */}
@@ -925,7 +925,7 @@ const FormularioEmpresa = ({
                   />
                   {/* Debug: mostrar valor actual */}
                   <div className="text-xs text-red-500 mt-1">
-                    DEBUG: direccion = "{formData.direccion || 'VACÍO'}"
+                    DEBUG: direccion = {JSON.stringify(formData.direccion || 'VACÍO')}
                   </div>
                 </div>
               </div>
@@ -1002,7 +1002,7 @@ const FormularioEmpresa = ({
                   </select>
                   {/* Debug: mostrar valor actual */}
                   <div className="text-xs text-blue-500 mt-1">
-                    DEBUG: estado = "{formData.estado || 'VACÍO'}"
+                    DEBUG: estado = {JSON.stringify(formData.estado || 'VACÍO')}
                   </div>
                 </div>
               </div>
