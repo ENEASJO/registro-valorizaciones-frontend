@@ -355,12 +355,17 @@ const FormularioEmpresa = ({
                 
                 // Información de contacto adicional
                 const contacto = consolidadaData.contactos ? consolidadaData.contactos[0] : {};
-                const telefono = contacto.telefono ? contacto.telefono.replace(/Teléfono\(\*\)\s*:\s*/, '').trim() : '';
+                const telefono = contacto.telefono 
+                  ? contacto.telefono.replace(/Teléfono\(\*\)\s*:\s*/g, '').replace(/\n/g, '').trim() 
+                  : '';
                 
                 setFormData(prev => ({
                   ...prev,
                   email: contacto.email || prev.email,
                   celular: telefono || prev.celular,
+                  direccion: consolidadaData.direccion && consolidadaData.direccion !== "y/o conformación jurídica" 
+                    ? consolidadaData.direccion 
+                    : prev.direccion, // Solo usar si la dirección es válida
                   representantes: representantesProcesados,
                   especialidades_oece: consolidadaData.especialidades || [],
                   fuentes_consultadas: ['SUNAT', 'OSCE'],
