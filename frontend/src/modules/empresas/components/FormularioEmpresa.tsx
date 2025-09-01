@@ -803,11 +803,16 @@ const FormularioEmpresa = ({
                   type="text"
                   value={formData.razon_social}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    console.log('🔧 Usuario modificó razon_social:', e.target.value);
                     setFormData(prev => ({ ...prev, razon_social: e.target.value }));
                   }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
                   placeholder="Se completará automáticamente..."
                 />
+                {/* Debug: mostrar valor actual */}
+                <div className="text-xs text-green-500 mt-1">
+                  DEBUG: razon_social = "{formData.razon_social || 'VACÍO'}"
+                </div>
               </div>
               {/* DNI field for natural persons */}
               {isPersonaNatural(formData.ruc) && datosObtenidos && (
@@ -909,12 +914,17 @@ const FormularioEmpresa = ({
                     key={`direccion-${renderKey}`}
                     value={formData.direccion}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                      console.log('🔧 Usuario modificó direccion:', e.target.value);
                       setFormData(prev => ({ ...prev, direccion: e.target.value }));
                     }}
                     rows={3}
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 resize-none"
                     placeholder="Dirección completa obtenida automáticamente..."
                   />
+                  {/* Debug: mostrar valor actual */}
+                  <div className="text-xs text-red-500 mt-1">
+                    DEBUG: direccion = "{formData.direccion || 'VACÍO'}"
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -988,6 +998,10 @@ const FormularioEmpresa = ({
                     <option value="INACTIVO">⏸️ Inactivo</option>
                     <option value="SUSPENDIDO">⚠️ Suspendido</option>
                   </select>
+                  {/* Debug: mostrar valor actual */}
+                  <div className="text-xs text-blue-500 mt-1">
+                    DEBUG: estado = "{formData.estado || 'VACÍO'}"
+                  </div>
                 </div>
               </div>
             </motion.div>
