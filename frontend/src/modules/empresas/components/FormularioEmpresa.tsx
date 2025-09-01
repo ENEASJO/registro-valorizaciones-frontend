@@ -272,6 +272,7 @@ const FormularioEmpresa = ({
       }
       const result = await response.json();
       console.log('🔍 Respuesta del servidor:', result);
+      console.log('🏠 Direccion desde SUNAT:', result.success ? result.data?.direccion : result?.direccion);
       
       // Extraer los datos de la respuesta (nuevo formato: {success, data})
       const data = result.success ? result.data : result;
