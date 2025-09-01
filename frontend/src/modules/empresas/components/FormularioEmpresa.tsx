@@ -287,10 +287,11 @@ const FormularioEmpresa = ({
             dni: dniExtracted,
             email: '',
             celular: '',
-            direccion: data.direccion || data.domicilio_fiscal || '',
+            direccion: data.direccion || '',
             representantes: [], // Natural persons don't have separate representatives
             representante_principal_id: 0,
             especialidades_oece: [],
+            estado: (data.estado === 'ACTIVO' ? 'ACTIVO' : data.estado === 'INACTIVO' ? 'INACTIVO' : 'SUSPENDIDO') as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_sunat: 'ACTIVO',
             fuentes_consultadas: ['SUNAT'],
             capacidad_contratacion: undefined
@@ -317,10 +318,11 @@ const FormularioEmpresa = ({
             razon_social: data.razon_social,
             email: '',
             celular: '',
-            direccion: data.direccion || data.domicilio_fiscal || '',
+            direccion: data.direccion || '',
             representantes: [], // Sin representantes por ahora
             representante_principal_id: 0,
             especialidades_oece: [],
+            estado: (data.estado === 'ACTIVO' ? 'ACTIVO' : data.estado === 'INACTIVO' ? 'INACTIVO' : 'SUSPENDIDO') as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_sunat: 'ACTIVO' as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_osce: '',
             fuentes_consultadas: ['SUNAT'],
