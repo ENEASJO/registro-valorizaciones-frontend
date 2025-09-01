@@ -276,6 +276,8 @@ const FormularioEmpresa = ({
       
       // Extraer los datos de la respuesta (nuevo formato: {success, data})
       const data = result.success ? result.data : result;
+      console.log('📦 Datos extraídos para procesar:', data);
+      console.log('🏠 Direccion final a mapear:', data.direccion);
       
       if (esPersonaNatural) {
         // Procesar respuesta SUNAT-only para persona natural
@@ -312,6 +314,12 @@ const FormularioEmpresa = ({
         if (data.ruc && data.razon_social) {
           // Para personas jurídicas usando SUNAT, no tenemos representantes aún
           // Podríamos llamar a la API consolidada posteriormente para obtener representantes
+          
+          console.log('🔧 Estableciendo datos en formulario:', {
+            direccion: data.direccion || '',
+            razon_social: data.razon_social,
+            estado: data.estado
+          });
           
           setFormData(prev => ({
             ...prev,
