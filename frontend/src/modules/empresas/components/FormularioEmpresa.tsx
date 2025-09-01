@@ -395,8 +395,11 @@ const FormularioEmpresa = ({
         }
       }
     } catch (err) {
+      console.error('❌ ERROR EN CONSULTA:', err);
+      console.error('❌ ERROR COMPLETO:', JSON.stringify(err, null, 2));
       setError('Error de conexión. Verifique que la API esté ejecutándose.');
     } finally {
+      console.log('🏁 CONSULTA TERMINADA, consultando =', false);
       setConsultando(false);
     }
   };
