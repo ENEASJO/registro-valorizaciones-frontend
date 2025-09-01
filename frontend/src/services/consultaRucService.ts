@@ -257,27 +257,16 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, TIMEOUT_MS);
-    // Intentar primero con el endpoint GET más moderno
-    let response = await fetch(`${API_BASE_URL}/consulta-ruc/${rucLimpio}`, {
-      method: 'GET',
+    // Usar el endpoint POST correcto del backend working
+    const response = await fetch(`${API_BASE_URL}/consultar-ruc`, {
+      method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ ruc: rucLimpio }),
       signal: controller.signal,
     });
-    // Si falla, intentar con el endpoint POST original como fallback
-    if (!response.ok && response.status === 404) {
-      response = await fetch(`${API_BASE_URL}/buscar`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ruc: rucLimpio }),
-        signal: controller.signal,
-      });
-    }
     clearTimeout(timeoutId);
     // Verificar si la respuesta es exitosa
     if (!response.ok) {
@@ -298,9 +287,11 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
         timestamp: new Date().toISOString(),
       };
     }
-    const data = await response.json();
+    const response_data = await response.json();
+    console.log('🔍 Respuesta del backend:', response_data);
+    
     // Verificar estructura de respuesta
-    if (!data || typeof data !== 'object') {
+    if (!response_data || typeof response_data !== 'object') {
       return {
         success: false,
         error: 'INVALID_RESPONSE',
@@ -308,7 +299,28 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
         timestamp: new Date().toISOString(),
       };
     }
-    // La API de SUNAT devuelve datos directamente, no en un objeto wrapper
+    
+    // Verificar respuesta exitosa del backend
+    if (!response_data.success) {
+      return {
+        success: false,
+        error: 'API_ERROR',
+        message: response_data.message || 'Error en la consulta del backend',
+        timestamp: new Date().toISOString(),
+      };
+    }
+    
+    // Extraer los datos del wrapper
+    const data = response_data.data;
+    if (!data) {
+      return {
+        success: false,
+        error: 'NO_DATA',
+        message: 'El backend no devolvió datos',
+        timestamp: new Date().toISOString(),
+      };
+    }
+    
     // Transformar la respuesta de la API al formato esperado por la aplicación
     const transformedData = transformarRespuestaAPI(data);
     // Validar datos mínimos requeridos

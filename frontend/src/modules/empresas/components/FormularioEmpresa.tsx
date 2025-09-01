@@ -238,32 +238,55 @@ const FormularioEmpresa = ({
       }
       let endpoint = '';
       let tipoConsulta = '';
+      let fetchOptions: RequestInit = {};
+      
       if (esPersonaNatural) {
-        // Para personas naturales, usar SOLO SUNAT
-        endpoint = `${API_ENDPOINTS.consultaRuc}/${formData.ruc}`;
+        // Para personas naturales, usar POST /consultar-ruc
+        endpoint = API_ENDPOINTS.consultaRuc;
         tipoConsulta = 'SUNAT-ONLY';
+        fetchOptions = {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ruc: formData.ruc })
+        };
       } else {
-        // Para personas jurídicas, usar endpoint consolidado (SUNAT + OSCE)
+        // Para personas jurídicas, usar GET /consulta-ruc-consolidada/{ruc}
         endpoint = `${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`;
         tipoConsulta = 'CONSOLIDADO';
+        fetchOptions = {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          }
+        };
       }
-      const response = await fetch(endpoint);
+      
+      const response = await fetch(endpoint, fetchOptions);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const result = await response.json();
+      console.log('🔍 Respuesta del servidor:', result);
+      
+      // Extraer los datos de la respuesta (nuevo formato: {success, data})
+      const data = result.success ? result.data : result;
+      
       if (esPersonaNatural) {
         // Procesar respuesta SUNAT-only para persona natural
-        if (result.ruc && result.razon_social) {
-          const dniExtracted = extractDniFromRuc(result.ruc);
+        if (data.ruc && data.razon_social) {
+          const dniExtracted = extractDniFromRuc(data.ruc);
           setFormData(prev => ({
             ...prev,
-            ruc: result.ruc,
-            razon_social: result.razon_social,
+            ruc: data.ruc,
+            razon_social: data.razon_social,
             dni: dniExtracted,
             email: '',
             celular: '',
-            direccion: result.domicilio_fiscal || '',
+            direccion: data.direccion || data.domicilio_fiscal || '',
             representantes: [], // Natural persons don't have separate representatives
             representante_principal_id: 0,
             especialidades_oece: [],
@@ -281,59 +304,45 @@ const FormularioEmpresa = ({
         }
       } else {
         // Procesar respuesta consolidada para persona jurídica
+        console.log('🔍 Procesando datos consolidados:', data);
         
-        // Verificar si la respuesta tiene la estructura anidada (sunat/osce)
-        if (result.sunat || result.osce) {
+        if (data.ruc) {
+          // Extraer información de contacto del array de contactos
+          const contacto = data.contactos ? data.contactos[0] : {};
+          const telefono = contacto.telefono ? contacto.telefono.replace(/Teléfono\(\*\)\s*:\s*/, '').trim() : '';
           
-          // Extraer datos de las fuentes anidadas
-          const sunatData = result.sunat || {};
-          const osceData = result.osce || {};
-          
-          // Combinar representantes de ambas fuentes
-          const representantesCombinados = [
-            ...(sunatData.representantes || []),
-            ...(osceData.representantes || [])
-          ];
+          // Procesar representantes
+          const representantesProcesados = (data.representantes || []).map(rep => ({
+            nombre: rep.nombre || '',
+            cargo: rep.cargo || 'SOCIO',
+            numero_documento: rep.documento || rep.numero_documento || '',
+            tipo_documento: 'DNI' as 'DNI' | 'CE' | 'PASSPORT',
+            fuente: (rep.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'OECE',
+            es_principal: false,
+            activo: true
+          }));
           
           setFormData(prev => ({
             ...prev,
-            ruc: result.ruc || sunatData.ruc || osceData.ruc || '',
-            razon_social: sunatData.razon_social || osceData.razon_social || '',
-            email: osceData.datos_contacto?.email || sunatData.email || osceData.email || '',
-            celular: osceData.datos_contacto?.telefono || sunatData.telefono || osceData.telefono || '',
-            direccion: sunatData.domicilio_fiscal || osceData.domicilio_fiscal || '',
-            representantes: representantesCombinados.map(rep => ({
-              nombre: rep.nombre || '',
-              cargo: rep.cargo || 'REPRESENTANTE',
-              numero_documento: rep.numero_doc || rep.numero_documento || '',
-              tipo_documento: 'DNI' as 'DNI' | 'CE' | 'PASSPORT',
-              fuente: (rep.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'SUNAT',
-              es_principal: false,
-              activo: true
-            })),
+            ruc: data.ruc,
+            razon_social: data.razon_social || 'EMPRESA CONSULTADA',
+            email: contacto.email || '',
+            celular: telefono,
+            direccion: data.direccion || '',
+            representantes: representantesProcesados,
             representante_principal_id: 0,
-            especialidades_oece: osceData.especialidades || [],
+            especialidades_oece: data.especialidades || [],
             estado_sunat: 'ACTIVO' as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
-            estado_osce: osceData.estado_registro || '',
-            fuentes_consultadas: ['SUNAT', 'OSCE'].filter(fuente => 
-              (fuente === 'SUNAT' && result.sunat) || (fuente === 'OSCE' && result.osce)
-            ),
-            capacidad_contratacion: osceData.capacidad_contratacion || ''
+            estado_osce: data.estado || '',
+            fuentes_consultadas: data.fuentes || ['CONSOLIDADO'],
+            capacidad_contratacion: data.capacidad_contratacion || ''
           }));
           setDatosObtenidos(true);
           setCurrentStep(2);
           setTipoConsultaRealizada('CONSOLIDADO');
           setError('');
-          
-          
-        } else if (result.data) {
-          // Estructura consolidada original
-          const data: DatosConsolidados = result.data;
-          
-          // Use the enhanced form update function
-          updateFormDataWithApiResponse(data, 'CONSOLIDADO_ESTRUCTURA_ORIGINAL');
         } else {
-          setError(result.message || 'Error en la respuesta del servidor');
+          setError(result.message || 'No se pudieron obtener datos consolidados para este RUC');
         }
       }
     } catch (err) {
