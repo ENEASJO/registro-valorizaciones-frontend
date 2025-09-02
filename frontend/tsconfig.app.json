@@ -16,13 +16,18 @@
     "jsx": "react-jsx",
 
     /* Linting */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": false,
-    "noImplicitAny": false
+    "noUncheckedSideEffectImports": true,
+    "noImplicitAny": true,
+    
+    /* Module Resolution - Prevenir problemas de archivos duplicados */
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
   "include": ["src"]
 }
