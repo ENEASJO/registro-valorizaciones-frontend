@@ -35,7 +35,7 @@ if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
 // Configuración de endpoints
 export const API_ENDPOINTS = {
     // Consultas RUC
-    consultaRuc: `${API_BASE_URL}/consulta-ruc`,
+    consultaRuc: `${API_BASE_URL}/consultar-ruc`,
     consultaRucConsolidada: `${API_BASE_URL}/consulta-ruc-consolidada`,
     // Empresas - Endpoints Turso integrados
     empresas: `${API_BASE_URL}/api/v1/empresas`, // CRUD completo
