@@ -47,7 +47,7 @@ export const API_ENDPOINTS = {
   
   // Empresas - Endpoints Turso integrados
   empresas: `${API_BASE_URL}/api/empresas`,              // CRUD completo
-  empresasGuardadas: `${API_BASE_URL}/api/empresas-guardadas`, // Listar guardadas
+  empresasGuardadas: `${API_BASE_URL}/api/empresas`, // Listar guardadas (mismo endpoint)
   empresasSearch: `${API_BASE_URL}/api/empresas-guardadas/search`, // Buscar
   empresasStats: `${API_BASE_URL}/api/empresas-guardadas/stats`,   // Estadísticas
   
