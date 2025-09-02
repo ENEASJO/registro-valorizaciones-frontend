@@ -46,7 +46,7 @@ export const API_ENDPOINTS = {
   consultaRucConsolidada: `${API_BASE_URL}/consulta-ruc-consolidada`,  // GET endpoint
   
   // Empresas - Endpoints Turso integrados
-  empresas: `${API_BASE_URL}/api/v1/empresas`,              // CRUD completo
+  empresas: `${API_BASE_URL}/api/empresas`,              // CRUD completo
   empresasGuardadas: `${API_BASE_URL}/api/empresas-guardadas`, // Listar guardadas
   empresasSearch: `${API_BASE_URL}/api/empresas-guardadas/search`, // Buscar
   empresasStats: `${API_BASE_URL}/api/empresas-guardadas/stats`,   // Estadísticas
