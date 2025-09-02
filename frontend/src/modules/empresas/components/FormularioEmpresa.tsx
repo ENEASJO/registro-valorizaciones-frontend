@@ -221,8 +221,6 @@ const FormularioEmpresa = ({
   // FUNCIONES DE NEGOCIO
   // =================================================================
   const handleObtenerDatosV2V2 = async () => {
-    console.log('🚀 INICIANDO CONSULTA RUC:', formData.ruc);
-    
     if (!formData.ruc || formData.ruc.length !== 11) {
       setError('Ingrese un RUC válido de 11 dígitos');
       return;
@@ -272,13 +270,9 @@ const FormularioEmpresa = ({
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const result = await response.json();
-      console.log('🔍 Respuesta del servidor:', result);
-      console.log('🏠 Direccion desde SUNAT:', result.success ? result.data?.direccion : result?.direccion);
       
       // Extraer los datos de la respuesta (nuevo formato: {success, data})
       const data = result.success ? result.data : result;
-      console.log('📦 Datos extraídos para procesar:', data);
-      console.log('🏠 Direccion final a mapear:', data.direccion);
       
       if (esPersonaNatural) {
         // Procesar respuesta SUNAT-only para persona natural
@@ -310,17 +304,9 @@ const FormularioEmpresa = ({
         }
       } else {
         // Procesar respuesta SUNAT para persona jurídica
-        console.log('🔍 Procesando datos SUNAT para persona jurídica:', data);
-        
         if (data.ruc && data.razon_social) {
           // Para personas jurídicas usando SUNAT, no tenemos representantes aún
           // Podríamos llamar a la API consolidada posteriormente para obtener representantes
-          
-          console.log('🔧 Estableciendo datos en formulario:', {
-            direccion: data.direccion || '',
-            razon_social: data.razon_social,
-            estado: data.estado
-          });
           
           setFormData(prev => ({
             ...prev,
@@ -345,7 +331,6 @@ const FormularioEmpresa = ({
           
           // Llamar consolidada en segundo plano para obtener representantes y contactos adicionales
           try {
-            console.log('🔍 Obteniendo datos adicionales de OSCE...');
             const consolidadaResponse = await fetch(`${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`);
             if (consolidadaResponse.ok) {
               const consolidadaResult = await consolidadaResponse.json();
@@ -381,12 +366,9 @@ const FormularioEmpresa = ({
                   fuentes_consultadas: ['SUNAT', 'OSCE'],
                   capacidad_contratacion: consolidadaData.capacidad_contratacion || ''
                 }));
-                
-                console.log('✅ Datos adicionales de OSCE agregados exitosamente');
               }
             }
           } catch (osceError) {
-            console.warn('⚠️ No se pudieron obtener datos adicionales de OSCE:', osceError);
             // No es crítico, continuar con los datos de SUNAT
           }
           
@@ -395,11 +377,8 @@ const FormularioEmpresa = ({
         }
       }
     } catch (err) {
-      console.error('❌ ERROR EN CONSULTA:', err);
-      console.error('❌ ERROR COMPLETO:', JSON.stringify(err, null, 2));
       setError('Error de conexión. Verifique que la API esté ejecutándose.');
     } finally {
-      console.log('🏁 CONSULTA TERMINADA, consultando =', false);
       setConsultando(false);
     }
   };
@@ -806,20 +785,11 @@ const FormularioEmpresa = ({
                   type="text"
                   value={formData.razon_social}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    console.log('🔧 Usuario modificó razon_social:', e.target.value);
                     setFormData(prev => ({ ...prev, razon_social: e.target.value }));
                   }}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500"
                   placeholder="Se completará automáticamente..."
                 />
-                {/* Debug: mostrar valor actual */}
-                <div className="text-xs text-green-500 mt-1">
-                  DEBUG: razon_social = {JSON.stringify(formData.razon_social || 'VACÍO')}
-                </div>
-                {/* Debug adicional: estado del formulario */}
-                <div className="text-xs text-purple-500 mt-1">
-                  DEBUG: datosObtenidos = {JSON.stringify(datosObtenidos)}, currentStep = {currentStep}
-                </div>
               </div>
               {/* DNI field for natural persons */}
               {isPersonaNatural(formData.ruc) && datosObtenidos && (
@@ -920,17 +890,12 @@ const FormularioEmpresa = ({
                   <textarea
                     value={formData.direccion}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      console.log('🔧 Usuario modificó direccion:', e.target.value);
                       setFormData(prev => ({ ...prev, direccion: e.target.value }));
                     }}
                     rows={3}
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-green-100 focus:border-green-500 resize-none"
                     placeholder="Dirección completa obtenida automáticamente..."
                   />
-                  {/* Debug: mostrar valor actual */}
-                  <div className="text-xs text-red-500 mt-1">
-                    DEBUG: direccion = {JSON.stringify(formData.direccion || 'VACÍO')}
-                  </div>
                 </div>
               </div>
             </motion.div>
@@ -1004,10 +969,6 @@ const FormularioEmpresa = ({
                     <option value="INACTIVO">⏸️ Inactivo</option>
                     <option value="SUSPENDIDO">⚠️ Suspendido</option>
                   </select>
-                  {/* Debug: mostrar valor actual */}
-                  <div className="text-xs text-blue-500 mt-1">
-                    DEBUG: estado = {JSON.stringify(formData.estado || 'VACÍO')}
-                  </div>
                 </div>
               </div>
             </motion.div>
