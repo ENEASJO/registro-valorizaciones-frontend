@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm ci && npm run build && cd .. && cp -r frontend/dist/* .",
-    "install": "cd frontend && npm ci"
+    "build": "cd frontend && npm run build"
   }
 }
