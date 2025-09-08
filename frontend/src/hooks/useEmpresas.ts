@@ -96,15 +96,8 @@ export const useEmpresas = () => {
       const result: TursoApiResponse<EmpresaTursoResponse[]> = await response.json();
       
       if (result.success && result.data) {
-        // Debug logging - temporal para debug en producción
-        console.log('🔧 cargarEmpresas - API response success, data count:', result.data.length);
-        
         // Convertir respuesta de API a formato Empresa
         let empresasFromAPI: Empresa[] = result.data.map(mapearEmpresaFromAPI);
-        
-        // Debug logging - temporal para debug en producción  
-        console.log('🔧 cargarEmpresas - mapped empresas count:', empresasFromAPI.length);
-        console.log('🔧 cargarEmpresas - categories:', empresasFromAPI.map(e => e.categoria_contratista));
       
         // Aplicar filtros localmente
         if (filtros?.search) {
@@ -144,13 +137,8 @@ export const useEmpresas = () => {
           );
         }
         
-        // Debug logging - temporal para debug en producción
-        console.log('🔧 cargarEmpresas - about to setEmpresas with count:', empresasFromAPI.length);
-        
         setEmpresas(empresasFromAPI);
       } else {
-        // Debug logging - temporal para debug en producción
-        console.log('🔧 cargarEmpresas - API failed or no data, setting empty array');
         setEmpresas([]);
       }
     } catch (err) {
@@ -484,11 +472,6 @@ export const useConsorcios = () => {
 export const useEntidadesContratistas = () => {
   const { empresas, loading: loadingEmpresas, error: errorEmpresas } = useEmpresas();
   const { consorcios, loading: loadingConsorcios, error: errorConsorcios } = useConsorcios();
-  
-  // Debug logging - temporal para debug en producción
-  console.log('🔧 useEntidadesContratistas - empresas count:', empresas.length);
-  console.log('🔧 useEntidadesContratistas - loading:', loadingEmpresas);
-  console.log('🔧 useEntidadesContratistas - error:', errorEmpresas);
 
   // Combinar empresas y consorcios en una vista unificada
   const entidades: EntidadContratistaDetalle[] = [
@@ -557,12 +540,6 @@ export const useEntidadesContratistas = () => {
       }))
     }))
   ];
-
-  // Debug logging - temporal para debug en producción
-  console.log('🔧 useEntidadesContratistas - final entidades count:', entidades.length);
-  if (entidades.length > 0) {
-    console.log('🔧 useEntidadesContratistas - first entidad categoria:', entidades[0]?.datos_empresa?.categoria_contratista);
-  }
 
   const loading = loadingEmpresas || loadingConsorcios;
   const error = errorEmpresas || errorConsorcios;
