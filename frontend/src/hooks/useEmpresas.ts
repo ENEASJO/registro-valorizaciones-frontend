@@ -216,19 +216,14 @@ export const useEmpresas = () => {
     }
   }, [cargarEmpresas]);
 
-  // Eliminar empresa por RUC usando el endpoint de Turso
+  // Eliminar empresa usando el endpoint correcto de Neon
   const eliminarEmpresa = useCallback(async (id: number): Promise<boolean> => {
     setLoading(true);
     setError(null);
     
     try {
-      // Primero obtener el RUC de la empresa
-      const empresa = empresas.find(e => e.id === id);
-      if (!empresa) {
-        throw new Error('Empresa no encontrada');
-      }
-      
-      const response = await fetch(`${API_ENDPOINTS.empresasGuardadas}/${empresa.ruc}`, {
+      // Usar el endpoint correcto con ID (Neon soporta tanto ID como RUC)
+      const response = await fetch(`${API_ENDPOINTS.empresas}/${id}`, {
         method: 'DELETE'
       });
 
@@ -239,14 +234,26 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: TursoApiResponse<{ deleted: boolean }> = await response.json();
-      
-      if (result.success) {
+      // Para status 204 (No Content), no hay cuerpo de respuesta
+      if (response.status === 204) {
         // Refrescar la lista después de la eliminación
         await cargarEmpresas();
         return true;
-      } else {
-        throw new Error(result.message || 'Error al eliminar empresa');
+      }
+      
+      // Si hay respuesta JSON, procesarla
+      try {
+        const result = await response.json();
+        if (result.message) {
+          console.log('✅ Eliminación exitosa:', result.message);
+        }
+        // Refrescar la lista después de la eliminación
+        await cargarEmpresas();
+        return true;
+      } catch {
+        // Si no hay JSON válido, asumir que fue exitoso
+        await cargarEmpresas();
+        return true;
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al eliminar empresa';
