@@ -388,8 +388,9 @@ export const useEmpresas = () => {
   }, []);
 
   useEffect(() => {
+    // Cargar empresas al montar el componente
     cargarEmpresas();
-  }, [cargarEmpresas]);
+  }, []);
 
   return {
     empresas,
