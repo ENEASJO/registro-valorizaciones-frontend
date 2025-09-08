@@ -22,7 +22,7 @@ interface TursoApiResponse<T> {
 }
 
 interface EmpresaTursoResponse {
-  id: number;
+  id: string;
   codigo: string;
   ruc: string;
   razon_social: string;
@@ -47,7 +47,13 @@ interface EstadisticasEmpresas {
 
 // Función auxiliar para mapear respuesta de API a tipo Empresa
 const mapearEmpresaFromAPI = (apiEmpresa: EmpresaTursoResponse): Empresa => ({
-  id: apiEmpresa.id,
+  id: typeof apiEmpresa.id === 'string' ? 
+    // Convertir UUID a número usando hash simple
+    Math.abs(apiEmpresa.id.split('').reduce((a, b) => { 
+      a = ((a << 5) - a) + b.charCodeAt(0); 
+      return a & a; 
+    }, 0)) : 
+    apiEmpresa.id,
   codigo: apiEmpresa.codigo || `EMP${apiEmpresa.id.toString().padStart(3, '0')}`,
   ruc: apiEmpresa.ruc,
   razon_social: apiEmpresa.razon_social,
