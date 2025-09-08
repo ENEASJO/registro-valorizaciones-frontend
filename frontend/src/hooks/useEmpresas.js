@@ -17,7 +17,7 @@ const mapearEmpresaFromAPI = (apiEmpresa) => ({
     dni_representante: apiEmpresa.dni_representante,
     estado: apiEmpresa.estado || 'ACTIVO',
     tipo_empresa: 'SAC', // Valor por defecto, podría mejorarse
-    categoria_contratista: undefined,
+    categoria_contratista: apiEmpresa.categoria_contratista,
     especialidades: apiEmpresa.especialidades || [],
     activo: true,
     created_at: apiEmpresa.created_at,
