@@ -41,9 +41,9 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
   });
   // Filtrar entidades para supervisoras
   const entidadesSupervisoras = entidades.filter(entidad => {
-    // Solo mostrar empresas con categoria_contratista_funcion = 'SUPERVISORA'
+    // Solo mostrar empresas con categoria_contratista = 'SUPERVISORA'
     if (entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa) {
-      return entidad.datos_empresa.categoria_contratista_funcion === 'SUPERVISORA';
+      return entidad.datos_empresa.categoria_contratista === 'SUPERVISORA';
     }
     // Para consorcios, por ahora mostrar todos (futuro: filtrar por función del consorcio)
     return entidad.tipo_entidad === 'CONSORCIO';
@@ -67,7 +67,6 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
         estado: empresa.estado,
         tipo_empresa: 'SAC', // Default
         categoria_contratista: empresa.datos_empresa.categoria_contratista,
-        categoria_contratista_funcion: empresa.datos_empresa.categoria_contratista_funcion,
         especialidades: empresa.datos_empresa.especialidades
       };
       setEmpresaEditando(empresaForm);
@@ -91,7 +90,7 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
       // Asegurar que la empresa se marque como SUPERVISORA
       const empresaConCategoria = {
         ...empresaData,
-        categoria_contratista_funcion: 'SUPERVISORA' as const
+        categoria_contratista: 'SUPERVISORA' as const
       };
       
       if (empresaEditando) {

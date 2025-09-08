@@ -272,7 +272,7 @@ const FormularioConsorcio = ({
         celular: '',
         estado: 'ACTIVO' as const,
         tipo_empresa: 'SAC' as const,
-        categoria_contratista: 'A' as const,
+        categoria_contratista: 'EJECUTORA' as const,
         especialidades: []
       };
       empresaConsorcio = await crearEmpresa(empresaConsorcioData);
@@ -294,7 +294,7 @@ const FormularioConsorcio = ({
           celular: '',
           estado: 'ACTIVO' as const,
           tipo_empresa: 'SAC' as const,
-          categoria_contratista: 'B' as const,
+          categoria_contratista: 'EJECUTORA' as const,
           especialidades: []
         };
         const empresaIntegrante = await crearEmpresa(empresaIntegranteData);

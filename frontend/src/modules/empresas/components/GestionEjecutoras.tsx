@@ -41,9 +41,9 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
   });
   // Filtrar entidades para ejecutoras
   const entidadesEjecutoras = entidades.filter(entidad => {
-    // Solo mostrar empresas con categoria_contratista_funcion = 'EJECUTORA'
+    // Solo mostrar empresas con categoria_contratista = 'EJECUTORA'
     if (entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa) {
-      return entidad.datos_empresa.categoria_contratista_funcion === 'EJECUTORA';
+      return entidad.datos_empresa.categoria_contratista === 'EJECUTORA';
     }
     // Para consorcios, por ahora mostrar todos (futuro: filtrar por función del consorcio)
     return entidad.tipo_entidad === 'CONSORCIO';
@@ -68,7 +68,6 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
         estado: empresa.estado,
         tipo_empresa: 'SAC', // Default
         categoria_contratista: empresa.datos_empresa.categoria_contratista,
-        categoria_contratista_funcion: empresa.datos_empresa.categoria_contratista_funcion,
         especialidades: empresa.datos_empresa.especialidades
       };
       setEmpresaEditando(empresaForm);
@@ -92,7 +91,7 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
       // Asegurar que la empresa se marque como EJECUTORA
       const empresaConCategoria = {
         ...empresaData,
-        categoria_contratista_funcion: 'EJECUTORA' as const
+        categoria_contratista: 'EJECUTORA' as const
       };
       
       if (empresaEditando) {

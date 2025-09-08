@@ -37,11 +37,11 @@ export type EspecialidadEmpresa =
   | 'MINERIA'
   | 'GASEODUCTOS_OLEODUCTOS';
 
-// Categorías de contratista según capacidad (tradicionales)
-export type CategoriaContratista = 'A' | 'B' | 'C' | 'D' | 'E';
+// Categorías de contratista según capacidad (tradicionales) - OSCE
+export type CategoriaContratistaCapacidad = 'A' | 'B' | 'C' | 'D' | 'E';
 
 // Categorías de contratista según función (como las envía el backend)
-export type CategoriaContratistaFuncion = 'EJECUTORA' | 'SUPERVISORA';
+export type CategoriaContratista = 'EJECUTORA' | 'SUPERVISORA';
 
 // Tipos de empresa según forma jurídica
 export type TipoEmpresa = 
@@ -86,8 +86,8 @@ export interface Empresa extends AuditoriaBase {
   // Estados y clasificación
   estado: EstadoGeneral;
   tipo_empresa: TipoEmpresa;
-  categoria_contratista?: CategoriaContratista;
-  categoria_contratista_funcion?: CategoriaContratistaFuncion; // Nueva: función del contratista
+  categoria_contratista?: CategoriaContratista; // Función del contratista (EJECUTORA/SUPERVISORA)
+  categoria_contratista_capacidad?: CategoriaContratistaCapacidad; // Capacidad OSCE (A, B, C, D, E)
   
   // Especialidades
   especialidades?: EspecialidadEmpresa[];
@@ -209,8 +209,8 @@ export interface EmpresaForm {
   // Estados y clasificación
   estado: EstadoGeneral;
   tipo_empresa: TipoEmpresa;
-  categoria_contratista?: CategoriaContratista;
-  categoria_contratista_funcion?: CategoriaContratistaFuncion; // Nueva: función del contratista
+  categoria_contratista?: CategoriaContratista; // Función del contratista (EJECUTORA/SUPERVISORA)
+  categoria_contratista_capacidad?: CategoriaContratistaCapacidad; // Capacidad OSCE (A, B, C, D, E)
   
   // Especialidades (actualizado para soportar datos de OECE)
   especialidades?: EspecialidadEmpresa[];
@@ -287,7 +287,7 @@ export interface EmpresaFormConsolidado extends EmpresaForm {
   // Clasificación local (editable)
   estado: EstadoGeneral; // ACTIVO, INACTIVO, SUSPENDIDO
   tipo_empresa: TipoEmpresa; // SAC, SA, SRL, etc.
-  categoria_contratista: CategoriaContratista; // A, B, C, D, E
+  categoria_contratista: CategoriaContratista; // EJECUTORA/SUPERVISORA
   especialidades_locales: EspecialidadEmpresa[]; // Especialidades mapeadas localmente
   
   // === MAPEO Y OBSERVACIONES ===
@@ -513,8 +513,8 @@ export interface EntidadContratistaDetalle extends EntidadContratista {
     representante_legal?: string;
     dni_representante?: string;
     tipo_empresa?: TipoEmpresa;
-    categoria_contratista?: CategoriaContratista;
-    categoria_contratista_funcion?: CategoriaContratistaFuncion;
+    categoria_contratista?: CategoriaContratista; // Función (EJECUTORA/SUPERVISORA)
+    categoria_contratista_capacidad?: CategoriaContratistaCapacidad; // Capacidad OSCE (A,B,C,D,E)
     especialidades?: EspecialidadEmpresa[];
   };
   
@@ -596,7 +596,8 @@ export interface RespuestaPaginada<T> {
 export interface FiltrosEmpresa {
   search?: string;
   estado?: EstadoGeneral;
-  categoria_contratista?: CategoriaContratista;
+  categoria_contratista?: CategoriaContratista; // Función (EJECUTORA/SUPERVISORA)
+  categoria_contratista_capacidad?: CategoriaContratistaCapacidad; // Capacidad OSCE (A,B,C,D,E)
   tipo_empresa?: TipoEmpresa;
   especialidades?: EspecialidadEmpresa[];
   departamento?: string;
@@ -613,8 +614,8 @@ export interface FiltrosEntidadContratista {
   search?: string;
   tipo_entidad?: TipoEntidad;
   estado?: EstadoGeneral;
-  categoria?: CategoriaContratista;
-  categoria_funcion?: CategoriaContratistaFuncion; // Nuevo: filtro por función (EJECUTORA/SUPERVISORA)
+  categoria?: CategoriaContratistaCapacidad; // Capacidad OSCE (A,B,C,D,E)
+  categoria_contratista?: CategoriaContratista; // Función (EJECUTORA/SUPERVISORA)
   especialidades?: EspecialidadEmpresa[];
   disponible_para_obra?: number; // ID de obra para excluir ya asignados
 }
@@ -639,7 +640,7 @@ export interface EstadisticasEmpresas {
   consorcios_activos: number;
   entidades_totales: number;
   contratos_vigentes: number;
-  empresas_por_categoria: Record<CategoriaContratista, number>;
+  empresas_por_categoria: Record<CategoriaContratistaCapacidad, number>;
   consorcios_por_mes: Array<{
     mes: string;
     total: number;
@@ -783,7 +784,8 @@ export interface OpcionEmpresa {
   value: number;
   label: string;
   ruc: string;
-  categoria?: CategoriaContratista;
+  categoria?: CategoriaContratistaCapacidad; // Capacidad OSCE
+  categoria_contratista?: CategoriaContratista; // Función
   especialidades?: EspecialidadEmpresa[];
 }
 
