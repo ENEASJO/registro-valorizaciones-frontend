@@ -37,8 +37,11 @@ export type EspecialidadEmpresa =
   | 'MINERIA'
   | 'GASEODUCTOS_OLEODUCTOS';
 
-// Categorías de contratista según capacidad
+// Categorías de contratista según capacidad (tradicionales)
 export type CategoriaContratista = 'A' | 'B' | 'C' | 'D' | 'E';
+
+// Categorías de contratista según función (como las envía el backend)
+export type CategoriaContratistaFuncion = 'EJECUTORA' | 'SUPERVISORA';
 
 // Tipos de empresa según forma jurídica
 export type TipoEmpresa = 
@@ -84,6 +87,7 @@ export interface Empresa extends AuditoriaBase {
   estado: EstadoGeneral;
   tipo_empresa: TipoEmpresa;
   categoria_contratista?: CategoriaContratista;
+  categoria_contratista_funcion?: CategoriaContratistaFuncion; // Nueva: función del contratista
   
   // Especialidades
   especialidades?: EspecialidadEmpresa[];
@@ -206,6 +210,7 @@ export interface EmpresaForm {
   estado: EstadoGeneral;
   tipo_empresa: TipoEmpresa;
   categoria_contratista?: CategoriaContratista;
+  categoria_contratista_funcion?: CategoriaContratistaFuncion; // Nueva: función del contratista
   
   // Especialidades (actualizado para soportar datos de OECE)
   especialidades?: EspecialidadEmpresa[];
@@ -509,6 +514,7 @@ export interface EntidadContratistaDetalle extends EntidadContratista {
     dni_representante?: string;
     tipo_empresa?: TipoEmpresa;
     categoria_contratista?: CategoriaContratista;
+    categoria_contratista_funcion?: CategoriaContratistaFuncion;
     especialidades?: EspecialidadEmpresa[];
   };
   
@@ -608,6 +614,7 @@ export interface FiltrosEntidadContratista {
   tipo_entidad?: TipoEntidad;
   estado?: EstadoGeneral;
   categoria?: CategoriaContratista;
+  categoria_funcion?: CategoriaContratistaFuncion; // Nuevo: filtro por función (EJECUTORA/SUPERVISORA)
   especialidades?: EspecialidadEmpresa[];
   disponible_para_obra?: number; // ID de obra para excluir ya asignados
 }

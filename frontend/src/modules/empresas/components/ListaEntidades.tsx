@@ -349,15 +349,17 @@ const ListaEntidades = ({
                           <Users className="w-6 h-6" />
                         )}
                       </div>
-                      {/* Badge indicador de rol - por ahora mostramos aleatoriamente para demo */}
-                      {Math.random() > 0.5 ? (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center" title="Empresa Ejecutora">
-                          <span className="text-white text-xs font-bold">E</span>
-                        </div>
-                      ) : (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" title="Empresa Supervisora">
-                          <span className="text-white text-xs font-bold">S</span>
-                        </div>
+                      {/* Badge indicador de rol basado en datos reales */}
+                      {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa?.categoria_contratista_funcion && (
+                        entidad.datos_empresa.categoria_contratista_funcion === 'EJECUTORA' ? (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center" title="Empresa Ejecutora">
+                            <span className="text-white text-xs font-bold">E</span>
+                          </div>
+                        ) : (
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" title="Empresa Supervisora">
+                            <span className="text-white text-xs font-bold">S</span>
+                          </div>
+                        )
                       )}
                     </div>
 
@@ -372,14 +374,12 @@ const ListaEntidades = ({
                         }`}>
                           {entidad.tipo_entidad === 'EMPRESA' ? 'Empresa' : 'Consorcio'}
                         </span>
-                        {/* Badge de rol más prominente */}
-                        {Math.random() > 0.5 ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500 text-white">
-                            EJECUTORA
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500 text-white">
-                            SUPERVISORA
+                        {/* Badge de rol basado en datos reales */}
+                        {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa?.categoria_contratista_funcion && (
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${
+                            entidad.datos_empresa.categoria_contratista_funcion === 'EJECUTORA' ? 'bg-blue-500' : 'bg-green-500'
+                          }`}>
+                            {entidad.datos_empresa.categoria_contratista_funcion}
                           </span>
                         )}
                         {entidad.tipo_entidad === 'CONSORCIO' && entidad.empresas_participantes?.some(ep => ep.es_lider) && (

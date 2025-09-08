@@ -9,7 +9,8 @@ import type {
   CrearConsorcioParams,
   ConsorcioCompleto,
   EstadoGeneral,
-  EspecialidadEmpresa
+  EspecialidadEmpresa,
+  CategoriaContratistaFuncion
 } from '../types/empresa.types';
 
 // Interfaces para respuestas de la API de Turso
@@ -31,6 +32,7 @@ interface EmpresaTursoResponse {
   representante_legal?: string;
   dni_representante?: string;
   estado: string;
+  categoria_contratista?: string; // Añadir el campo que viene del backend
   especialidades?: string[];
   created_at: string;
   updated_at: string;
@@ -60,7 +62,8 @@ const mapearEmpresaFromAPI = (apiEmpresa: EmpresaTursoResponse): Empresa => ({
   dni_representante: apiEmpresa.dni_representante,
   estado: (apiEmpresa.estado as EstadoGeneral) || 'ACTIVO',
   tipo_empresa: 'SAC', // Valor por defecto, podría mejorarse
-  categoria_contratista: undefined,
+  categoria_contratista: undefined, // Para las categorías A, B, C, D, E (futuro)
+  categoria_contratista_funcion: apiEmpresa.categoria_contratista as CategoriaContratistaFuncion, // Mapear EJECUTORA/SUPERVISORA
   especialidades: (apiEmpresa.especialidades as EspecialidadEmpresa[]) || [],
   activo: true,
   created_at: apiEmpresa.created_at,
@@ -107,8 +110,16 @@ export const useEmpresas = () => {
         }
         
         if (filtros?.categoria) {
+          // Filtrar por categoría tradicional (A, B, C, D, E)
           empresasFromAPI = empresasFromAPI.filter(empresa => 
             empresa.categoria_contratista === filtros.categoria
+          );
+        }
+        
+        // Nuevo filtro por función (EJECUTORA/SUPERVISORA)
+        if (filtros?.categoria_funcion) {
+          empresasFromAPI = empresasFromAPI.filter(empresa => 
+            empresa.categoria_contratista_funcion === filtros.categoria_funcion
           );
         }
         
@@ -484,6 +495,7 @@ export const useEntidadesContratistas = () => {
         dni_representante: empresa.dni_representante,
         tipo_empresa: empresa.tipo_empresa,
         categoria_contratista: empresa.categoria_contratista,
+        categoria_contratista_funcion: empresa.categoria_contratista_funcion,
         especialidades: empresa.especialidades
       },
       datos_consorcio: undefined,

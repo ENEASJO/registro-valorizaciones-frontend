@@ -39,8 +39,15 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
     categoria: undefined,
     especialidades: []
   });
-  // Filtrar entidades para ejecutoras (por ahora mostramos todas, en el futuro se filtrarían por rol)
-  const entidadesEjecutoras = entidades.filter(() => true); // TODO: Filtrar por rol EJECUTOR
+  // Filtrar entidades para ejecutoras
+  const entidadesEjecutoras = entidades.filter(entidad => {
+    // Solo mostrar empresas con categoria_contratista_funcion = 'EJECUTORA'
+    if (entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa) {
+      return entidad.datos_empresa.categoria_contratista_funcion === 'EJECUTORA';
+    }
+    // Para consorcios, por ahora mostrar todos (futuro: filtrar por función del consorcio)
+    return entidad.tipo_entidad === 'CONSORCIO';
+  });
   // Estadísticas específicas para ejecutoras
   const estadisticas = {
     totalEjecutoras: entidadesEjecutoras.length,
@@ -61,6 +68,7 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
         estado: empresa.estado,
         tipo_empresa: 'SAC', // Default
         categoria_contratista: empresa.datos_empresa.categoria_contratista,
+        categoria_contratista_funcion: empresa.datos_empresa.categoria_contratista_funcion,
         especialidades: empresa.datos_empresa.especialidades
       };
       setEmpresaEditando(empresaForm);
@@ -81,10 +89,16 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
   // Handler para crear/actualizar empresa ejecutora
   const handleSubmitEmpresa = async (empresaData: EmpresaForm) => {
     try {
+      // Asegurar que la empresa se marque como EJECUTORA
+      const empresaConCategoria = {
+        ...empresaData,
+        categoria_contratista_funcion: 'EJECUTORA' as const
+      };
+      
       if (empresaEditando) {
         onMostrarMensaje?.('success', 'Empresa ejecutora actualizada correctamente');
       } else {
-        await crearEmpresa(empresaData);
+        await crearEmpresa(empresaConCategoria);
         onMostrarMensaje?.('success', 'Empresa ejecutora registrada correctamente');
       }
       cerrarModal();

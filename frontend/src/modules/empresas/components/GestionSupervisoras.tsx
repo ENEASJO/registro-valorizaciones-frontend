@@ -39,8 +39,15 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
     categoria: undefined,
     especialidades: []
   });
-  // Filtrar entidades para supervisoras (por ahora mostramos todas, en el futuro se filtrarían por rol)
-  const entidadesSupervisoras = entidades.filter(() => true); // TODO: Filtrar por rol SUPERVISOR
+  // Filtrar entidades para supervisoras
+  const entidadesSupervisoras = entidades.filter(entidad => {
+    // Solo mostrar empresas con categoria_contratista_funcion = 'SUPERVISORA'
+    if (entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa) {
+      return entidad.datos_empresa.categoria_contratista_funcion === 'SUPERVISORA';
+    }
+    // Para consorcios, por ahora mostrar todos (futuro: filtrar por función del consorcio)
+    return entidad.tipo_entidad === 'CONSORCIO';
+  });
   // Estadísticas específicas para supervisoras
   const estadisticas = {
     totalSupervisoras: entidadesSupervisoras.length,
@@ -60,6 +67,7 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
         estado: empresa.estado,
         tipo_empresa: 'SAC', // Default
         categoria_contratista: empresa.datos_empresa.categoria_contratista,
+        categoria_contratista_funcion: empresa.datos_empresa.categoria_contratista_funcion,
         especialidades: empresa.datos_empresa.especialidades
       };
       setEmpresaEditando(empresaForm);
@@ -80,10 +88,16 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
   // Handler para crear/actualizar empresa supervisora
   const handleSubmitEmpresa = async (empresaData: EmpresaForm) => {
     try {
+      // Asegurar que la empresa se marque como SUPERVISORA
+      const empresaConCategoria = {
+        ...empresaData,
+        categoria_contratista_funcion: 'SUPERVISORA' as const
+      };
+      
       if (empresaEditando) {
         onMostrarMensaje?.('success', 'Empresa supervisora actualizada correctamente');
       } else {
-        await crearEmpresa(empresaData);
+        await crearEmpresa(empresaConCategoria);
         onMostrarMensaje?.('success', 'Empresa supervisora registrada correctamente');
       }
       cerrarModal();
