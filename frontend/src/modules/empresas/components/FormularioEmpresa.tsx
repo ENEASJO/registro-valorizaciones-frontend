@@ -265,17 +265,16 @@ const FormularioEmpresa = ({
       // Configurar timeout para evitar que la consulta se quede colgada
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 segundos de timeout
-      
-      try {
-        const response = await fetch(endpoint, {
-          ...fetchOptions,
-          signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+
+      const response = await fetch(endpoint, {
+        ...fetchOptions,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       const result = await response.json();
       
       // Extraer los datos de la respuesta (nuevo formato: {success, data})
@@ -365,10 +364,6 @@ const FormularioEmpresa = ({
         }
       }
     } catch (err) {
-      // Limpiar timeout si existe
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
       
       // Manejar diferentes tipos de errores
       if (err.name === 'AbortError') {
