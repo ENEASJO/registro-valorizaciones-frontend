@@ -97,7 +97,48 @@ if (import.meta.env.PROD) {
     return originalFetch.call(this, input, init);
   };
   
+  // También interceptar XMLHttpRequest para mayor cobertura
+  const OriginalXMLHttpRequest = globalThis.XMLHttpRequest;
+  globalThis.XMLHttpRequest = function() {
+    const xhr = new OriginalXMLHttpRequest();
+    const originalOpen = xhr.open;
+    
+    xhr.open = function(method: string, url: string | URL, async?: boolean, username?: string | null, password?: string | null) {
+      let urlString = url.toString();
+      
+      // Corregir URLs HTTP
+      if (urlString.startsWith('http://registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
+        const correctedUrl = urlString.replace('http://', 'https://');
+        console.warn('🔧 XMLHttpRequest interceptado: Corrigiendo HTTP a HTTPS:', {
+          original: urlString,
+          corrected: correctedUrl
+        });
+        urlString = correctedUrl;
+      }
+      
+      return originalOpen.call(this, method, urlString, async !== false, username || null, password || null);
+    };
+    
+    return xhr;
+  };
+  
+  // Interceptar el constructor Request también
+  const OriginalRequest = globalThis.Request;
+  globalThis.Request = function(input: RequestInfo | URL, init?: RequestInit) {
+    if (typeof input === 'string' && input.startsWith('http://registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
+      const correctedUrl = input.replace('http://', 'https://');
+      console.warn('🔧 Request constructor interceptado: Corrigiendo HTTP a HTTPS:', {
+        original: input,
+        corrected: correctedUrl
+      });
+      return new OriginalRequest(correctedUrl, init);
+    }
+    return new OriginalRequest(input, init);
+  };
+  
   console.log('🛡️ Fetch interceptador activado para corregir URLs HTTP');
+  console.log('🛡️ XMLHttpRequest interceptador activado');
+  console.log('🛡️ Request constructor interceptador');
 }
 
 // Debug en producción
