@@ -14,9 +14,17 @@ if (import.meta.env.DEV) {
 // URL base del backend - Usa variable de entorno o fallback según el entorno
 // En producción usa Cloud Run, en desarrollo usa localhost
 const getBackendUrl = () => {
-  // Si hay variable de entorno definida, úsala
+  // Si hay variable de entorno definida, úsala pero fuerza HTTPS en producción
   if (import.meta.env.VITE_BACKEND_URL) {
-    return import.meta.env.VITE_BACKEND_URL;
+    let url = import.meta.env.VITE_BACKEND_URL;
+    
+    // Forzar HTTPS en producción
+    if (import.meta.env.PROD && url.startsWith('http://')) {
+      console.log('🔒 Forzando HTTPS en producción (cambiando http:// a https://)');
+      url = url.replace('http://', 'https://');
+    }
+    
+    return url;
   }
   
   // En producción usa Cloud Run - URL unificada
