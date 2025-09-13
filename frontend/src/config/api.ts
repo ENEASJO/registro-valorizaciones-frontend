@@ -72,16 +72,16 @@ export const API_ENDPOINTS = {
   consultaRuc: `${API_BASE_URL}/consultar-ruc`,  // POST endpoint
   consultaRucConsolidada: `${API_BASE_URL}/consulta-ruc-consolidada`,  // GET endpoint
   
-  // Empresas - Endpoints Turso integrados
+  // Empresas - Endpoints Neon integrados
   empresas: `${API_BASE_URL}/api/empresas`,              // CRUD completo
   empresasGuardadas: `${API_BASE_URL}/api/empresas`, // Listar guardadas (mismo endpoint)
   empresasSearch: `${API_BASE_URL}/api/empresas-guardadas/search`, // Buscar
   empresasStats: `${API_BASE_URL}/api/empresas-guardadas/stats`,   // Estadísticas
   
-  // Obras - Turso integrado
+  // Obras - Neon integrado
   obras: `${API_BASE_URL}/obras`,
   
-  // Valorizaciones - Turso integrado
+  // Valorizaciones - Neon integrado
   valorizaciones: `${API_BASE_URL}/valorizaciones`,
   
   // Health check
@@ -92,15 +92,21 @@ export const API_ENDPOINTS = {
   buscar: `${API_BASE_URL}/buscar`
 } as const;
 
-// Agregar parámetro de versión para evitar caché en desarrollo
-if (import.meta.env.DEV) {
-  // En desarrollo, agregar timestamp para evitar caché
+// Agregar parámetro de versión para evitar caché (en producción también)
+if (import.meta.env.DEV || import.meta.env.PROD) {
+  // Forzar cache busting en ambos entornos para resolver Mixed Content
   const cacheParam = `?_v=${Date.now()}`;
   Object.keys(API_ENDPOINTS).forEach(key => {
     if (typeof API_ENDPOINTS[key as keyof typeof API_ENDPOINTS] === 'string') {
       (API_ENDPOINTS as any)[key] += cacheParam;
     }
   });
+  
+  // Debug para verificar cache busting
+  if (import.meta.env.PROD) {
+    console.log('🔄 Cache busting activado con parámetro:', cacheParam);
+    console.log('🔄 Endpoint empresas:', API_ENDPOINTS.empresas);
+  }
 }
 
 // Configuración de headers por defecto
