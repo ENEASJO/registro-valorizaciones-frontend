@@ -103,46 +103,57 @@ if (import.meta.env.PROD) {
     console.log('🛡️ WINDOW.FETCH interceptador activado');
   }
   
-  // También intentar registrar un Service Worker si es posible
+  // Registrar Service Worker para interceptar peticiones HTTP
   if ('serviceWorker' in navigator) {
     try {
-      // Crear un script de service worker simple para interceptar peticiones
-      const swScript = `
-        self.addEventListener('fetch', (event) => {
-          const url = event.request.url;
-          const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
-          
-          if (url.includes('http://') && url.includes(targetDomain)) {
-            const correctedUrl = url.replace('http://' + targetDomain, 'https://' + targetDomain);
-            console.log('🔧 SERVICE WORKER interceptado:', url, '->', correctedUrl);
+      const swUrl = '/service-worker.js';
+      
+      navigator.serviceWorker.register(swUrl, {
+        scope: '/'
+      }).then((registration) => {
+        console.log('🛡️ Service Worker interceptador registrado:', registration);
+        console.log('🛡️ Service Worker scope:', registration.scope);
+        
+        // Verificar si está activo
+        if (registration.active) {
+          console.log('✅ Service Worker ya está activo');
+        } else {
+          console.log('⏳ Service Worker está instalando...');
+          registration.addEventListener('updatefound', () => {
+            console.log('🔄 Service Worker encontrado, actualizando...');
+          });
+        }
+      }).catch((error) => {
+        console.error('❌ Error registrando Service Worker:', error);
+        console.error('❌ Service Worker URL:', swUrl);
+        
+        // Intentar con un fallback usando Blob si el archivo no está disponible
+        console.log('🔄 Intentando registro con Blob como fallback...');
+        const fallbackScript = `
+          self.addEventListener('fetch', (event) => {
+            const url = event.request.url;
+            const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
             
-            const newRequest = new Request(correctedUrl, {
-              method: event.request.method,
-              headers: event.request.headers,
-              mode: event.request.mode,
-              credentials: event.request.credentials,
-              redirect: event.request.redirect,
-              referrer: event.request.referrer,
-              referrerPolicy: event.request.referrerPolicy,
-              body: event.request.body
-            });
-            
-            event.respondWith(fetch(newRequest));
-            return;
-          }
+            if (url.includes('http://') && url.includes(targetDomain)) {
+              const correctedUrl = url.replace('http://' + targetDomain, 'https://' + targetDomain);
+              console.log('🔧 SERVICE WORKER (fallback) interceptado:', url, '->', correctedUrl);
+              event.respondWith(fetch(correctedUrl));
+              return;
+            }
+          });
+        `;
+        
+        const blob = new Blob([fallbackScript], { type: 'application/javascript' });
+        const blobUrl = URL.createObjectURL(blob);
+        
+        navigator.serviceWorker.register(blobUrl).then(() => {
+          console.log('🛡️ Service Worker fallback registrado');
+        }).catch((fallbackError) => {
+          console.error('❌ Error también con el fallback:', fallbackError);
         });
-      `;
-      
-      const blob = new Blob([swScript], { type: 'application/javascript' });
-      const swUrl = URL.createObjectURL(blob);
-      
-      navigator.serviceWorker.register(swUrl).then(() => {
-        console.log('🛡️ Service Worker interceptador registrado');
-      }).catch(() => {
-        // Silenciar errores de service worker
       });
     } catch (e) {
-      // Silenciar errores
+      console.error('❌ Excepción en registro de Service Worker:', e);
     }
   }
   // Sobrescribir fetch para interceptar y corregir URLs HTTP
@@ -276,6 +287,24 @@ if (import.meta.env.PROD) {
   console.log('  MODE:', import.meta.env.MODE);
   console.log('  ¿Empieza con http://?:', API_BASE_URL.startsWith('http://'));
   console.log('  ¿Empieza con https://?:', API_BASE_URL.startsWith('https://'));
+  
+  // Debug Service Worker
+  if ('serviceWorker' in navigator) {
+    console.log('🔍 Service Worker disponible:', navigator.serviceWorker);
+    navigator.serviceWorker.getRegistration().then(registration => {
+      console.log('📋 Service Worker registration:', registration);
+      if (registration) {
+        console.log('✅ Service Worker activo:', registration.active);
+        console.log('📍 Service Worker scope:', registration.scope);
+      } else {
+        console.log('❌ No hay Service Worker registrado');
+      }
+    }).catch(error => {
+      console.error('❌ Error getting Service Worker registration:', error);
+    });
+  } else {
+    console.log('❌ Service Worker no disponible en este navegador');
+  }
 }
 
 // Verificar que en producción no se use localhost
