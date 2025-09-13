@@ -39,6 +39,16 @@ const getBackendUrl = () => {
 const rawUrl = getBackendUrl();
 export const API_BASE_URL = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
 
+// Debug en producción
+if (import.meta.env.PROD) {
+  console.log('🌐 Configuración de API en producción:', {
+    API_BASE_URL,
+    VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
+    PROD: import.meta.env.PROD,
+    MODE: import.meta.env.MODE
+  });
+}
+
 // Verificar que en producción no se use localhost
 if (import.meta.env.PROD && API_BASE_URL.includes('localhost')) {
   console.error('🚨 ERROR: Usando localhost en producción!', {
