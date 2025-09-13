@@ -252,7 +252,7 @@ const useDashboard = () => {
     ]);
     // Usar obras reales si están disponibles, sino usar mock
     const obrasParaDashboard = obrasFormateadas.length > 0 ? obrasFormateadas : obrasMock;
-    // Calcular métricas reales basadas en datos de Turso
+    // Calcular métricas reales basadas en datos de Neon
     useEffect(() => {
         if (!loading && obras.length > 0) {
             const obrasActivas = obras.filter((obra) => obra.estado_obra === 'EJECUCION' || obra.estado_obra === 'PENDIENTE').length;

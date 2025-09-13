@@ -13,15 +13,15 @@ import type {
   CategoriaContratista
 } from '../types/empresa.types';
 
-// Interfaces para respuestas de la API de Turso
-interface TursoApiResponse<T> {
+// Interfaces para respuestas de la API de Neon
+interface NeonApiResponse<T> {
   success: boolean;
   data: T;
   timestamp: string;
   message?: string;
 }
 
-interface EmpresaTursoResponse {
+interface EmpresaNeonResponse {
   id: string;
   codigo: string;
   ruc: string;
@@ -46,7 +46,7 @@ interface EstadisticasEmpresas {
 }
 
 // Función auxiliar para mapear respuesta de API a tipo Empresa
-const mapearEmpresaFromAPI = (apiEmpresa: EmpresaTursoResponse): Empresa => ({
+const mapearEmpresaFromAPI = (apiEmpresa: EmpresaNeonResponse): Empresa => ({
   id: typeof apiEmpresa.id === 'string' ? 
     // Convertir UUID a número usando hash simple
     Math.abs(apiEmpresa.id.split('').reduce((a, b) => { 
@@ -81,7 +81,7 @@ export const useEmpresas = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar empresas guardadas desde Turso
+  // Cargar empresas guardadas desde Neon
   const cargarEmpresas = useCallback(async (filtros?: FiltrosEntidadContratista) => {
     setLoading(true);
     setError(null);
@@ -93,7 +93,7 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: TursoApiResponse<EmpresaTursoResponse[]> = await response.json();
+      const result: NeonApiResponse<EmpresaNeonResponse[]> = await response.json();
       
       if (result.success && result.data) {
         // Convertir respuesta de API a formato Empresa
@@ -142,7 +142,7 @@ export const useEmpresas = () => {
         setEmpresas([]);
       }
     } catch (err) {
-      console.error('Error loading empresas from Turso:', err);
+      console.error('Error loading empresas from Neon:', err);
       setError('Error al cargar empresas desde el servidor');
       setEmpresas([]);
     } finally {
@@ -150,7 +150,7 @@ export const useEmpresas = () => {
     }
   }, []);
 
-  // Crear nueva empresa usando el endpoint de Turso
+  // Crear nueva empresa usando el endpoint de Neon
   const crearEmpresa = useCallback(async (empresaData: EmpresaForm): Promise<Empresa | null> => {
     setLoading(true);
     setError(null);
@@ -168,7 +168,7 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: TursoApiResponse<EmpresaTursoResponse> = await response.json();
+      const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
       
       if (result.success && result.data) {
         const nuevaEmpresa = mapearEmpresaFromAPI(result.data);
@@ -190,7 +190,7 @@ export const useEmpresas = () => {
     }
   }, [cargarEmpresas]);
 
-  // Actualizar empresa usando PUT al endpoint de Turso
+  // Actualizar empresa usando PUT al endpoint de Neon
   const actualizarEmpresa = useCallback(async (id: number, empresaData: Partial<EmpresaForm>): Promise<Empresa | null> => {
     setLoading(true);
     setError(null);
@@ -211,7 +211,7 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: TursoApiResponse<EmpresaTursoResponse> = await response.json();
+      const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
       
       if (result.success && result.data) {
         const empresaActualizada = mapearEmpresaFromAPI(result.data);
@@ -282,7 +282,7 @@ export const useEmpresas = () => {
     }
   }, [empresas, cargarEmpresas]);
 
-  // Obtener empresa por RUC usando el endpoint de Turso
+  // Obtener empresa por RUC usando el endpoint de Neon
   const obtenerEmpresaPorId = useCallback(async (id: number): Promise<Empresa | null> => {
     // Primero buscar en la lista local
     const empresaLocal = empresas.find(e => e.id === id);
@@ -311,7 +311,7 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: TursoApiResponse<EmpresaTursoResponse> = await response.json();
+      const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
       
       if (result.success && result.data) {
         return mapearEmpresaFromAPI(result.data);
@@ -327,7 +327,7 @@ export const useEmpresas = () => {
     }
   }, []);
   
-  // Buscar empresas usando el endpoint de búsqueda de Turso
+  // Buscar empresas usando el endpoint de búsqueda de Neon
   const buscarEmpresas = useCallback(async (query: string): Promise<Empresa[]> => {
     if (!query.trim()) {
       return [];
@@ -343,7 +343,7 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: TursoApiResponse<EmpresaTursoResponse[]> = await response.json();
+      const result: NeonApiResponse<EmpresaNeonResponse[]> = await response.json();
       
       if (result.success && result.data) {
         return result.data.map(mapearEmpresaFromAPI);
@@ -359,7 +359,7 @@ export const useEmpresas = () => {
     }
   }, []);
   
-  // Obtener estadísticas usando el endpoint de Turso
+  // Obtener estadísticas usando el endpoint de Neon
   const obtenerEstadisticas = useCallback(async (): Promise<EstadisticasEmpresas | null> => {
     setLoading(true);
     setError(null);
@@ -371,7 +371,7 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: TursoApiResponse<EstadisticasEmpresas> = await response.json();
+      const result: NeonApiResponse<EstadisticasEmpresas> = await response.json();
       
       if (result.success && result.data) {
         return result.data;
@@ -415,13 +415,13 @@ export const useConsorcios = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar consorcios (actualmente usando mock - pendiente de implementación en Turso)
+  // Cargar consorcios (actualmente usando mock - pendiente de implementación en Neon)
   const cargarConsorcios = useCallback(async (filtros?: FiltrosEntidadContratista) => {
     setLoading(true);
     setError(null);
     
     try {
-      // TODO: Implementar endpoint de consorcios en Turso
+      // TODO: Implementar endpoint de consorcios en Neon
       // Por ahora retornamos lista vacía
       setConsorcios([]);
     } catch (err) {
@@ -438,7 +438,7 @@ export const useConsorcios = () => {
     setError(null);
     
     try {
-      // TODO: Implementar creación de consorcios en Turso
+      // TODO: Implementar creación de consorcios en Neon
       throw new Error('Funcionalidad de consorcios no implementada aún');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al crear consorcio';
@@ -451,7 +451,7 @@ export const useConsorcios = () => {
 
   // Obtener consorcio por ID (pendiente de implementación)
   const obtenerConsorcioPorId = useCallback((id: number): ConsorcioCompleto | null => {
-    return null; // TODO: Implementar búsqueda de consorcios en Turso
+    return null; // TODO: Implementar búsqueda de consorcios en Neon
   }, []);
 
   useEffect(() => {

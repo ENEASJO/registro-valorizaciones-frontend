@@ -6,7 +6,7 @@ import '../types/valorizacion-extended.types'; // Importar extensiones de tipos
 // TIPOS E INTERFACES
 // =================================================================
 
-// Tipo base de Valorización desde backend Turso
+// Tipo base de Valorización desde backend Neon
 export interface ValorizacionResponse {
   id: number;
   codigo?: string;
