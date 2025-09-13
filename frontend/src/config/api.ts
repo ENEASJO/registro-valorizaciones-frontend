@@ -37,16 +37,36 @@ const getBackendUrl = () => {
 };
 
 const rawUrl = getBackendUrl();
-export const API_BASE_URL = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
+
+// Forzar HTTPS en producción (doble seguridad)
+let finalUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
+if (import.meta.env.PROD && finalUrl.startsWith('http://')) {
+  console.warn('🔒 Forzando HTTPS en API_BASE_URL (segunda verificación)');
+  finalUrl = finalUrl.replace('http://', 'https://');
+}
+
+export const API_BASE_URL = finalUrl;
+
+// Agregar parámetro de versión para evitar caché en desarrollo
+if (import.meta.env.DEV) {
+  // En desarrollo, agregar timestamp para evitar caché
+  const cacheParam = `?_v=${Date.now()}`;
+  Object.keys(API_ENDPOINTS).forEach(key => {
+    if (typeof API_ENDPOINTS[key as keyof typeof API_ENDPOINTS] === 'string') {
+      (API_ENDPOINTS as any)[key] += cacheParam;
+    }
+  });
+}
 
 // Debug en producción
 if (import.meta.env.PROD) {
-  console.log('🌐 Configuración de API en producción:', {
-    API_BASE_URL,
-    VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
-    PROD: import.meta.env.PROD,
-    MODE: import.meta.env.MODE
-  });
+  console.log('🌐 Configuración de API en producción:');
+  console.log('  API_BASE_URL:', API_BASE_URL);
+  console.log('  VITE_BACKEND_URL:', import.meta.env.VITE_BACKEND_URL);
+  console.log('  PROD:', import.meta.env.PROD);
+  console.log('  MODE:', import.meta.env.MODE);
+  console.log('  ¿Empieza con http://?:', API_BASE_URL.startsWith('http://'));
+  console.log('  ¿Empieza con https://?:', API_BASE_URL.startsWith('https://'));
 }
 
 // Verificar que en producción no se use localhost
