@@ -380,7 +380,7 @@ export const useEmpresas = () => {
         };
         
         loadEmpresas();
-    }, [cargarEmpresas]);
+    }, []); // Empty dependency array to prevent infinite loops
     return {
         empresas,
         loading,
