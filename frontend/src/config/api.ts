@@ -49,6 +49,102 @@ export const API_BASE_URL = finalUrl;
 
 // Interceptador global para corregir URLs HTTP en producción (definitivo)
 if (import.meta.env.PROD) {
+  
+  // ÚLTIMO RECURSO: Interceptar a nivel de window.fetch también
+  if (typeof window !== 'undefined') {
+    const windowFetch = window.fetch;
+    window.fetch = function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+      let url: string;
+      
+      if (typeof input === 'string') {
+        url = input;
+      } else if (input instanceof URL) {
+        url = input.toString();
+      } else if (input instanceof Request) {
+        url = input.url;
+      } else {
+        return windowFetch.call(this, input, init);
+      }
+      
+      const cleanUrl = url.trim();
+      const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
+      
+      if (cleanUrl.includes('http://') && cleanUrl.includes(targetDomain)) {
+        const correctedUrl = cleanUrl.replace('http://' + targetDomain, 'https://' + targetDomain);
+        console.warn('🔧 WINDOW.FETCH interceptado: Corrigiendo HTTP a HTTPS:', {
+          original: cleanUrl,
+          corrected: correctedUrl
+        });
+        
+        if (typeof input === 'string') {
+          return windowFetch.call(this, correctedUrl, init);
+        } else if (input instanceof URL) {
+          return windowFetch.call(this, new URL(correctedUrl), init);
+        } else {
+          const newRequest = new Request(correctedUrl, {
+            method: input.method,
+            headers: input.headers,
+            body: input.body,
+            mode: input.mode,
+            credentials: input.credentials,
+            cache: input.cache,
+            redirect: input.redirect,
+            referrer: input.referrer,
+            referrerPolicy: input.referrerPolicy,
+            ...init
+          });
+          return windowFetch.call(this, newRequest);
+        }
+      }
+      
+      return windowFetch.call(this, input, init);
+    };
+    
+    console.log('🛡️ WINDOW.FETCH interceptador activado');
+  }
+  
+  // También intentar registrar un Service Worker si es posible
+  if ('serviceWorker' in navigator) {
+    try {
+      // Crear un script de service worker simple para interceptar peticiones
+      const swScript = `
+        self.addEventListener('fetch', (event) => {
+          const url = event.request.url;
+          const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
+          
+          if (url.includes('http://') && url.includes(targetDomain)) {
+            const correctedUrl = url.replace('http://' + targetDomain, 'https://' + targetDomain);
+            console.log('🔧 SERVICE WORKER interceptado:', url, '->', correctedUrl);
+            
+            const newRequest = new Request(correctedUrl, {
+              method: event.request.method,
+              headers: event.request.headers,
+              mode: event.request.mode,
+              credentials: event.request.credentials,
+              redirect: event.request.redirect,
+              referrer: event.request.referrer,
+              referrerPolicy: event.request.referrerPolicy,
+              body: event.request.body
+            });
+            
+            event.respondWith(fetch(newRequest));
+            return;
+          }
+        });
+      `;
+      
+      const blob = new Blob([swScript], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      
+      navigator.serviceWorker.register(swUrl).then(() => {
+        console.log('🛡️ Service Worker interceptador registrado');
+      }).catch(() => {
+        // Silenciar errores de service worker
+      });
+    } catch (e) {
+      // Silenciar errores
+    }
+  }
   // Sobrescribir fetch para interceptar y corregir URLs HTTP
   const originalFetch = globalThis.fetch;
   globalThis.fetch = function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
