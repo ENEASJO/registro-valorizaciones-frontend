@@ -64,11 +64,12 @@ if (import.meta.env.PROD) {
       return originalFetch.call(this, input, init);
     }
     
-    // Corregir URLs HTTP en producción - detección mejorada
+    // Corregir URLs HTTP en producción - detección ultra agresiva
     const cleanUrl = url.trim();
     const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
     
-    if (cleanUrl.includes('http://' + targetDomain)) {
+    // Detectar cualquier URL con nuestro dominio en HTTP - ULTRA AGRESIVO
+    if (cleanUrl.includes('http://') && cleanUrl.includes(targetDomain)) {
       const correctedUrl = cleanUrl.replace('http://' + targetDomain, 'https://' + targetDomain);
       console.warn('🔧 Fetch interceptado: Corrigiendo HTTP a HTTPS:', {
         original: cleanUrl,
@@ -97,9 +98,9 @@ if (import.meta.env.PROD) {
       }
     }
     
-    // Debug: mostrar todas las URLs que pasan por fetch
-    if (cleanUrl.includes(targetDomain)) {
-      console.log('🔍 Fetch URL detectada:', cleanUrl);
+    // Debug: mostrar URLs HTTP de nuestro dominio
+    if (cleanUrl.includes('http://') && cleanUrl.includes(targetDomain)) {
+      console.log('⚠️  URL HTTP detectada para corrección:', cleanUrl);
     }
     
     return originalFetch.call(this, input, init);
@@ -118,7 +119,7 @@ if (import.meta.env.PROD) {
       const cleanUrlString = urlString.trim();
       const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
       
-      if (cleanUrlString.includes('http://' + targetDomain)) {
+      if (cleanUrlString.includes('http://') && cleanUrlString.includes(targetDomain)) {
         const correctedUrl = cleanUrlString.replace('http://' + targetDomain, 'https://' + targetDomain);
         console.warn('🔧 XMLHttpRequest interceptado: Corrigiendo HTTP a HTTPS:', {
           original: cleanUrlString,
@@ -150,7 +151,7 @@ if (import.meta.env.PROD) {
       const cleanInput = input.trim();
       const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
       
-      if (cleanInput.includes('http://' + targetDomain)) {
+      if (cleanInput.includes('http://') && cleanInput.includes(targetDomain)) {
         const correctedUrl = cleanInput.replace('http://' + targetDomain, 'https://' + targetDomain);
         console.warn('🔧 Request constructor interceptado: Corrigiendo HTTP a HTTPS:', {
           original: cleanInput,
