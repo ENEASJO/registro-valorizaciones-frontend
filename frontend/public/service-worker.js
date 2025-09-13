@@ -78,7 +78,7 @@ self.addEventListener('fetch', (event) => {
   
   // Debug: Log all fetch requests to see what's happening
   if (url.includes(TARGET_DOMAINS[0]) || url.includes('/api/')) {
-    console.log(`🌐 SERVICE WORKER [${timestamp}] petición passthrough:`, {
+    console.log(`🌐 SERVICE WORKER [${timestamp}] petición recibida:`, {
       url: url,
       method: event.request.method,
       isHTTPS: url.startsWith('https://'),
@@ -86,8 +86,33 @@ self.addEventListener('fetch', (event) => {
     });
   }
   
-  // Para todas las demás peticiones, dejarlas pasar
-  event.respondWith(fetch(event.request));
+  // CORRECCIÓN: Convertir HTTP a HTTPS para nuestro dominio antes de hacer fetch
+  let finalRequest = event.request;
+  for (const domain of TARGET_DOMAINS) {
+    if (url.includes('http://' + domain)) {
+      const correctedUrl = url.replace('http://' + domain, 'https://' + domain);
+      console.log(`🔧 SERVICE WORKER [${timestamp}] CORRIGIENDO URL:`, {
+        original: url,
+        corrected: correctedUrl
+      });
+      
+      // Crear nueva request con la URL corregida
+      finalRequest = new Request(correctedUrl, {
+        method: event.request.method,
+        headers: event.request.headers,
+        mode: event.request.mode,
+        credentials: event.request.credentials,
+        redirect: event.request.redirect,
+        referrer: event.request.referrer,
+        referrerPolicy: event.request.referrerPolicy,
+        body: event.request.body
+      });
+      break;
+    }
+  }
+  
+  // Responder con la request (posiblemente corregida)
+  event.respondWith(fetch(finalRequest));
 });
 
 // Debug: Log Service Worker messages
