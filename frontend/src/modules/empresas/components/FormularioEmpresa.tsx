@@ -240,16 +240,14 @@ const FormularioEmpresa = ({
       let fetchOptions: RequestInit = {};
       
       if (esPersonaNatural) {
-        // Para personas naturales, usar POST /consultar-ruc
-        endpoint = API_ENDPOINTS.consultaRuc;
-        tipoConsulta = 'SUNAT-ONLY';
+        // Para personas naturales, usar GET /consulta-ruc-consolidada para obtener también contactos
+        endpoint = `${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`;
+        tipoConsulta = 'CONSOLIDADO';
         fetchOptions = {
-          method: 'POST',
+          method: 'GET',
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ruc: formData.ruc })
+          }
         };
       } else {
         // Para personas jurídicas, usar GET /consulta-ruc-consolidada para obtener SUNAT + OSCE

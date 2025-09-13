@@ -30,6 +30,8 @@ export interface DatosRucConsulta {
     fecha_desde: string;
     fecha_hasta?: string;
   }>;
+  email?: string;
+  telefono?: string;
   actividades_economicas?: Array<{
     ciiu: string;
     descripcion: string;
@@ -73,6 +75,8 @@ export interface DatosEmpresaFormulario {
   departamento?: string;
   representante_legal?: string;
   dni_representante?: string;
+  email?: string;
+  telefono?: string;
   ubigeo?: string;
   fecha_constitucion?: string;
 }
@@ -119,64 +123,37 @@ export function limpiarRuc(ruc: string): string {
 // FUNCIONES DE TRANSFORMACIÓN
 // =================================================================
 /**
- * Transforma la respuesta de la API de SUNAT al formato interno esperado
+ * Transforma la respuesta de la API consolidada al formato interno esperado
  */
 function transformarRespuestaAPI(apiData: any): DatosRucConsulta {
-  // Manejar estructura consolidada (sunat/osce anidada) o estructura plana
-  let datosBase: any;
-  let representantes: any[] = [];
-  
-  if (apiData.sunat || apiData.osce) {
-    // Estructura consolidada con datos anidados
-    
-    // Priorizar datos de SUNAT, fallback a OSCE
-    const sunatData = apiData.sunat || {};
-    const osceData = apiData.osce || {};
-    
-    datosBase = {
-      ruc: apiData.ruc || sunatData.ruc || osceData.ruc || '',
-      razon_social: sunatData.razon_social || osceData.razon_social || '',
-      domicilio_fiscal: sunatData.domicilio_fiscal || osceData.domicilio_fiscal || '',
-      tipo_persona: sunatData.tipo_persona || (apiData.ruc?.startsWith('10') ? 'NATURAL' : 'JURÍDICA')
-    };
-    
-    // Combinar representantes de ambas fuentes
-    representantes = [
-      ...(sunatData.representantes || []),
-      ...(osceData.representantes || [])
-    ];
-    
-  } else {
-    // Estructura plana original
-    datosBase = apiData;
-    representantes = apiData.representantes || [];
-  }
-  
+  // La API consolidada devuelve una estructura diferente
   return {
-    ruc: datosBase.ruc || '',
-    razon_social: datosBase.razon_social || '',
-    nombre_comercial: undefined, // La API actual no proporciona este campo
-    estado_contribuyente: 'ACTIVO', // Asumir activo si se encontraron datos
-    condicion_domicilio: 'HABIDO', // Asumir habido si se encontraron datos  
-    direccion_completa: datosBase.domicilio_fiscal || '',
-    domicilio_fiscal: datosBase.domicilio_fiscal,
-    direccion: undefined,
-    distrito: undefined,
-    provincia: undefined,
-    departamento: undefined,
+    ruc: apiData.ruc || '',
+    razon_social: apiData.razon_social || '',
+    nombre_comercial: undefined,
+    estado_contribuyente: apiData.estado || 'ACTIVO',
+    condicion_domicilio: 'HABIDO',
+    direccion_completa: apiData.direccion || '',
+    domicilio_fiscal: apiData.direccion || '',
+    direccion: apiData.direccion,
+    distrito: apiData.distrito,
+    provincia: apiData.provincia,
+    departamento: apiData.departamento,
     ubigeo: undefined,
     fecha_inscripcion: undefined,
     fecha_inicio_actividades: undefined,
     tipo_contribuyente: undefined,
-    tipo_persona: datosBase.tipo_persona || (datosBase.ruc?.startsWith('10') ? 'NATURAL' : 'JURÍDICA'),
-    representantes_legales: representantes.map((rep: any) => ({
-      tipo_documento: rep.tipo_doc || 'DNI',
-      numero_documento: rep.numero_doc || '',
+    tipo_persona: apiData.ruc?.startsWith('10') ? 'NATURAL' : 'JURÍDICA',
+    representantes_legales: (apiData.representantes || []).map((rep: any) => ({
+      tipo_documento: 'DNI',
+      numero_documento: rep.documento || '',
       nombre_completo: rep.nombre || '',
       cargo: rep.cargo || '',
-      fecha_desde: rep.fecha_desde || '',
+      fecha_desde: '',
       fecha_hasta: undefined
     })),
+    email: apiData.contactos?.[0]?.email || '',
+    telefono: apiData.contactos?.[0]?.telefono || '',
     actividades_economicas: []
   };
 }
@@ -196,6 +173,8 @@ function transformarDatosParaFormulario(datos: DatosRucConsulta): DatosEmpresaFo
     departamento: datos.departamento,
     representante_legal: representante?.nombre_completo,
     dni_representante: representante?.numero_documento,
+    email: datos.email,
+    telefono: datos.telefono,
     ubigeo: datos.ubigeo,
     fecha_constitucion: datos.fecha_inscripcion,
   };
@@ -257,14 +236,12 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
     const timeoutId = setTimeout(() => {
       controller.abort();
     }, TIMEOUT_MS);
-    // Usar el endpoint POST correcto del backend working
-    const response = await fetch(`${API_BASE_URL}/consultar-ruc`, {
-      method: 'POST',
+    // Usar el endpoint consolidado GET para obtener todos los datos (SUNAT + OSCE)
+    const response = await fetch(`${API_BASE_URL}/consulta-ruc-consolidada/${rucLimpio}`, {
+      method: 'GET',
       headers: {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ ruc: rucLimpio }),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
@@ -288,8 +265,8 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
       };
     }
     const response_data = await response.json();
-    console.log('🔍 Respuesta del backend:', response_data);
-    
+    console.log('🔍 Respuesta del backend (consolidado):', response_data);
+
     // Verificar estructura de respuesta
     if (!response_data || typeof response_data !== 'object') {
       return {
@@ -299,7 +276,7 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
         timestamp: new Date().toISOString(),
       };
     }
-    
+
     // Verificar respuesta exitosa del backend
     if (!response_data.success) {
       return {
@@ -309,8 +286,8 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
         timestamp: new Date().toISOString(),
       };
     }
-    
-    // Extraer los datos del wrapper
+
+    // Extraer los datos del wrapper - la respuesta consolidada tiene estructura diferente
     const data = response_data.data;
     if (!data) {
       return {
