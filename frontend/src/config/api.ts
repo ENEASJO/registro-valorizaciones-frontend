@@ -99,7 +99,7 @@ if (import.meta.env.PROD) {
   
   // También interceptar XMLHttpRequest para mayor cobertura
   const OriginalXMLHttpRequest = globalThis.XMLHttpRequest;
-  globalThis.XMLHttpRequest = function() {
+  function InterceptedXMLHttpRequest(this: XMLHttpRequest) {
     const xhr = new OriginalXMLHttpRequest();
     const originalOpen = xhr.open;
     
@@ -120,11 +120,21 @@ if (import.meta.env.PROD) {
     };
     
     return xhr;
-  };
+  }
+  
+  // Mantener el prototype y propiedades estáticas
+  InterceptedXMLHttpRequest.prototype = OriginalXMLHttpRequest.prototype;
+  InterceptedXMLHttpRequest.UNSENT = OriginalXMLHttpRequest.UNSENT;
+  InterceptedXMLHttpRequest.OPENED = OriginalXMLHttpRequest.OPENED;
+  InterceptedXMLHttpRequest.HEADERS_RECEIVED = OriginalXMLHttpRequest.HEADERS_RECEIVED;
+  InterceptedXMLHttpRequest.LOADING = OriginalXMLHttpRequest.LOADING;
+  InterceptedXMLHttpRequest.DONE = OriginalXMLHttpRequest.DONE;
+  
+  globalThis.XMLHttpRequest = InterceptedXMLHttpRequest as any;
   
   // Interceptar el constructor Request también
   const OriginalRequest = globalThis.Request;
-  globalThis.Request = function(input: RequestInfo | URL, init?: RequestInit) {
+  function InterceptedRequest(this: Request, input: RequestInfo | URL, init?: RequestInit) {
     if (typeof input === 'string' && input.startsWith('http://registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
       const correctedUrl = input.replace('http://', 'https://');
       console.warn('🔧 Request constructor interceptado: Corrigiendo HTTP a HTTPS:', {
@@ -134,7 +144,10 @@ if (import.meta.env.PROD) {
       return new OriginalRequest(correctedUrl, init);
     }
     return new OriginalRequest(input, init);
-  };
+  }
+  
+  InterceptedRequest.prototype = OriginalRequest.prototype;
+  globalThis.Request = InterceptedRequest as any;
   
   console.log('🛡️ Fetch interceptador activado para corregir URLs HTTP');
   console.log('🛡️ XMLHttpRequest interceptador activado');
