@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { API_ENDPOINTS } from '../config/api';
+import { waitForServiceWorker, isServiceWorkerReady, debugServiceWorkerStatus } from '../utils/service-worker-manager';
 // Función auxiliar para mapear respuesta de API a tipo Empresa
 const mapearEmpresaFromAPI = (apiEmpresa) => ({
     id: apiEmpresa.id,
@@ -27,11 +28,31 @@ export const useEmpresas = () => {
     const [empresas, setEmpresas] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    // Cargar empresas guardadas desde Turso
+    // Cargar empresas guardadas desde la base de datos
     const cargarEmpresas = useCallback(async (filtros) => {
         setLoading(true);
         setError(null);
+        
+        // Debug: Log Service Worker status before making API calls
+        if (import.meta.env.PROD) {
+            console.log('🔍 Service Worker status before API call:');
+            debugServiceWorkerStatus();
+            console.log('⏰ API call timestamp:', new Date().toISOString());
+        }
+        
+        // Wait for Service Worker to be ready in production
+        if (import.meta.env.PROD) {
+            try {
+                console.log('⏳ Waiting for Service Worker before loading empresas...');
+                await waitForServiceWorker(5000); // 5 second timeout
+                console.log('✅ Service Worker ready, proceeding with API call');
+            } catch (error) {
+                console.warn('⚠️ Service Worker not ready, proceeding anyway:', error);
+            }
+        }
+        
         try {
+            console.log('🌐 Making API call to:', API_ENDPOINTS.empresasGuardadas);
             const response = await fetch(API_ENDPOINTS.empresasGuardadas);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -63,7 +84,7 @@ export const useEmpresas = () => {
             }
         }
         catch (err) {
-            console.error('Error loading empresas from Turso:', err);
+            console.error('Error loading empresas from database:', err);
             setError('Error al cargar empresas desde el servidor');
             setEmpresas([]);
         }
@@ -71,11 +92,24 @@ export const useEmpresas = () => {
             setLoading(false);
         }
     }, []);
-    // Crear nueva empresa usando el endpoint de Turso
+    // Crear nueva empresa usando el endpoint de la API
     const crearEmpresa = useCallback(async (empresaData) => {
         setLoading(true);
         setError(null);
+        
+        // Wait for Service Worker to be ready in production
+        if (import.meta.env.PROD) {
+            try {
+                console.log('⏳ Waiting for Service Worker before creating empresa...');
+                await waitForServiceWorker(5000);
+                console.log('✅ Service Worker ready, proceeding with create API call');
+            } catch (error) {
+                console.warn('⚠️ Service Worker not ready for create, proceeding anyway:', error);
+            }
+        }
+        
         try {
+            console.log('🌐 Making create API call to:', API_ENDPOINTS.empresas);
             const response = await fetch(API_ENDPOINTS.empresas, {
                 method: 'POST',
                 headers: {
@@ -107,11 +141,24 @@ export const useEmpresas = () => {
             setLoading(false);
         }
     }, [cargarEmpresas]);
-    // Actualizar empresa usando PUT al endpoint de Turso
+    // Actualizar empresa usando PUT al endpoint de la API
     const actualizarEmpresa = useCallback(async (id, empresaData) => {
         setLoading(true);
         setError(null);
+        
+        // Wait for Service Worker to be ready in production
+        if (import.meta.env.PROD) {
+            try {
+                console.log('⏳ Waiting for Service Worker before updating empresa...');
+                await waitForServiceWorker(5000);
+                console.log('✅ Service Worker ready, proceeding with update API call');
+            } catch (error) {
+                console.warn('⚠️ Service Worker not ready for update, proceeding anyway:', error);
+            }
+        }
+        
         try {
+            console.log('🌐 Making update API call to:', `${API_ENDPOINTS.empresas}/${id}`);
             const response = await fetch(`${API_ENDPOINTS.empresas}/${id}`, {
                 method: 'PUT',
                 headers: {
@@ -146,7 +193,7 @@ export const useEmpresas = () => {
             setLoading(false);
         }
     }, [cargarEmpresas]);
-    // Eliminar empresa por RUC usando el endpoint de Turso
+    // Eliminar empresa por RUC usando el endpoint de la API
     const eliminarEmpresa = useCallback(async (id) => {
         setLoading(true);
         setError(null);
@@ -185,7 +232,7 @@ export const useEmpresas = () => {
             setLoading(false);
         }
     }, [empresas, cargarEmpresas]);
-    // Obtener empresa por RUC usando el endpoint de Turso
+    // Obtener empresa por RUC usando el endpoint de la API
     const obtenerEmpresaPorId = useCallback(async (id) => {
         // Primero buscar en la lista local
         const empresaLocal = empresas.find(e => e.id === id);
@@ -201,7 +248,20 @@ export const useEmpresas = () => {
     const obtenerEmpresaPorRuc = useCallback(async (ruc) => {
         setLoading(true);
         setError(null);
+        
+        // Wait for Service Worker to be ready in production
+        if (import.meta.env.PROD) {
+            try {
+                console.log('⏳ Waiting for Service Worker before getting empresa by RUC...');
+                await waitForServiceWorker(5000);
+                console.log('✅ Service Worker ready, proceeding with get API call');
+            } catch (error) {
+                console.warn('⚠️ Service Worker not ready for get, proceeding anyway:', error);
+            }
+        }
+        
         try {
+            console.log('🌐 Making get API call to:', `${API_ENDPOINTS.empresasGuardadas}/${ruc}`);
             const response = await fetch(`${API_ENDPOINTS.empresasGuardadas}/${ruc}`);
             if (!response.ok) {
                 if (response.status === 404) {
@@ -224,14 +284,27 @@ export const useEmpresas = () => {
             setLoading(false);
         }
     }, []);
-    // Buscar empresas usando el endpoint de búsqueda de Turso
+    // Buscar empresas usando el endpoint de búsqueda de la API
     const buscarEmpresas = useCallback(async (query) => {
         if (!query.trim()) {
             return [];
         }
         setLoading(true);
         setError(null);
+        
+        // Wait for Service Worker to be ready in production
+        if (import.meta.env.PROD) {
+            try {
+                console.log('⏳ Waiting for Service Worker before searching empresas...');
+                await waitForServiceWorker(5000);
+                console.log('✅ Service Worker ready, proceeding with search API call');
+            } catch (error) {
+                console.warn('⚠️ Service Worker not ready for search, proceeding anyway:', error);
+            }
+        }
+        
         try {
+            console.log('🌐 Making search API call to:', `${API_ENDPOINTS.empresasSearch}?q=${encodeURIComponent(query)}`);
             const response = await fetch(`${API_ENDPOINTS.empresasSearch}?q=${encodeURIComponent(query)}`);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -251,11 +324,24 @@ export const useEmpresas = () => {
             setLoading(false);
         }
     }, []);
-    // Obtener estadísticas usando el endpoint de Turso
+    // Obtener estadísticas usando el endpoint de la API
     const obtenerEstadisticas = useCallback(async () => {
         setLoading(true);
         setError(null);
+        
+        // Wait for Service Worker to be ready in production
+        if (import.meta.env.PROD) {
+            try {
+                console.log('⏳ Waiting for Service Worker before getting stats...');
+                await waitForServiceWorker(5000);
+                console.log('✅ Service Worker ready, proceeding with stats API call');
+            } catch (error) {
+                console.warn('⚠️ Service Worker not ready for stats, proceeding anyway:', error);
+            }
+        }
+        
         try {
+            console.log('🌐 Making stats API call to:', API_ENDPOINTS.empresasStats);
             const response = await fetch(API_ENDPOINTS.empresasStats);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -276,7 +362,24 @@ export const useEmpresas = () => {
         }
     }, []);
     useEffect(() => {
-        cargarEmpresas();
+        // Delay initial load to ensure Service Worker is ready
+        const loadEmpresas = async () => {
+            if (import.meta.env.PROD) {
+                console.log('⏳ useEmpresas: Waiting for Service Worker before initial load...');
+                try {
+                    await waitForServiceWorker(5000);
+                    console.log('✅ useEmpresas: Service Worker ready, loading empresas...');
+                } catch (error) {
+                    console.warn('⚠️ useEmpresas: Service Worker not ready, loading anyway:', error);
+                }
+            } else {
+                console.log('🔧 useEmpresas: Development mode, loading empresas immediately');
+            }
+            
+            await cargarEmpresas();
+        };
+        
+        loadEmpresas();
     }, [cargarEmpresas]);
     return {
         empresas,
@@ -298,12 +401,12 @@ export const useConsorcios = () => {
     const [consorcios, setConsorcios] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    // Cargar consorcios (actualmente usando mock - pendiente de implementación en Turso)
+    // Cargar consorcios (actualmente usando mock - pendiente de implementación en la API)
     const cargarConsorcios = useCallback(async (filtros) => {
         setLoading(true);
         setError(null);
         try {
-            // TODO: Implementar endpoint de consorcios en Turso
+            // TODO: Implementar endpoint de consorcios en la API
             // Por ahora retornamos lista vacía
             setConsorcios([]);
         }
@@ -320,7 +423,7 @@ export const useConsorcios = () => {
         setLoading(true);
         setError(null);
         try {
-            // TODO: Implementar creación de consorcios en Turso
+            // TODO: Implementar creación de consorcios en la API
             throw new Error('Funcionalidad de consorcios no implementada aún');
         }
         catch (err) {
@@ -334,7 +437,7 @@ export const useConsorcios = () => {
     }, []);
     // Obtener consorcio por ID (pendiente de implementación)
     const obtenerConsorcioPorId = useCallback((id) => {
-        return null; // TODO: Implementar búsqueda de consorcios en Turso
+        return null; // TODO: Implementar búsqueda de consorcios en la API
     }, []);
     useEffect(() => {
         cargarConsorcios();
