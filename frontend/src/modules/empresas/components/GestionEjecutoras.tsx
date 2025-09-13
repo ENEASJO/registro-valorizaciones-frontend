@@ -41,9 +41,11 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
   });
   // Filtrar entidades para ejecutoras
   const entidadesEjecutoras = entidades.filter(entidad => {
-    // Solo mostrar empresas con categoria_contratista = 'EJECUTORA'
+    // Mostrar empresas con categoria_contratista = 'EJECUTORA' o null (temporal)
     if (entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa) {
-      return entidad.datos_empresa.categoria_contratista === 'EJECUTORA';
+      return entidad.datos_empresa.categoria_contratista === 'EJECUTORA' || 
+             entidad.datos_empresa.categoria_contratista === null ||
+             entidad.datos_empresa.categoria_contratista === undefined;
     }
     // Para consorcios, por ahora mostrar todos (futuro: filtrar por función del consorcio)
     return entidad.tipo_entidad === 'CONSORCIO';
