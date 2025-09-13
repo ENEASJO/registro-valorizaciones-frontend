@@ -103,49 +103,74 @@ self.addEventListener('fetch', (event) => {
     });
   }
   
-  // CORRECCIÓN: Convertir HTTP a HTTPS para nuestro dominio antes de hacer fetch
+  // CORRECCIÓN CRÍTICA: Forzar HTTPS para nuestro dominio independientemente del protocolo original
   let finalRequest = event.request;
+  let needsCorrection = false;
+  let correctedUrl = url;
+  
   for (const domain of TARGET_DOMAINS) {
-    if (url.includes('http://' + domain)) {
-      const correctedUrl = url.replace('http://' + domain, 'https://' + domain);
-      console.log(`🔧 SERVICE WORKER [${timestamp}] CORRIGIENDO URL:`, {
+    // Verificar si la URL contiene nuestro dominio y no es HTTPS
+    if (url.includes(domain) && !url.startsWith('https://')) {
+      correctedUrl = url.replace('http://' + domain, 'https://' + domain);
+      needsCorrection = true;
+      console.log(`🔧 SERVICE WORKER [${timestamp}] CORRIGIENDO URL CRÍTICA:`, {
+        original: url,
+        corrected: correctedUrl,
+        reason: 'URL contiene dominio objetivo pero no es HTTPS'
+      });
+      break;
+    }
+    
+    // Verificación adicional: asegurar que cualquier URL con nuestro dominio sea HTTPS
+    if (url.includes(domain) && url.includes('http://' + domain)) {
+      correctedUrl = url.replace('http://' + domain, 'https://' + domain);
+      needsCorrection = true;
+      console.log(`🔧 SERVICE WORKER [${timestamp}] CORRECIÓN HTTP EXPLÍCITA:`, {
         original: url,
         corrected: correctedUrl
-      });
-      
-      // Crear nueva request con la URL corregida
-      finalRequest = new Request(correctedUrl, {
-        method: event.request.method,
-        headers: event.request.headers,
-        mode: event.request.mode,
-        credentials: event.request.credentials,
-        redirect: event.request.redirect,
-        referrer: event.request.referrer,
-        referrerPolicy: event.request.referrerPolicy,
-        body: event.request.body
       });
       break;
     }
   }
   
-  // Responder con la request (posiblemente corregida)
-  console.log(`🎯 SERVICE WORKER [${timestamp}] FETCH FINAL:`, {
-    originalUrl: url,
-    finalRequestUrl: finalRequest.url,
-    method: finalRequest.method
-  });
-  
-  // Si finalRequest es el mismo que event.request, clonarlo para evitar errores
-  if (finalRequest === event.request) {
-    try {
-      const requestClone = event.request.clone();
-      event.respondWith(fetch(requestClone));
-    } catch (error) {
-      console.error(`❌ SERVICE WORKER [${timestamp}] Error en fetch final:`, error);
-      event.respondWith(fetch(finalRequest));
-    }
+  // Si se necesita corrección, crear nueva request con URL HTTPS
+  if (needsCorrection) {
+    console.log(`🎯 SERVICE WORKER [${timestamp}] CREANDO NUEVA REQUEST HTTPS:`, {
+      originalUrl: url,
+      finalUrl: correctedUrl,
+      method: event.request.method
+    });
+    
+    finalRequest = new Request(correctedUrl, {
+      method: event.request.method,
+      headers: event.request.headers,
+      mode: event.request.mode,
+      credentials: event.request.credentials,
+      redirect: event.request.redirect,
+      referrer: event.request.referrer,
+      referrerPolicy: event.request.referrerPolicy,
+      body: event.request.body
+    });
   } else {
-    event.respondWith(fetch(finalRequest));
+    console.log(`🎯 SERVICE WORKER [${timestamp}] URL YA ES HTTPS - FETCH DIRECTO:`, {
+      url: url,
+      method: event.request.method
+    });
+  }
+  
+  // IMPORTANTE: Siempre clonar el request para evitar errores de cuerpo ya leído
+  try {
+    const requestClone = finalRequest.clone();
+    event.respondWith(fetch(requestClone));
+  } catch (error) {
+    console.error(`❌ SERVICE WORKER [${timestamp}] Error crítico en fetch:`, error);
+    // Último recurso: intentar con la petición original
+    try {
+      event.respondWith(fetch(event.request));
+    } catch (finalError) {
+      console.error(`❌ SERVICE WORKER [${timestamp}] Error fatal en fetch final:`, finalError);
+      throw finalError;
+    }
   }
 });
 
@@ -160,6 +185,11 @@ self.addEventListener('message', (event) => {
       active: true,
       scope: self.registration?.scope
     });
+  }
+  
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('⏭️ Service Worker saltando espera');
+    self.skipWaiting();
   }
 });
 

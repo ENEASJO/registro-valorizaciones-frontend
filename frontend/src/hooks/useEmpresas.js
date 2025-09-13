@@ -60,7 +60,9 @@ export const useEmpresas = () => {
             const result = await response.json();
             if (result.success && result.data) {
                 // Convertir respuesta de API a formato Empresa
-                let empresasFromAPI = result.data.map(mapearEmpresaFromAPI);
+                // La respuesta está anidada: result.data.empresas
+                const empresasArray = result.data.empresas || result.data; // Fallback por si cambia el formato
+                let empresasFromAPI = empresasArray.map(mapearEmpresaFromAPI);
                 // Aplicar filtros localmente
                 if (filtros?.search) {
                     const searchTerm = filtros.search.toLowerCase();
@@ -311,7 +313,9 @@ export const useEmpresas = () => {
             }
             const result = await response.json();
             if (result.success && result.data) {
-                return result.data.map(mapearEmpresaFromAPI);
+                // La respuesta está anidada: result.data.empresas
+                const empresasArray = result.data.empresas || result.data; // Fallback por si cambia el formato
+                return empresasArray.map(mapearEmpresaFromAPI);
             }
             return [];
         }

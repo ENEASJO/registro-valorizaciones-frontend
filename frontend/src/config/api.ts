@@ -66,6 +66,11 @@ if (import.meta.env.PROD) {
         return windowFetch.call(this, input, init);
       }
       
+      // DEBUG: Mostrar URL original para depuración
+      if (url.includes('registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
+        console.log('🔍 DEBUG: URL que llega al interceptor fetch:', url);
+      }
+      
       const cleanUrl = url.trim();
       const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
       
