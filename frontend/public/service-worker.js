@@ -82,8 +82,14 @@ self.addEventListener('fetch', (event) => {
       url: url,
       method: event.request.method
     });
-    // IMPORTANTE: Hacer fetch directo de la request original sin modificar
-    event.respondWith(fetch(event.request));
+    // IMPORTANTE: Clonar el request antes de hacer fetch para evitar "Failed to fetch"
+    try {
+      const requestClone = event.request.clone();
+      event.respondWith(fetch(requestClone));
+    } catch (error) {
+      console.error(`❌ SERVICE WORKER [${timestamp}] Error en fetch directo:`, error);
+      event.respondWith(fetch(event.request));
+    }
     return;
   }
   
@@ -129,7 +135,18 @@ self.addEventListener('fetch', (event) => {
     method: finalRequest.method
   });
   
-  event.respondWith(fetch(finalRequest));
+  // Si finalRequest es el mismo que event.request, clonarlo para evitar errores
+  if (finalRequest === event.request) {
+    try {
+      const requestClone = event.request.clone();
+      event.respondWith(fetch(requestClone));
+    } catch (error) {
+      console.error(`❌ SERVICE WORKER [${timestamp}] Error en fetch final:`, error);
+      event.respondWith(fetch(finalRequest));
+    }
+  } else {
+    event.respondWith(fetch(finalRequest));
+  }
 });
 
 // Debug: Log Service Worker messages
