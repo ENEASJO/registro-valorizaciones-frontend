@@ -108,7 +108,30 @@ if (import.meta.env.PROD) {
     console.log('🛡️ WINDOW.FETCH interceptador activado');
   }
   
-  // Service Worker registration is now handled by service-worker-manager.ts
+  // Service Worker registration - Forzar reinstalación para corregir Mixed Content
+  if ('serviceWorker' in navigator && import.meta.env.PROD) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(registration => {
+        console.log('🔄 Desinstalando Service Worker anterior:', registration);
+        registration.unregister();
+      });
+      
+      // Forzar nueva instalación
+      setTimeout(() => {
+        navigator.serviceWorker.register('/service-worker.js?v=' + Date.now(), {
+          scope: '/'
+        }).then(registration => {
+          console.log('✅ Service Worker reinstalado:', registration);
+          // Forzar activación inmediata
+          if (registration.active) {
+            registration.active.postMessage({ type: 'SKIP_WAITING' });
+          }
+        }).catch(error => {
+          console.error('❌ Error al reinstalar Service Worker:', error);
+        });
+      }, 1000);
+    });
+  }
   // Sobrescribir fetch para interceptar y corregir URLs HTTP
   const originalFetch = globalThis.fetch;
   globalThis.fetch = function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
@@ -273,8 +296,8 @@ export const API_ENDPOINTS = {
   // Health check
   health: `${API_BASE_URL}/health`,
   
-  // OSCE - Extracción de consorcios con Playwright
-  consultaOsce: `${API_BASE_URL}/consulta-osce`,
+  // OSCE - Extracción de consorcios con Playwright (usando endpoint consolidado que incluye OSCE)
+  consultaOsce: `${API_BASE_URL}/consulta-osce`, // Temporalmente deshabilitado - usar consultaRucConsolidada en su lugar
   buscar: `${API_BASE_URL}/buscar`
 } as const;
 

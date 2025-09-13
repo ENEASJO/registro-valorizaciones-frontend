@@ -28,6 +28,35 @@ self.addEventListener('fetch', (event) => {
   const url = event.request.url;
   const timestamp = new Date().toISOString();
   
+  // Debug: Log all fetch requests to see what's happening
+  if (url.includes(TARGET_DOMAINS[0]) || url.includes('/api/')) {
+    console.log(`🌐 SERVICE WORKER [${timestamp}] petición recibida:`, {
+      url: url,
+      method: event.request.method,
+      isHTTPS: url.startsWith('https://'),
+      containsTargetDomain: TARGET_DOMAINS.some(domain => url.includes(domain))
+    });
+  }
+  
+  // CORRECCIÓN PRINCIPAL: Si la URL ya es HTTPS, responder directamente
+  if (url.startsWith('https://')) {
+    console.log(`✅ SERVICE WORKER [${timestamp}] URL ya es HTTPS - FETCH DIRECTO:`, {
+      url: url,
+      method: event.request.method
+    });
+    
+    // Clonar el request para evitar "body already used" errors
+    try {
+      const requestClone = event.request.clone();
+      event.respondWith(fetch(requestClone));
+      return; // IMPORTANTE: Salir después de responder
+    } catch (error) {
+      console.error(`❌ SERVICE WORKER [${timestamp}] Error en fetch directo:`, error);
+      event.respondWith(fetch(event.request));
+      return;
+    }
+  }
+  
   // Detectar URLs HTTP de nuestros dominios objetivo y convertirlas a HTTPS
   const shouldIntercept = TARGET_DOMAINS.some(domain => 
     url.includes('http://' + domain)
@@ -39,7 +68,7 @@ self.addEventListener('fetch', (event) => {
       correctedUrl = correctedUrl.replace('http://' + domain, 'https://' + domain);
     });
     
-    console.log(`🔧 SERVICE WORKER [${timestamp}] interceptado:`, {
+    console.log(`🔧 SERVICE WORKER [${timestamp}] CORRIGIENDO HTTP a HTTPS:`, {
       original: url,
       corrected: correctedUrl,
       method: event.request.method,
@@ -73,105 +102,16 @@ self.addEventListener('fetch', (event) => {
         throw error;
       })
     );
-    return;
+    return; // IMPORTANTE: Salir después de responder
   }
   
-  // Si la URL ya es HTTPS, usarla directamente - ESTA ES LA CORRECCIÓN CLAVE
-  if (url.startsWith('https://')) {
-    console.log(`✅ SERVICE WORKER [${timestamp}] URL ya es HTTPS - FETCH DIRECTO:`, {
-      url: url,
-      method: event.request.method
-    });
-    // IMPORTANTE: Clonar el request antes de hacer fetch para evitar "Failed to fetch"
-    try {
-      const requestClone = event.request.clone();
-      event.respondWith(fetch(requestClone));
-    } catch (error) {
-      console.error(`❌ SERVICE WORKER [${timestamp}] Error en fetch directo:`, error);
-      event.respondWith(fetch(event.request));
-    }
-    return;
-  }
+  // Para cualquier otra petición, dejarla pasar sin modificaciones
+  console.log(`🔄 SERVICE WORKER [${timestamp}] Pasando petición sin modificar:`, {
+    url: url,
+    method: event.request.method
+  });
   
-  // Debug: Log all fetch requests to see what's happening
-  if (url.includes(TARGET_DOMAINS[0]) || url.includes('/api/')) {
-    console.log(`🌐 SERVICE WORKER [${timestamp}] petición recibida:`, {
-      url: url,
-      method: event.request.method,
-      isHTTPS: url.startsWith('https://'),
-      containsTargetDomain: TARGET_DOMAINS.some(domain => url.includes(domain))
-    });
-  }
-  
-  // CORRECCIÓN CRÍTICA: Forzar HTTPS para nuestro dominio independientemente del protocolo original
-  let finalRequest = event.request;
-  let needsCorrection = false;
-  let correctedUrl = url;
-  
-  for (const domain of TARGET_DOMAINS) {
-    // Verificar si la URL contiene nuestro dominio y no es HTTPS
-    if (url.includes(domain) && !url.startsWith('https://')) {
-      correctedUrl = url.replace('http://' + domain, 'https://' + domain);
-      needsCorrection = true;
-      console.log(`🔧 SERVICE WORKER [${timestamp}] CORRIGIENDO URL CRÍTICA:`, {
-        original: url,
-        corrected: correctedUrl,
-        reason: 'URL contiene dominio objetivo pero no es HTTPS'
-      });
-      break;
-    }
-    
-    // Verificación adicional: asegurar que cualquier URL con nuestro dominio sea HTTPS
-    if (url.includes(domain) && url.includes('http://' + domain)) {
-      correctedUrl = url.replace('http://' + domain, 'https://' + domain);
-      needsCorrection = true;
-      console.log(`🔧 SERVICE WORKER [${timestamp}] CORRECIÓN HTTP EXPLÍCITA:`, {
-        original: url,
-        corrected: correctedUrl
-      });
-      break;
-    }
-  }
-  
-  // Si se necesita corrección, crear nueva request con URL HTTPS
-  if (needsCorrection) {
-    console.log(`🎯 SERVICE WORKER [${timestamp}] CREANDO NUEVA REQUEST HTTPS:`, {
-      originalUrl: url,
-      finalUrl: correctedUrl,
-      method: event.request.method
-    });
-    
-    finalRequest = new Request(correctedUrl, {
-      method: event.request.method,
-      headers: event.request.headers,
-      mode: event.request.mode,
-      credentials: event.request.credentials,
-      redirect: event.request.redirect,
-      referrer: event.request.referrer,
-      referrerPolicy: event.request.referrerPolicy,
-      body: event.request.body
-    });
-  } else {
-    console.log(`🎯 SERVICE WORKER [${timestamp}] URL YA ES HTTPS - FETCH DIRECTO:`, {
-      url: url,
-      method: event.request.method
-    });
-  }
-  
-  // IMPORTANTE: Siempre clonar el request para evitar errores de cuerpo ya leído
-  try {
-    const requestClone = finalRequest.clone();
-    event.respondWith(fetch(requestClone));
-  } catch (error) {
-    console.error(`❌ SERVICE WORKER [${timestamp}] Error crítico en fetch:`, error);
-    // Último recurso: intentar con la petición original
-    try {
-      event.respondWith(fetch(event.request));
-    } catch (finalError) {
-      console.error(`❌ SERVICE WORKER [${timestamp}] Error fatal en fetch final:`, finalError);
-      throw finalError;
-    }
-  }
+  event.respondWith(fetch(event.request));
 });
 
 // Debug: Log Service Worker messages

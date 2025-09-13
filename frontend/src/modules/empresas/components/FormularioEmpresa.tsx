@@ -252,23 +252,31 @@ const FormularioEmpresa = ({
           body: JSON.stringify({ ruc: formData.ruc })
         };
       } else {
-        // Para personas jurídicas, usar POST /consultar-ruc (más confiable) 
-        endpoint = API_ENDPOINTS.consultaRuc;
-        tipoConsulta = 'SUNAT';
+        // Para personas jurídicas, usar GET /consulta-ruc-consolidada para obtener SUNAT + OSCE
+        endpoint = `${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`;
+        tipoConsulta = 'CONSOLIDADO';
         fetchOptions = {
-          method: 'POST',
+          method: 'GET',
           headers: {
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ruc: formData.ruc })
+          }
         };
       }
       
-      const response = await fetch(endpoint, fetchOptions);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
+      // Configurar timeout para evitar que la consulta se quede colgada
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 segundos de timeout
+      
+      try {
+        const response = await fetch(endpoint, {
+          ...fetchOptions,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       const result = await response.json();
       
       // Extraer los datos de la respuesta (nuevo formato: {success, data})
@@ -331,7 +339,15 @@ const FormularioEmpresa = ({
           
           // Llamar consolidada en segundo plano para obtener representantes y contactos adicionales
           try {
-            const consolidadaResponse = await fetch(`${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`);
+            // Configurar timeout para la llamada secundaria (más corto porque es en segundo plano)
+            const osceController = new AbortController();
+            const osceTimeoutId = setTimeout(() => osceController.abort(), 30000); // 30 segundos
+            
+            const consolidadaResponse = await fetch(`${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`, {
+              signal: osceController.signal
+            });
+            clearTimeout(osceTimeoutId);
+            
             if (consolidadaResponse.ok) {
               const consolidadaResult = await consolidadaResponse.json();
               const consolidadaData = consolidadaResult.success ? consolidadaResult.data : consolidadaResult;
@@ -369,7 +385,14 @@ const FormularioEmpresa = ({
               }
             }
           } catch (osceError) {
-            // No es crítico, continuar con los datos de SUNAT
+            // Limpiar timeout si existe
+            if (osceTimeoutId) {
+              clearTimeout(osceTimeoutId);
+            }
+            
+            // No es crítico, pero registrar el error para debug
+            console.warn('⚠️ Error en consulta OSCE secundaria:', osceError);
+            // Continuar con los datos de SUNAT ya obtenidos
           }
           
         } else {
@@ -377,7 +400,23 @@ const FormularioEmpresa = ({
         }
       }
     } catch (err) {
-      setError('Error de conexión. Verifique que la API esté ejecutándose.');
+      // Limpiar timeout si existe
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      
+      // Manejar diferentes tipos de errores
+      if (err.name === 'AbortError') {
+        setError('⏱️ La consulta está tomando demasiado tiempo. El scraping puede tardar hasta 45 segundos. Por favor espere o intente nuevamente.');
+      } else if (err.message.includes('HTTP 404')) {
+        setError('❌ RUC no encontrado en los registros de SUNAT/OSCE.');
+      } else if (err.message.includes('HTTP 5')) {
+        setError('🔧 Error en el servidor de scraping. Por favor intente nuevamente en unos minutos.');
+      } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        setError('🌐 Error de conexión. Verifique su conexión a internet.');
+      } else {
+        setError(`❌ Error de conexión: ${err.message || 'Verifique que la API esté ejecutándose.'}`);
+      }
     } finally {
       setConsultando(false);
     }
@@ -821,7 +860,9 @@ const FormularioEmpresa = ({
                 {consultando ? (
                   <>
                     <Loader2 className="w-6 h-6 animate-spin" />
-                    Consultando...
+                    <span>
+                      {formData.ruc.startsWith('10') ? 'Consultando SUNAT...' : 'Scraping SUNAT + OSCE...'}
+                    </span>
                   </>
                 ) : (
                   <>
