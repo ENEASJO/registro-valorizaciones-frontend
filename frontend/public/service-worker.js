@@ -76,6 +76,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Si la URL ya es HTTPS, usarla directamente - ESTA ES LA CORRECCIÓN CLAVE
+  if (url.startsWith('https://')) {
+    console.log(`✅ SERVICE WORKER [${timestamp}] URL ya es HTTPS - FETCH DIRECTO:`, {
+      url: url,
+      method: event.request.method
+    });
+    // IMPORTANTE: Hacer fetch directo de la request original sin modificar
+    event.respondWith(fetch(event.request));
+    return;
+  }
+  
   // Debug: Log all fetch requests to see what's happening
   if (url.includes(TARGET_DOMAINS[0]) || url.includes('/api/')) {
     console.log(`🌐 SERVICE WORKER [${timestamp}] petición recibida:`, {
@@ -112,6 +123,12 @@ self.addEventListener('fetch', (event) => {
   }
   
   // Responder con la request (posiblemente corregida)
+  console.log(`🎯 SERVICE WORKER [${timestamp}] FETCH FINAL:`, {
+    originalUrl: url,
+    finalRequestUrl: finalRequest.url,
+    method: finalRequest.method
+  });
+  
   event.respondWith(fetch(finalRequest));
 });
 

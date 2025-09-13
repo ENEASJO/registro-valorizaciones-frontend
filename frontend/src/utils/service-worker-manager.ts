@@ -33,8 +33,10 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
     try {
       console.log('🛡️ Registering Service Worker...');
       
-      // Register the Service Worker
-      const registration = await navigator.serviceWorker.register('/service-worker.js', {
+      // Register the Service Worker with cache busting
+      const timestamp = Date.now();
+      const serviceWorkerUrl = `/service-worker.js?v=${timestamp}`;
+      const registration = await navigator.serviceWorker.register(serviceWorkerUrl, {
         scope: '/'
       });
       
