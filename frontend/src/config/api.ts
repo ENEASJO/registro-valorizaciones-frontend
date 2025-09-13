@@ -47,6 +47,59 @@ if (import.meta.env.PROD && finalUrl.startsWith('http://')) {
 
 export const API_BASE_URL = finalUrl;
 
+// Interceptador global para corregir URLs HTTP en producción (definitivo)
+if (import.meta.env.PROD) {
+  // Sobrescribir fetch para interceptar y corregir URLs HTTP
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = function(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    let url: string;
+    
+    if (typeof input === 'string') {
+      url = input;
+    } else if (input instanceof URL) {
+      url = input.toString();
+    } else if (input instanceof Request) {
+      url = input.url;
+    } else {
+      return originalFetch.call(this, input, init);
+    }
+    
+    // Corregir URLs HTTP en producción
+    if (url.startsWith('http://registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
+      const correctedUrl = url.replace('http://', 'https://');
+      console.warn('🔧 Fetch interceptado: Corrigiendo HTTP a HTTPS:', {
+        original: url,
+        corrected: correctedUrl
+      });
+      
+      if (typeof input === 'string') {
+        return originalFetch.call(this, correctedUrl, init);
+      } else if (input instanceof URL) {
+        return originalFetch.call(this, new URL(correctedUrl), init);
+      } else {
+        // Para Request objects, crear uno nuevo con la URL corregida
+        const newRequest = new Request(correctedUrl, {
+          method: input.method,
+          headers: input.headers,
+          body: input.body,
+          mode: input.mode,
+          credentials: input.credentials,
+          cache: input.cache,
+          redirect: input.redirect,
+          referrer: input.referrer,
+          referrerPolicy: input.referrerPolicy,
+          ...init
+        });
+        return originalFetch.call(this, newRequest);
+      }
+    }
+    
+    return originalFetch.call(this, input, init);
+  };
+  
+  console.log('🛡️ Fetch interceptador activado para corregir URLs HTTP');
+}
+
 // Debug en producción
 if (import.meta.env.PROD) {
   console.log('🌐 Configuración de API en producción:');
