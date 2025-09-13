@@ -175,14 +175,15 @@ const FormularioEmpresa = ({
       direccion = data.direccion || '';
       dni = data.dni || '';
     } else {
-      email = data.contacto?.email || '';
-      
-      // Clean phone field
-      let telefonoRaw = data.contacto?.telefono || '';
+      // For legal entities, use contact data from the new consolidated structure
+      email = data.email || data.contactos?.[0]?.email || '';
+
+      // Clean phone field - handle both new and old structure
+      let telefonoRaw = data.telefono || data.contactos?.[0]?.telefono || '';
       celular = telefonoRaw.replace(/^[^:]*:\s*/, '').replace(/\n/g, '').trim();
-      
+
       // Use fiscal address as main address
-      direccion = data.contacto?.domicilio_fiscal || data.contacto?.direccion || '';
+      direccion = data.direccion || data.contactos?.[0]?.domicilio_fiscal || data.contactos?.[0]?.direccion || '';
     }
     
     const newFormData = {
@@ -281,117 +282,83 @@ const FormularioEmpresa = ({
       const data = result.success ? result.data : result;
       
       if (esPersonaNatural) {
-        // Procesar respuesta SUNAT-only para persona natural
+        // Procesar respuesta consolidada para persona natural
         if (data.ruc && data.razon_social) {
           const dniExtracted = extractDniFromRuc(data.ruc);
+
+          // Extract contact information
+          const contacto = data.contactos?.[0] || {};
+          const telefono = contacto.telefono
+            ? contacto.telefono.replace(/^[^:]*:\s*/, '').replace(/\n/g, '').trim()
+            : '';
+
           setFormData(prev => ({
             ...prev,
             ruc: data.ruc,
             razon_social: data.razon_social,
             dni: dniExtracted,
-            email: '',
-            celular: '',
+            email: data.email || contacto.email || '',
+            celular: data.telefono || telefono || '',
             direccion: data.direccion || '',
             representantes: [], // Natural persons don't have separate representatives
             representante_principal_id: 0,
             especialidades_oece: [],
             estado: (data.estado === 'ACTIVO' ? 'ACTIVO' : data.estado === 'INACTIVO' ? 'INACTIVO' : 'SUSPENDIDO') as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_sunat: 'ACTIVO',
-            fuentes_consultadas: ['SUNAT'],
-            capacidad_contratacion: undefined
+            fuentes_consultadas: data.fuentes || ['SUNAT', 'OSCE'],
+            capacidad_contratacion: data.capacidad_contratacion || undefined
           }));
           setDatosObtenidos(true);
           setCurrentStep(2);
-          setTipoConsultaRealizada('SUNAT');
+          setTipoConsultaRealizada('CONSOLIDADO');
           setError('');
           
         } else {
           setError(result.message || 'No se pudo obtener información de SUNAT para este RUC');
         }
       } else {
-        // Procesar respuesta SUNAT para persona jurídica
+        // Procesar respuesta consolidada para persona jurídica
         if (data.ruc && data.razon_social) {
-          // Para personas jurídicas usando SUNAT, no tenemos representantes aún
-          // Podríamos llamar a la API consolidada posteriormente para obtener representantes
-          
+          // Extract contact information from the consolidated response
+          const contacto = data.contactos?.[0] || {};
+          const telefono = contacto.telefono
+            ? contacto.telefono.replace(/^[^:]*:\s*/, '').replace(/\n/g, '').trim()
+            : '';
+
+          // Process representatives from the consolidated response
+          const representantesProcesados = (data.representantes || []).map(rep => ({
+            nombre: rep.nombre || '',
+            cargo: rep.cargo || 'SOCIO',
+            numero_documento: rep.documento || rep.numero_documento || '',
+            tipo_documento: 'DNI' as 'DNI' | 'CE' | 'PASSPORT',
+            fuente: (rep.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'OECE',
+            es_principal: false,
+            activo: true
+          }));
+
+          // Set the main representative if available
+          const representantePrincipalId = representantesProcesados.length > 0 ? 0 : -1;
+
           setFormData(prev => ({
             ...prev,
             ruc: data.ruc,
             razon_social: data.razon_social,
-            email: '',
-            celular: '',
+            email: data.email || contacto.email || '',
+            celular: data.telefono || telefono || '',
             direccion: data.direccion || '',
-            representantes: [], // Sin representantes por ahora
-            representante_principal_id: 0,
-            especialidades_oece: [],
+            representantes: representantesProcesados,
+            representante_principal_id: representantePrincipalId,
+            especialidades_oece: data.especialidades || [],
             estado: (data.estado === 'ACTIVO' ? 'ACTIVO' : data.estado === 'INACTIVO' ? 'INACTIVO' : 'SUSPENDIDO') as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_sunat: 'ACTIVO' as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_osce: '',
-            fuentes_consultadas: ['SUNAT'],
-            capacidad_contratacion: ''
+            fuentes_consultadas: data.fuentes || ['SUNAT', 'OSCE'],
+            capacidad_contratacion: data.capacidad_contratacion || ''
           }));
           setDatosObtenidos(true);
           setCurrentStep(2);
-          setTipoConsultaRealizada('SUNAT');
+          setTipoConsultaRealizada('CONSOLIDADO');
           setError('');
-          
-          // Llamar consolidada en segundo plano para obtener representantes y contactos adicionales
-          try {
-            // Configurar timeout para la llamada secundaria (más corto porque es en segundo plano)
-            const osceController = new AbortController();
-            const osceTimeoutId = setTimeout(() => osceController.abort(), 30000); // 30 segundos
-            
-            const consolidadaResponse = await fetch(`${API_ENDPOINTS.consultaRucConsolidada}/${formData.ruc}`, {
-              signal: osceController.signal
-            });
-            clearTimeout(osceTimeoutId);
-            
-            if (consolidadaResponse.ok) {
-              const consolidadaResult = await consolidadaResponse.json();
-              const consolidadaData = consolidadaResult.success ? consolidadaResult.data : consolidadaResult;
-              
-              if (consolidadaData.representantes && consolidadaData.representantes.length > 0) {
-                // Agregar representantes de OSCE
-                const representantesProcesados = consolidadaData.representantes.map(rep => ({
-                  nombre: rep.nombre || '',
-                  cargo: rep.cargo || 'SOCIO',
-                  numero_documento: rep.documento || rep.numero_documento || '',
-                  tipo_documento: 'DNI' as 'DNI' | 'CE' | 'PASSPORT',
-                  fuente: (rep.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'OECE',
-                  es_principal: false,
-                  activo: true
-                }));
-                
-                // Información de contacto adicional
-                const contacto = consolidadaData.contactos ? consolidadaData.contactos[0] : {};
-                const telefono = contacto.telefono 
-                  ? contacto.telefono.replace(/Teléfono\(\*\)\s*:\s*/g, '').replace(/\n/g, '').trim() 
-                  : '';
-                
-                setFormData(prev => ({
-                  ...prev,
-                  email: contacto.email || prev.email,
-                  celular: telefono || prev.celular,
-                  direccion: consolidadaData.direccion && consolidadaData.direccion !== "y/o conformación jurídica" 
-                    ? consolidadaData.direccion 
-                    : prev.direccion, // Solo usar si la dirección es válida
-                  representantes: representantesProcesados,
-                  especialidades_oece: consolidadaData.especialidades || [],
-                  fuentes_consultadas: ['SUNAT', 'OSCE'],
-                  capacidad_contratacion: consolidadaData.capacidad_contratacion || ''
-                }));
-              }
-            }
-          } catch (osceError) {
-            // Limpiar timeout si existe
-            if (osceTimeoutId) {
-              clearTimeout(osceTimeoutId);
-            }
-            
-            // No es crítico, pero registrar el error para debug
-            console.warn('⚠️ Error en consulta OSCE secundaria:', osceError);
-            // Continuar con los datos de SUNAT ya obtenidos
-          }
           
         } else {
           setError(result.message || 'No se pudo obtener información de SUNAT para este RUC');
