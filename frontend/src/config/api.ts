@@ -47,17 +47,6 @@ if (import.meta.env.PROD && finalUrl.startsWith('http://')) {
 
 export const API_BASE_URL = finalUrl;
 
-// Agregar parámetro de versión para evitar caché en desarrollo
-if (import.meta.env.DEV) {
-  // En desarrollo, agregar timestamp para evitar caché
-  const cacheParam = `?_v=${Date.now()}`;
-  Object.keys(API_ENDPOINTS).forEach(key => {
-    if (typeof API_ENDPOINTS[key as keyof typeof API_ENDPOINTS] === 'string') {
-      (API_ENDPOINTS as any)[key] += cacheParam;
-    }
-  });
-}
-
 // Debug en producción
 if (import.meta.env.PROD) {
   console.log('🌐 Configuración de API en producción:');
@@ -102,6 +91,17 @@ export const API_ENDPOINTS = {
   consultaOsce: `${API_BASE_URL}/consulta-osce`,
   buscar: `${API_BASE_URL}/buscar`
 } as const;
+
+// Agregar parámetro de versión para evitar caché en desarrollo
+if (import.meta.env.DEV) {
+  // En desarrollo, agregar timestamp para evitar caché
+  const cacheParam = `?_v=${Date.now()}`;
+  Object.keys(API_ENDPOINTS).forEach(key => {
+    if (typeof API_ENDPOINTS[key as keyof typeof API_ENDPOINTS] === 'string') {
+      (API_ENDPOINTS as any)[key] += cacheParam;
+    }
+  });
+}
 
 // Configuración de headers por defecto
 export const DEFAULT_HEADERS = {
