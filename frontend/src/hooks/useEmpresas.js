@@ -58,11 +58,14 @@ export const useEmpresas = () => {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             const result = await response.json();
+            console.log('📊 DEBUG: Respuesta completa del API:', result);
             if (result.success && result.data) {
                 // Convertir respuesta de API a formato Empresa
                 // La respuesta está anidada: result.data.empresas
                 const empresasArray = result.data.empresas || result.data; // Fallback por si cambia el formato
+                console.log('📊 DEBUG: Array de empresas antes de mapear:', empresasArray);
                 let empresasFromAPI = empresasArray.map(mapearEmpresaFromAPI);
+                console.log('📊 DEBUG: Empresas después de mapear:', empresasFromAPI);
                 // Aplicar filtros localmente
                 if (filtros?.search) {
                     const searchTerm = filtros.search.toLowerCase();
@@ -312,10 +315,14 @@ export const useEmpresas = () => {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             const result = await response.json();
+            console.log('🔍 DEBUG: Respuesta de búsqueda:', result);
             if (result.success && result.data) {
                 // La respuesta está anidada: result.data.empresas
                 const empresasArray = result.data.empresas || result.data; // Fallback por si cambia el formato
-                return empresasArray.map(mapearEmpresaFromAPI);
+                console.log('🔍 DEBUG: Array de empresas en búsqueda:', empresasArray);
+                const mappedEmpresas = empresasArray.map(mapearEmpresaFromAPI);
+                console.log('🔍 DEBUG: Empresas mapeadas en búsqueda:', mappedEmpresas);
+                return mappedEmpresas;
             }
             return [];
         }
