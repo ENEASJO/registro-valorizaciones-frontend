@@ -64,11 +64,14 @@ if (import.meta.env.PROD) {
       return originalFetch.call(this, input, init);
     }
     
-    // Corregir URLs HTTP en producción
-    if (url.startsWith('http://registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
-      const correctedUrl = url.replace('http://', 'https://');
+    // Corregir URLs HTTP en producción - detección mejorada
+    const cleanUrl = url.trim();
+    const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
+    
+    if (cleanUrl.includes('http://' + targetDomain)) {
+      const correctedUrl = cleanUrl.replace('http://' + targetDomain, 'https://' + targetDomain);
       console.warn('🔧 Fetch interceptado: Corrigiendo HTTP a HTTPS:', {
-        original: url,
+        original: cleanUrl,
         corrected: correctedUrl
       });
       
@@ -94,6 +97,11 @@ if (import.meta.env.PROD) {
       }
     }
     
+    // Debug: mostrar todas las URLs que pasan por fetch
+    if (cleanUrl.includes(targetDomain)) {
+      console.log('🔍 Fetch URL detectada:', cleanUrl);
+    }
+    
     return originalFetch.call(this, input, init);
   };
   
@@ -106,11 +114,14 @@ if (import.meta.env.PROD) {
     xhr.open = function(method: string, url: string | URL, async?: boolean, username?: string | null, password?: string | null) {
       let urlString = url.toString();
       
-      // Corregir URLs HTTP
-      if (urlString.startsWith('http://registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
-        const correctedUrl = urlString.replace('http://', 'https://');
+      // Corregir URLs HTTP - detección mejorada
+      const cleanUrlString = urlString.trim();
+      const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
+      
+      if (cleanUrlString.includes('http://' + targetDomain)) {
+        const correctedUrl = cleanUrlString.replace('http://' + targetDomain, 'https://' + targetDomain);
         console.warn('🔧 XMLHttpRequest interceptado: Corrigiendo HTTP a HTTPS:', {
-          original: urlString,
+          original: cleanUrlString,
           corrected: correctedUrl
         });
         urlString = correctedUrl;
@@ -135,13 +146,18 @@ if (import.meta.env.PROD) {
   // Interceptar el constructor Request también
   const OriginalRequest = globalThis.Request;
   function InterceptedRequest(this: Request, input: RequestInfo | URL, init?: RequestInit) {
-    if (typeof input === 'string' && input.startsWith('http://registro-valorizaciones-503600768755.southamerica-west1.run.app')) {
-      const correctedUrl = input.replace('http://', 'https://');
-      console.warn('🔧 Request constructor interceptado: Corrigiendo HTTP a HTTPS:', {
-        original: input,
-        corrected: correctedUrl
-      });
-      return new OriginalRequest(correctedUrl, init);
+    if (typeof input === 'string') {
+      const cleanInput = input.trim();
+      const targetDomain = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
+      
+      if (cleanInput.includes('http://' + targetDomain)) {
+        const correctedUrl = cleanInput.replace('http://' + targetDomain, 'https://' + targetDomain);
+        console.warn('🔧 Request constructor interceptado: Corrigiendo HTTP a HTTPS:', {
+          original: cleanInput,
+          corrected: correctedUrl
+        });
+        return new OriginalRequest(correctedUrl, init);
+      }
     }
     return new OriginalRequest(input, init);
   }
