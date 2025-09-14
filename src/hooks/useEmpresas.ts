@@ -93,11 +93,21 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result: NeonApiResponse<EmpresaNeonResponse[]> = await response.json();
-      
+      const result = await response.json();
+
+      // Debug: Verificar la estructura de la respuesta
+      console.log('📊 DEBUG: Estructura completa de la respuesta:', result);
+      console.log('📊 DEBUG: Tipo de result.data:', typeof result.data);
+      console.log('📊 DEBUG: result.data es array?:', Array.isArray(result.data));
+      console.log('📊 DEBUG: result.data:', result.data);
+
       if (result.success && result.data) {
+        // Asegurarse de que data sea un array
+        const dataArray = Array.isArray(result.data) ? result.data : [result.data];
+        console.log('📊 DEBUG: dataArray después de conversión:', dataArray);
+
         // Convertir respuesta de API a formato Empresa
-        let empresasFromAPI: Empresa[] = result.data.map(mapearEmpresaFromAPI);
+        let empresasFromAPI: Empresa[] = dataArray.map(mapearEmpresaFromAPI);
       
         // Aplicar filtros localmente
         if (filtros?.search) {
