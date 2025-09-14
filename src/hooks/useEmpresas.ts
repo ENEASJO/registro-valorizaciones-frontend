@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, API_BASE_URL } from '../config/api';
 import type { 
   Empresa, 
   EntidadContratistaDetalle,
