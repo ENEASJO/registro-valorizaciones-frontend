@@ -14,6 +14,7 @@ export interface MiembroConsolidado {
   cargo?: string;
   tipo_documento?: string;
   numero_documento?: string;
+  documento?: string;
   participacion?: string;
   fecha_desde?: string;
   fuente: 'SUNAT' | 'OECE' | 'AMBOS';
@@ -64,19 +65,19 @@ export interface EmpresaConsolidada {
   razon_social: string;
   tipo_persona?: 'NATURAL' | 'JURIDICA';
   contacto: ContactoConsolidado;
-  miembros: MiembroConsolidado[];
+  representantes: MiembroConsolidado[];
   especialidades: string[];
   especialidades_detalle: any[];
   registro: RegistroConsolidado;
-  total_miembros: number;
-  total_especialidades: number;
-  fuentes_consultadas: string[];
-  fuentes_con_errores: string[];
+  total_miembros?: number;
+  total_especialidades?: number;
+  fuentes_consultadas?: string[];
+  fuentes_con_errores?: string[];
   capacidad_contratacion?: string;
   vigencia?: string;
   timestamp: string;
-  consolidacion_exitosa: boolean;
-  observaciones: string[];
+  consolidacion_exitosa?: boolean;
+  observaciones?: string[];
 }
 export interface RespuestaConsolidada {
   success: true;
@@ -180,8 +181,8 @@ function mapearEspecialidadesOSCE(especialidades: string[]): string[] {
 /**
  * Selecciona el mejor representante legal basado en el cargo
  */
-function seleccionarRepresentantePrincipal(miembros: MiembroConsolidado[]): MiembroConsolidado | null {
-  if (!miembros || miembros.length === 0) return null;
+function seleccionarRepresentantePrincipal(representantes: MiembroConsolidado[]): MiembroConsolidado | null {
+  if (!representantes || representantes.length === 0) return null;
   // Orden de prioridad por cargo
   const prioridadCargos = [
     'GERENTE GENERAL',
@@ -194,13 +195,13 @@ function seleccionarRepresentantePrincipal(miembros: MiembroConsolidado[]): Miem
   ];
   // Buscar por prioridad de cargo
   for (const cargoPreferido of prioridadCargos) {
-    const miembro = miembros.find(m => 
+    const representante = representantes.find(m =>
       m.cargo?.toUpperCase().includes(cargoPreferido)
     );
-    if (miembro) return miembro;
+    if (representante) return representante;
   }
   // Si no se encuentra por cargo, devolver el primero con DNI válido
-  return miembros.find(m => m.numero_documento && m.numero_documento.length >= 8) || miembros[0];
+  return representantes.find(m => m.numero_documento && m.numero_documento.length >= 8) || representantes[0];
 }
 /**
  * Extrae ubicación de la dirección o domicilio fiscal
@@ -315,17 +316,17 @@ function generarAdvertenciasConsolidadas(datos: EmpresaConsolidada): string[] {
   if (!datos.contacto.telefono && !datos.contacto.email) {
     advertencias.push('No se encontró información de contacto');
   }
-  if (datos.miembros.length === 0) {
+  if (datos.representantes.length === 0) {
     advertencias.push('No se encontraron representantes legales');
   }
   // Verificar especialidades
-  if (datos.especialidades.length === 0 && datos.fuentes_consultadas.includes('OECE')) {
+  if (datos.especialidades.length === 0 && datos.fuentes_consultadas?.includes('OECE')) {
     advertencias.push('No se encontraron especialidades registradas en OSCE');
   }
   // Verificar conflictos de datos entre fuentes
-  const representantesConflicto = datos.miembros.filter(m => 
-    m.fuente === 'AMBOS' && 
-    m.fuentes_detalle.matching && 
+  const representantesConflicto = datos.representantes.filter(m =>
+    m.fuente === 'AMBOS' &&
+    m.fuentes_detalle.matching &&
     parseFloat(m.fuentes_detalle.matching.split('(')[1]?.split(')')[0]) < 1.0
   );
   if (representantesConflicto.length > 0) {
@@ -453,9 +454,9 @@ export async function consultarRucConsolidadoParaFormulario(ruc: string): Promis
   }
   const datosTransformados = transformarDatosConsolidados(resultado.data);
   const advertencias = generarAdvertenciasConsolidadas(resultado.data);
-  const representantesDisponibles = resultado.data.miembros.map(miembro => ({
+  const representantesDisponibles = resultado.data.representantes.map(miembro => ({
     nombre: miembro.nombre,
-    dni: miembro.numero_documento || '',
+    dni: miembro.numero_documento || miembro.documento || '',
     cargo: miembro.cargo || '',
     fuente: miembro.fuente,
   }));

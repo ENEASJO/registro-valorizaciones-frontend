@@ -193,7 +193,7 @@ const FormularioEmpresa = ({
       email: email,
       celular: celular,
       direccion: direccion,
-      representantes: (data.miembros || []).map(miembro => ({
+      representantes: (data.representantes || []).map(miembro => ({
         nombre: miembro.nombre || '',
         cargo: miembro.cargo || 'REPRESENTANTE',
         numero_documento: miembro.numero_documento || '',
@@ -325,7 +325,7 @@ const FormularioEmpresa = ({
             : '';
 
           // Process representatives from the consolidated response
-          const representantesProcesados = (data.miembros || []).map(rep => ({
+          const representantesProcesados = (data.representantes || []).map(rep => ({
             nombre: rep.nombre || '',
             cargo: rep.cargo || 'SOCIO',
             numero_documento: rep.documento || rep.numero_documento || '',

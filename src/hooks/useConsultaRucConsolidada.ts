@@ -366,14 +366,14 @@ export function useRepresentantesLegales() {
   } = useConsultaRucConsolidada();
 
   const obtenerRepresentanteActual = useCallback(() => {
-    if (!datosOriginales || !datosOriginales.miembros.length) return null;
-    
+    if (!datosOriginales || !datosOriginales.representantes.length) return null;
+
     // Buscar el representante principal (GERENTE GENERAL generalmente)
-    const principal = datosOriginales.miembros.find(m => 
+    const principal = datosOriginales.representantes.find(m =>
       m.cargo?.toUpperCase().includes('GERENTE GENERAL')
     );
-    
-    return principal || datosOriginales.miembros[0];
+
+    return principal || datosOriginales.representantes[0];
   }, [datosOriginales]);
 
   return {
