@@ -53,14 +53,8 @@ interface EstadisticasEmpresas {
 
 // Función auxiliar para mapear respuesta de API a tipo Empresa
 const mapearEmpresaFromAPI = (apiEmpresa: EmpresaNeonResponse): Empresa => ({
-  id: typeof apiEmpresa.id === 'string' ? 
-    // Convertir UUID a número usando hash simple
-    Math.abs(apiEmpresa.id.split('').reduce((a, b) => { 
-      a = ((a << 5) - a) + b.charCodeAt(0); 
-      return a & a; 
-    }, 0)) : 
-    apiEmpresa.id,
-  codigo: apiEmpresa.codigo || `EMP${apiEmpresa.id.toString().padStart(3, '0')}`,
+  id: apiEmpresa.id, // Mantener el UUID original
+  codigo: apiEmpresa.codigo || `EMP${apiEmpresa.id.slice(-3).padStart(3, '0')}`,
   ruc: apiEmpresa.ruc,
   razon_social: apiEmpresa.razon_social,
   nombre_comercial: apiEmpresa.razon_social, // Usar razón social como nombre comercial por defecto
@@ -307,7 +301,7 @@ export const useEmpresas = () => {
   }, [empresas, cargarEmpresas]);
 
   // Obtener empresa por RUC usando el endpoint de Neon
-  const obtenerEmpresaPorId = useCallback(async (id: number): Promise<Empresa | null> => {
+  const obtenerEmpresaPorId = useCallback(async (id: string): Promise<Empresa | null> => {
     // Primero buscar en la lista local
     const empresaLocal = empresas.find(e => e.id === id);
     if (empresaLocal) {

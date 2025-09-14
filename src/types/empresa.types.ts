@@ -7,8 +7,8 @@
 export interface AuditoriaBase {
   created_at: string;
   updated_at: string;
-  created_by?: number;
-  updated_by?: number;
+  created_by?: string;
+  updated_by?: string;
   version?: number;
 }
 
@@ -61,7 +61,7 @@ export type TipoEmpresa =
  * Empresa individual registrada en el sistema
  */
 export interface Empresa extends AuditoriaBase {
-  id: number;
+  id: string;
   codigo: string;
   ruc: string;
   razon_social: string;
@@ -307,7 +307,7 @@ export interface EmpresaFormConsolidado extends EmpresaForm {
  * Consorcio de empresas
  */
 export interface Consorcio extends AuditoriaBase {
-  id: number;
+  id: string;
   codigo: string;
   nombre: string;
   descripcion?: string;
@@ -339,7 +339,7 @@ export interface ConsorcioForm {
   nombre: string;
   descripcion?: string;
   fecha_constitucion: string;
-  empresa_lider_id: number;
+  empresa_lider_id: string;
   representante_consorcio?: string;
   estado: EstadoGeneral;
   especialidades?: EspecialidadEmpresa[];
@@ -350,9 +350,9 @@ export interface ConsorcioForm {
  * Participación de una empresa en un consorcio
  */
 export interface ConsorcioEmpresa extends AuditoriaBase {
-  id: number;
-  consorcio_id: number;
-  empresa_id: number;
+  id: string;
+  consorcio_id: string;
+  empresa_id: string;
   
   // Participación
   porcentaje_participacion: number;
@@ -377,12 +377,12 @@ export interface ConsorcioEmpresa extends AuditoriaBase {
  * Entidad contratista unificada (empresa o consorcio)
  */
 export interface EntidadContratista extends AuditoriaBase {
-  id: number;
+  id: string;
   tipo_entidad: TipoEntidad;
-  
+
   // Referencias polimórficas
-  empresa_id?: number;
-  consorcio_id?: number;
+  empresa_id?: string;
+  consorcio_id?: string;
   
   // Datos denormalizados para consultas rápidas
   nombre_completo: string;
@@ -432,8 +432,8 @@ export interface ObraContratista extends AuditoriaBase {
  * Documento adjunto de empresa o consorcio
  */
 export interface EmpresaDocumento extends AuditoriaBase {
-  id: number;
-  entidad_contratista_id: number;
+  id: string;
+  entidad_contratista_id: string;
   
   // Datos del documento
   tipo_documento: TipoDocumento;
@@ -471,9 +471,9 @@ export type EstadoDocumento = 'VIGENTE' | 'VENCIDO' | 'REEMPLAZADO';
  * Registro de auditoría para cambios
  */
 export interface EmpresaAuditoria {
-  id: number;
+  id: string;
   tabla_origen: string;
-  registro_id: number;
+  registro_id: string;
   operacion: 'INSERT' | 'UPDATE' | 'DELETE';
   
   // Datos del cambio
