@@ -114,7 +114,7 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
     }
     try {
       if (entidad.tipo_entidad === 'EMPRESA' && entidad.id) {
-        await eliminarEmpresa(entidad.id);
+        await eliminarEmpresa(String(entidad.id));
         onMostrarMensaje?.('success', 'Empresa supervisora eliminada correctamente');
       } else {
         onMostrarMensaje?.('error', 'La eliminación de consorcios aún no está implementada');
