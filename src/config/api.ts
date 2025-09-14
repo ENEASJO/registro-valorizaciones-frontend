@@ -308,7 +308,8 @@ if (import.meta.env.DEV || import.meta.env.PROD) {
   Object.keys(API_ENDPOINTS).forEach(key => {
     // No añadir cache busting a endpoints que necesitan paths dinámicos
     if (typeof API_ENDPOINTS[key as keyof typeof API_ENDPOINTS] === 'string' &&
-        key !== 'consultaRucConsolidada') {
+        key !== 'consultaRucConsolidada' &&
+        key !== 'empresas') {
       (API_ENDPOINTS as any)[key] += cacheParam;
     }
   });
