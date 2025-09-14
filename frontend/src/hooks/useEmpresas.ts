@@ -237,10 +237,11 @@ export const useEmpresas = () => {
   const eliminarEmpresa = useCallback(async (id: number): Promise<boolean> => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Usar el endpoint correcto con ID (Neon soporta tanto ID como RUC)
-      const response = await fetch(`${API_ENDPOINTS.empresas}/${id}`, {
+      // Nota: No usar API_ENDPOINTS.empresas porque ya tiene cache busting
+      const response = await fetch(`${API_BASE_URL}/api/empresas/${id}`, {
         method: 'DELETE'
       });
 
