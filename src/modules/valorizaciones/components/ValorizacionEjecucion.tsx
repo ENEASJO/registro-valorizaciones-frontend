@@ -28,12 +28,12 @@ type VistaActiva = 'lista' | 'crear' | 'detalle';
 const ValorizacionEjecucion = () => {
   // Estados principales
   const [vistaActiva, setVistaActiva] = useState<VistaActiva>('lista');
-  const [valorizacionSeleccionada, setValorizacionSeleccionada] = useState<number | null>(null);
+  const [valorizacionSeleccionada, setValorizacionSeleccionada] = useState<string | null>(null);
   
   // Estados de filtros
   const [filtros, setFiltros] = useState<FiltrosValorizacion>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [obraFiltro, setObraFiltro] = useState<number | undefined>();
+  const [obraFiltro, setObraFiltro] = useState<string | undefined>();
   const [estadoFiltro, setEstadoFiltro] = useState<string>('');
   const [showFiltrosAvanzados, setShowFiltrosAvanzados] = useState(false);
 
@@ -61,7 +61,7 @@ const ValorizacionEjecucion = () => {
     setVistaActiva('crear');
   }, []);
 
-  const verDetalle = useCallback((id: number) => {
+  const verDetalle = useCallback((id: string) => {
     setValorizacionSeleccionada(id);
     setVistaActiva('detalle');
   }, []);
@@ -130,16 +130,16 @@ const ValorizacionEjecucion = () => {
   };
 
   // Función para obtener nombre de obra
-  const getNombreObra = (obraId: number) => {
+  const getNombreObra = (obraId: string) => {
     const obra = obras.find(o => o.id === obraId);
     return obra ? obra.nombre : 'Obra no encontrada';
   };
 
   // Función para obtener nombre de entidad ejecutora
-  const getNombreEjecutora = (obraId: number) => {
+  const getNombreEjecutora = (obraId: string) => {
     const obra = obras.find(o => o.id === obraId);
     if (!obra) return 'No disponible';
-    
+
     const entidad = entidades.find(e => e.id === obra.entidad_ejecutora_id);
     return entidad ? entidad.nombre_completo : 'Entidad no encontrada';
   };
@@ -276,7 +276,7 @@ const ValorizacionEjecucion = () => {
             
             <select
               value={obraFiltro || ''}
-              onChange={(e) => setObraFiltro(e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) => setObraFiltro(e.target.value || undefined)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 min-w-[200px]"
             >
               <option value="">Todas las obras</option>

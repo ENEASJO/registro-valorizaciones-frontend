@@ -532,14 +532,14 @@ export interface EstadisticasValorizaciones {
 
 export interface FiltrosValorizacion {
   search?: string;
-  obra_id?: number;
+  obra_id?: string;
   estado?: string;
   fecha_desde?: string;
   fecha_hasta?: string;
   monto_desde?: number;
   monto_hasta?: number;
-  ejecutora_id?: number;
-  supervisora_id?: number;
+  ejecutora_id?: string;
+  supervisora_id?: string;
   solo_con_atraso?: boolean;
 }
 

@@ -8,9 +8,9 @@ import '../types/valorizacion-extended.types'; // Importar extensiones de tipos
 
 // Tipo base de Valorización desde backend Neon
 export interface ValorizacionResponse {
-  id: number;
+  id: string;
   codigo?: string;
-  obra_id: number;
+  obra_id: string;
   numero_valorizacion: number;
   periodo: string;  // YYYY-MM
   fecha_inicio: string;
@@ -42,9 +42,9 @@ export interface ValorizacionResponse {
 
 // Tipo mapeado para frontend 
 export interface Valorizacion {
-  id: number;
+  id: string;
   codigo?: string;
-  obra_id: number;
+  obra_id: string;
   numero_valorizacion: number;
   periodo: string;
   fecha_inicio: string;
@@ -106,8 +106,8 @@ export interface Valorizacion {
 
 // Formulario para crear/editar valorización
 export interface ValorizacionForm {
-  id?: number;
-  obra_id: number;
+  id?: string;
+  obra_id: string;
   numero_valorizacion?: number;
   periodo: string;
   fecha_inicio: string;
@@ -140,7 +140,7 @@ export interface ValorizacionForm {
 
 // Filtros para búsqueda
 export interface FiltrosValorizacion {
-  obra_id?: number;
+  obra_id?: string;
   estado?: string;
   fecha_desde?: string;
   fecha_hasta?: string;
@@ -367,7 +367,7 @@ export const useValorizaciones = () => {
   }, []);
 
   const actualizarValorizacion = useCallback(async (
-    id: number, 
+    id: string,
     data: Partial<ValorizacionForm>
   ): Promise<Valorizacion> => {
     setLoading(true);
@@ -436,7 +436,7 @@ export const useValorizaciones = () => {
     }
   }, [valorizaciones]);
 
-  const eliminarValorizacion = useCallback(async (id: number): Promise<boolean> => {
+  const eliminarValorizacion = useCallback(async (id: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
@@ -463,7 +463,7 @@ export const useValorizaciones = () => {
     }
   }, []);
 
-  const obtenerValorizacionPorId = useCallback(async (id: number): Promise<Valorizacion> => {
+  const obtenerValorizacionPorId = useCallback(async (id: string): Promise<Valorizacion> => {
     setLoading(true);
     setError(null);
 
@@ -630,7 +630,7 @@ export const useValorizaciones = () => {
       pagadas: estadisticasLocales.porEstado.PAGADA || 0,
       conAtraso: 0 // Placeholder
     },
-    cambiarEstadoValorizacion: async (id: number, nuevoEstado: string) => {
+    cambiarEstadoValorizacion: async (id: string, nuevoEstado: string) => {
       return await actualizarValorizacion(id, { estado_valorizacion: nuevoEstado });
     },
     formatearMoneda: (monto: number) => new Intl.NumberFormat('es-PE', {
@@ -640,7 +640,7 @@ export const useValorizaciones = () => {
       maximumFractionDigits: 0
     }).format(monto),
     partidas: [], // Placeholder para compatibilidad
-    cargarPartidasPorObra: async (obraId: number) => {
+    cargarPartidasPorObra: async (obraId: string) => {
       console.warn(`Carga de partidas para obra ${obraId} no implementada aún`);
     },
     crearValorizacionEjecucion: crearValorizacion,

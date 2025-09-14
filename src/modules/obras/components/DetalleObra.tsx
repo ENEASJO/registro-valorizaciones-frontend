@@ -35,10 +35,10 @@ import { useObras, useProfesionales, useValorizaciones } from '../../../hooks/us
 import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
 
 interface DetalleObraProps {
-  obraId: number | null;
+  obraId: string | null;
   isOpen: boolean;
   onClose: () => void;
-  onEditar?: (obraId: number) => void;
+  onEditar?: (obraId: string) => void;
 }
 
 const DetalleObra: React.FC<DetalleObraProps> = ({

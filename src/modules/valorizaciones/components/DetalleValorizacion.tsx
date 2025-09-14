@@ -27,7 +27,7 @@ import TablaPartidas from './TablaPartidas';
 import type { EstadoValorizacionEjecucion } from '../../../types/valorizacion.types';
 
 interface Props {
-  valorizacionId: number;
+  valorizacionId: string;
   tipo: 'ejecucion' | 'supervision';
   onBack: () => void;
 }

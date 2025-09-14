@@ -72,8 +72,8 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
     numero_contrato: '',
     nombre: '',
     codigo_interno: '',
-    entidad_ejecutora_id: 0,
-    entidad_supervisora_id: 0,
+    entidad_ejecutora_id: '',
+    entidad_supervisora_id: '',
     monto_ejecucion: 0,
     monto_supervision: 0,
     plazo_ejecucion_dias: 0,
@@ -116,8 +116,8 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
         numero_contrato: '',
         nombre: '',
         codigo_interno: '',
-        entidad_ejecutora_id: 0,
-        entidad_supervisora_id: 0,
+        entidad_ejecutora_id: '',
+        entidad_supervisora_id: '',
         monto_ejecucion: 0,
         monto_supervision: 0,
         plazo_ejecucion_dias: 0,
@@ -654,10 +654,10 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       </label>
                       <select
                         value={formData.entidad_ejecutora_id}
-                        onChange={(e) => actualizarCampo('entidad_ejecutora_id', parseInt(e.target.value))}
+                        onChange={(e) => actualizarCampo('entidad_ejecutora_id', e.target.value)}
                         className={`input-field ${formData.errors.entidad_ejecutora_id ? 'border-red-300' : ''}`}
                       >
-                        <option value={0}>Seleccionar entidad ejecutora</option>
+                        <option value="">Seleccionar entidad ejecutora</option>
                         {entidades.map(entidad => (
                           <option key={entidad.id} value={entidad.id}>
                             {entidad.nombre_completo} ({entidad.tipo_entidad})
@@ -676,10 +676,10 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       </label>
                       <select
                         value={formData.entidad_supervisora_id}
-                        onChange={(e) => actualizarCampo('entidad_supervisora_id', parseInt(e.target.value))}
+                        onChange={(e) => actualizarCampo('entidad_supervisora_id', e.target.value)}
                         className={`input-field ${formData.errors.entidad_supervisora_id ? 'border-red-300' : ''}`}
                       >
-                        <option value={0}>Seleccionar entidad supervisora</option>
+                        <option value="">Seleccionar entidad supervisora</option>
                         {entidades
                           .filter(entidad => entidad.id !== formData.entidad_ejecutora_id)
                           .map(entidad => (

@@ -28,12 +28,12 @@ type VistaActiva = 'lista' | 'crear' | 'detalle';
 const ValorizacionSupervision = () => {
   // Estados principales
   const [vistaActiva, setVistaActiva] = useState<VistaActiva>('lista');
-  const [valorizacionSeleccionada, setValorizacionSeleccionada] = useState<number | null>(null);
+  const [valorizacionSeleccionada, setValorizacionSeleccionada] = useState<string | null>(null);
   
   // Estados de filtros
   const [filtros, setFiltros] = useState<FiltrosValorizacion>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [obraFiltro, setObraFiltro] = useState<number | undefined>();
+  const [obraFiltro, setObraFiltro] = useState<string | undefined>();
   const [estadoFiltro, setEstadoFiltro] = useState<string>('');
   const [showFiltrosAvanzados, setShowFiltrosAvanzados] = useState(false);
 
@@ -61,7 +61,7 @@ const ValorizacionSupervision = () => {
     setVistaActiva('crear');
   }, []);
 
-  const verDetalle = useCallback((id: number) => {
+  const verDetalle = useCallback((id: string) => {
     setValorizacionSeleccionada(id);
     setVistaActiva('detalle');
   }, []);
@@ -130,16 +130,16 @@ const ValorizacionSupervision = () => {
   };
 
   // Función para obtener nombre de obra
-  const getNombreObra = (obraId: number) => {
+  const getNombreObra = (obraId: string) => {
     const obra = obras.find(o => o.id === obraId);
     return obra ? obra.nombre : 'Obra no encontrada';
   };
 
   // Función para obtener nombre de entidad supervisora
-  const getNombreSupervisora = (obraId: number) => {
+  const getNombreSupervisora = (obraId: string) => {
     const obra = obras.find(o => o.id === obraId);
     if (!obra) return 'No disponible';
-    
+
     const entidad = entidades.find(e => e.id === obra.entidad_supervisora_id);
     return entidad ? entidad.nombre_completo : 'Entidad no encontrada';
   };
@@ -276,7 +276,7 @@ const ValorizacionSupervision = () => {
             
             <select
               value={obraFiltro || ''}
-              onChange={(e) => setObraFiltro(e.target.value ? Number(e.target.value) : undefined)}
+              onChange={(e) => setObraFiltro(e.target.value || undefined)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 min-w-[200px]"
             >
               <option value="">Todas las obras</option>
@@ -430,7 +430,7 @@ const ValorizacionSupervision = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                     className="hover:bg-green-50 cursor-pointer transition-colors"
-                    onClick={() => verDetalle(val.id)}
+                    onClick={() => verDetalle(String(val.id))}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
@@ -448,10 +448,10 @@ const ValorizacionSupervision = () => {
                     
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
-                        {getNombreObra(val.obra_id)}
+                        {getNombreObra(String(val.obra_id))}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {getNombreSupervisora(val.obra_id)}
+                        {getNombreSupervisora(String(val.obra_id))}
                       </div>
                     </td>
                     
@@ -499,7 +499,7 @@ const ValorizacionSupervision = () => {
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            verDetalle(val.id);
+                            verDetalle(String(val.id));
                           }}
                           className="text-green-600 hover:text-green-900" 
                           title="Ver detalles"

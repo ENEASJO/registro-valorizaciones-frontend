@@ -106,7 +106,7 @@ export const useReportes = () => {
 
     return {
       obra: {
-        id: obraSeleccionada?.id || 1,
+        id: obraSeleccionada?.id || '',
         numeroContrato: obraSeleccionada?.numero_contrato || 'N.º 001-2025-MDSM/GM',
         nombre: obraSeleccionada?.nombre || 'CONSTRUCCION DE CARRETERA PRINCIPAL',
         ubicacion: obraSeleccionada?.ubicacion || 'Distrito de Lima, Provincia de Lima',
@@ -328,7 +328,7 @@ export const useReportes = () => {
       ],
       estadoPagos: [
         {
-          obraId: 1,
+          obraId: '1',
           obraNombre: 'CONSTRUCCION DE CARRETERA PRINCIPAL',
           montoContratado: 2625000,
           montoEjecutado: 245000,
@@ -340,7 +340,7 @@ export const useReportes = () => {
           morosidad: 0
         },
         {
-          obraId: 2,
+          obraId: '2',
           obraNombre: 'MEJORAMIENTO DE SISTEMA DE AGUA POTABLE',
           montoContratado: 1850000,
           montoEjecutado: 185000,
@@ -388,7 +388,7 @@ export const useReportes = () => {
     return {
       contratosVigentes: [
         {
-          obraId: 1,
+          obraId: '1',
           numeroContrato: 'N.º 001-2025-MDSM/GM',
           nombreObra: 'CONSTRUCCION DE CARRETERA PRINCIPAL',
           contratista: 'CONSTRUCTORA ABC S.A.C.',
@@ -401,7 +401,7 @@ export const useReportes = () => {
           riesgoIncumplimiento: 'BAJO'
         },
         {
-          obraId: 2,
+          obraId: '2',
           numeroContrato: 'N.º 002-2025-MDSM/GM',
           nombreObra: 'MEJORAMIENTO DE SISTEMA DE AGUA POTABLE',
           contratista: 'INGENIERIA XYZ E.I.R.L.',
@@ -435,7 +435,7 @@ export const useReportes = () => {
       penalidades: [],
       adicionalesDeductivos: [
         {
-          obraId: 1,
+          obraId: '1',
           obraNombre: 'CONSTRUCCION DE CARRETERA PRINCIPAL',
           tipo: 'ADICIONAL',
           concepto: 'Mejora en especificaciones de pavimento',
@@ -448,7 +448,7 @@ export const useReportes = () => {
       ],
       garantias: [
         {
-          obraId: 1,
+          obraId: '1',
           obraNombre: 'CONSTRUCCION DE CARRETERA PRINCIPAL',
           tipoGarantia: 'FIEL CUMPLIMIENTO',
           entidadEmisora: 'Banco de Crédito del Perú',
@@ -459,7 +459,7 @@ export const useReportes = () => {
           diasParaVencer: 438
         },
         {
-          obraId: 2,
+          obraId: '2',
           obraNombre: 'MEJORAMIENTO DE SISTEMA DE AGUA POTABLE',
           tipoGarantia: 'FIEL CUMPLIMIENTO',
           entidadEmisora: 'Banco Continental',

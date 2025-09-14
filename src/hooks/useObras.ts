@@ -23,7 +23,7 @@ interface ObraResponse {
   codigo?: string;
   nombre: string;
   descripcion?: string;
-  empresa_id: number;
+  empresa_id: string;
   cliente?: string;
   ubicacion?: string;
   distrito?: string;
@@ -65,8 +65,8 @@ const mapearObraResponse = (response: ObraResponse): any => ({ // Usando any tem
   numero_contrato: response.codigo || `OBR-${response.id}`, // Mapear codigo a numero_contrato
   nombre: response.nombre,
   codigo_interno: response.codigo,
-  entidad_ejecutora_id: response.empresa_id, // Mapear empresa_id a entidad_ejecutora_id
-  entidad_supervisora_id: 0, // Default, se puede ajustar según necesidades
+  entidad_ejecutora_id: String(response.empresa_id), // Mapear empresa_id a entidad_ejecutora_id
+  entidad_supervisora_id: '', // Default, se puede ajustar según necesidades
   monto_ejecucion: response.monto_contractual || 0,
   monto_supervision: response.monto_adicionales || 0,
   monto_total: response.monto_total || 0,
@@ -212,7 +212,7 @@ export const useObras = () => {
       }
       
       if (filtros?.entidad_ejecutora_id) {
-        params.append('empresa_id', filtros.entidad_ejecutora_id.toString());
+        params.append('empresa_id', filtros.entidad_ejecutora_id);
       }
       
       if (filtros?.tipo_obra) {
@@ -281,7 +281,7 @@ export const useObras = () => {
   }, [cargarObras]);
 
   // Actualizar obra
-  const actualizarObra = useCallback(async (id: number, obraData: Partial<ObraForm>): Promise<Obra | null> => {
+  const actualizarObra = useCallback(async (id: string, obraData: Partial<ObraForm>): Promise<Obra | null> => {
     setLoading(true);
     setError(null);
     
@@ -338,7 +338,7 @@ export const useObras = () => {
   }, [cargarObras]);
 
   // Eliminar obra
-  const eliminarObra = useCallback(async (id: number): Promise<boolean> => {
+  const eliminarObra = useCallback(async (id: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
     
@@ -363,7 +363,7 @@ export const useObras = () => {
   }, [cargarObras]);
 
   // Obtener obra por ID con detalles
-  const obtenerObraPorId = useCallback(async (id: number): Promise<Obra | null> => {
+  const obtenerObraPorId = useCallback(async (id: string): Promise<Obra | null> => {
     setLoading(true);
     setError(null);
     
@@ -486,7 +486,7 @@ export const useObras = () => {
     obtenerEstadisticas,
     estadisticasObras: obtenerEstadisticas, // Alias para compatibilidad con dashboard
     // Método sincrónico para compatibilidad con componentes
-    obtenerObraPorIdSync: (id: number) => {
+    obtenerObraPorIdSync: (id: string) => {
       return obras.find(obra => obra.id === id) || null;
     }
   };
@@ -500,7 +500,7 @@ export const useProfesionales = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Placeholder: Cargar profesionales de una obra
-  const cargarProfesionalesPorObra = useCallback(async (obraId: number) => {
+  const cargarProfesionalesPorObra = useCallback(async (obraId: string) => {
     setLoading(true);
     setError(null);
     
@@ -690,19 +690,19 @@ export const useValidacionesObra = () => {
   }, []);
 
   const validarEntidadesContratistas = useCallback((
-    entidadEjecutoraId: number, 
-    entidadSupervisoraId: number
+    entidadEjecutoraId: string,
+    entidadSupervisoraId: string
   ): ErrorValidacion[] => {
     const errores: ErrorValidacion[] = [];
     
     if (!entidadEjecutoraId) {
       errores.push({ campo: 'entidad_ejecutora_id', mensaje: 'Debe seleccionar una entidad ejecutora' });
     }
-    
+
     if (!entidadSupervisoraId) {
       errores.push({ campo: 'entidad_supervisora_id', mensaje: 'Debe seleccionar una entidad supervisora' });
     }
-    
+
     if (entidadEjecutoraId && entidadSupervisoraId && entidadEjecutoraId === entidadSupervisoraId) {
       errores.push({ 
         campo: 'entidad_supervisora_id', 
@@ -779,7 +779,7 @@ export const useValorizaciones = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const cargarValorizacionesPorObra = useCallback(async (obraId: number) => {
+  const cargarValorizacionesPorObra = useCallback(async (obraId: string) => {
     setLoading(true);
     setError(null);
     

@@ -5,7 +5,7 @@
 
 // Extensión temporal de Obra para compatibilidad con dashboard
 export interface ObraExtendida {
-  id: number;
+  id: string;
   nombre: string;
   empresa_contratista?: string;
   porcentaje_avance?: number;
@@ -16,8 +16,8 @@ export interface ObraExtendida {
   ubicacion?: string;
   tipo_obra?: string;
   observaciones?: string;
-  entidad_ejecutora_id?: number;
-  entidad_supervisora_id?: number;
+  entidad_ejecutora_id?: string;
+  entidad_supervisora_id?: string;
   monto_ejecucion?: number;
   monto_supervision?: number;
   numero_contrato?: string;

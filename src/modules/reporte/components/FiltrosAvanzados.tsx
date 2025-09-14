@@ -291,9 +291,9 @@ const FiltrosAvanzados = ({
                     <label key={obra.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={filtros.obraIds?.includes(obra.id) || false}
-                        onChange={() => 
-                          actualizarFiltro('obraIds', toggleArrayValue(filtros.obraIds, obra.id))
+                        checked={filtros.obraIds?.includes(String(obra.id)) || false}
+                        onChange={() =>
+                          actualizarFiltro('obraIds', toggleArrayValue(filtros.obraIds, String(obra.id)))
                         }
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
@@ -332,9 +332,9 @@ const FiltrosAvanzados = ({
                     <label key={contratista.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={filtros.contratistaIds?.includes(contratista.id) || false}
+                        checked={filtros.contratistaIds?.includes(String(contratista.id)) || false}
                         onChange={() =>
-                          actualizarFiltro('contratistaIds', toggleArrayValue(filtros.contratistaIds, contratista.id))
+                          actualizarFiltro('contratistaIds', toggleArrayValue(filtros.contratistaIds, String(contratista.id)))
                         }
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />

@@ -39,7 +39,7 @@ const Obras = () => {
   const { entidades } = useEntidadesContratistas();
 
   const [modalAbierto, setModalAbierto] = useState<TipoModal>(null);
-  const [obraSeleccionada, setObraSeleccionada] = useState<number | null>(null);
+  const [obraSeleccionada, setObraSeleccionada] = useState<string | null>(null);
   const [loadingModal, setLoadingModal] = useState(false);
   const [mostrarFiltrosAvanzados, setMostrarFiltrosAvanzados] = useState(false);
   const [mensaje, setMensaje] = useState<{ tipo: 'success' | 'error'; texto: string } | null>(null);
@@ -63,12 +63,12 @@ const Obras = () => {
     setModalAbierto('crear');
   };
 
-  const abrirModalEditar = (obraId: number) => {
+  const abrirModalEditar = (obraId: string) => {
     setObraSeleccionada(obraId);
     setModalAbierto('editar');
   };
 
-  const abrirDetalleObra = (obraId: number) => {
+  const abrirDetalleObra = (obraId: string) => {
     setObraSeleccionada(obraId);
     setModalAbierto('detalle');
   };
@@ -95,7 +95,7 @@ const Obras = () => {
   };
 
   // Handler para eliminar obra
-  const handleEliminarObra = async (obraId: number) => {
+  const handleEliminarObra = async (obraId: string) => {
     const obra = obras.find(o => o.id === obraId);
     if (!obra) return;
 
@@ -146,7 +146,7 @@ const Obras = () => {
   };
 
   // Obtener nombre de entidad
-  const getNombreEntidad = (entidadId: number): string => {
+  const getNombreEntidad = (entidadId: string): string => {
     const entidad = entidades.find(e => e.id === entidadId);
     return entidad ? entidad.nombre_completo : 'Entidad no encontrada';
   };
@@ -352,7 +352,7 @@ const Obras = () => {
                   </label>
                   <select
                     value={filtros.entidad_ejecutora_id || ''}
-                    onChange={(e) => actualizarFiltros({ entidad_ejecutora_id: parseInt(e.target.value) || undefined })}
+                    onChange={(e) => actualizarFiltros({ entidad_ejecutora_id: e.target.value || undefined })}
                     className="input-field"
                   >
                     <option value="">Todas las ejecutoras</option>
@@ -370,7 +370,7 @@ const Obras = () => {
                   </label>
                   <select
                     value={filtros.entidad_supervisora_id || ''}
-                    onChange={(e) => actualizarFiltros({ entidad_supervisora_id: parseInt(e.target.value) || undefined })}
+                    onChange={(e) => actualizarFiltros({ entidad_supervisora_id: e.target.value || undefined })}
                     className="input-field"
                   >
                     <option value="">Todas las supervisoras</option>

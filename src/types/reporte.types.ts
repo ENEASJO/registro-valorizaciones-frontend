@@ -58,9 +58,9 @@ export interface FiltrosReporte {
   periodo: PeriodoReporte;
   fechaInicio: string;
   fechaFin: string;
-  obraIds?: number[];
-  contratistaIds?: number[];
-  supervisorIds?: number[];
+  obraIds?: string[];
+  contratistaIds?: string[];
+  supervisorIds?: string[];
   tiposObra?: string[];
   estadosObra?: string[];
   rangoMontoMin?: number;
@@ -95,7 +95,7 @@ export interface OpcionesPresentacion {
 
 export interface DatosReporteValorizacion {
   obra: {
-    id: number;
+    id: string;
     numeroContrato: string;
     nombre: string;
     ubicacion: string;
@@ -270,7 +270,7 @@ export interface DatosReporteFinanciero {
   }>;
   
   estadoPagos: Array<{
-    obraId: number;
+    obraId: string;
     obraNombre: string;
     montoContratado: number;
     montoEjecutado: number;
@@ -317,7 +317,7 @@ export interface DatosReporteFinanciero {
 
 export interface DatosReporteContractual {
   contratosVigentes: Array<{
-    obraId: number;
+    obraId: string;
     numeroContrato: string;
     nombreObra: string;
     contratista: string;
@@ -341,7 +341,7 @@ export interface DatosReporteContractual {
   }>;
   
   penalidades: Array<{
-    obraId: number;
+    obraId: string;
     obraNombre: string;
     tipoIncumplimiento: string;
     fechaIncumplimiento: string;
@@ -352,7 +352,7 @@ export interface DatosReporteContractual {
   }>;
   
   adicionalesDeductivos: Array<{
-    obraId: number;
+    obraId: string;
     obraNombre: string;
     tipo: 'ADICIONAL' | 'DEDUCTIVO';
     concepto: string;
@@ -364,7 +364,7 @@ export interface DatosReporteContractual {
   }>;
   
   garantias: Array<{
-    obraId: number;
+    obraId: string;
     obraNombre: string;
     tipoGarantia: string;
     entidadEmisora: string;

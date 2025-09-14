@@ -202,7 +202,7 @@ export const useEmpresas = () => {
   }, [cargarEmpresas]);
 
   // Actualizar empresa usando PUT al endpoint de Neon
-  const actualizarEmpresa = useCallback(async (id: number, empresaData: Partial<EmpresaForm>): Promise<Empresa | null> => {
+  const actualizarEmpresa = useCallback(async (id: string, empresaData: Partial<EmpresaForm>): Promise<Empresa | null> => {
     setLoading(true);
     setError(null);
     
@@ -468,7 +468,7 @@ export const useConsorcios = () => {
   }, []);
 
   // Obtener consorcio por ID (pendiente de implementación)
-  const obtenerConsorcioPorId = useCallback((id: number): ConsorcioCompleto | null => {
+  const obtenerConsorcioPorId = useCallback((id: string): ConsorcioCompleto | null => {
     return null; // TODO: Implementar búsqueda de consorcios en Neon
   }, []);
 

@@ -129,16 +129,16 @@ export interface Profesion extends AuditoriaBase {
  * Obra principal del sistema
  */
 export interface Obra extends AuditoriaBase {
-  id: number;
-  
+  id: string;
+
   // Identificación
   numero_contrato: string;
   nombre: string;
   codigo_interno?: string;
-  
+
   // Referencias a entidades contratistas
-  entidad_ejecutora_id: number;
-  entidad_supervisora_id: number;
+  entidad_ejecutora_id: string;
+  entidad_supervisora_id: string;
   
   // Montos
   monto_ejecucion: number;
@@ -186,8 +186,8 @@ export interface ObraForm {
   numero_contrato: string;
   nombre: string;
   codigo_interno?: string;
-  entidad_ejecutora_id: number;
-  entidad_supervisora_id: number;
+  entidad_ejecutora_id: string;
+  entidad_supervisora_id: string;
   monto_ejecucion: number;
   monto_supervision: number;
   plazo_ejecucion_dias: number;
@@ -262,8 +262,8 @@ export interface ProfesionalForm {
  * Valorización de obra
  */
 export interface ObraValorizacion extends AuditoriaBase {
-  id: number;
-  obra_id: number;
+  id: string;
+  obra_id: string;
   
   // Identificación
   numero_valorizacion: number;
@@ -412,8 +412,8 @@ export interface RespuestaPaginada<T> {
 export interface FiltrosObra {
   search?: string;
   estado?: EstadoObra;
-  entidad_ejecutora_id?: number;
-  entidad_supervisora_id?: number;
+  entidad_ejecutora_id?: string;
+  entidad_supervisora_id?: string;
   tipo_obra?: TipoObra;
   modalidad_ejecucion?: ModalidadEjecucion;
   fecha_inicio_desde?: string;

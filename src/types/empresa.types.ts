@@ -317,7 +317,7 @@ export interface Consorcio extends AuditoriaBase {
   fecha_disolucion?: string;
   
   // Representación
-  empresa_lider_id: number;
+  empresa_lider_id: string;
   representante_consorcio?: string;
   
   // Estados
@@ -403,7 +403,7 @@ export interface EntidadContratista extends AuditoriaBase {
 export interface ObraContratista extends AuditoriaBase {
   id: number;
   obra_id: number;
-  entidad_contratista_id: number;
+  entidad_contratista_id: string;
   
   // Rol en la obra
   rol: RolContratista;
@@ -522,14 +522,14 @@ export interface EntidadContratistaDetalle extends EntidadContratista {
     nombre: string;
     descripcion?: string;
     fecha_constitucion: string;
-    empresa_lider_id: number;
+    empresa_lider_id: string;
     empresa_lider_nombre: string;
     especialidades?: EspecialidadEmpresa[];
   };
   
   // Información de participación (solo para consorcios)
   empresas_participantes?: Array<{
-    empresa_id: number;
+    empresa_id: string;
     empresa_nombre: string;
     empresa_ruc: string;
     porcentaje_participacion: number;
@@ -544,7 +544,7 @@ export interface EntidadContratistaDetalle extends EntidadContratista {
 export interface EmpresaConConsorcio extends Empresa {
   // Consorcios en los que participa
   consorcios_participacion: Array<{
-    consorcio_id: number;
+    consorcio_id: string;
     consorcio_nombre: string;
     consorcio_codigo: string;
     porcentaje_participacion: number;
@@ -626,7 +626,7 @@ export interface FiltrosEntidadContratista {
 export interface CrearConsorcioParams {
   consorcio: ConsorcioForm;
   empresas_participacion: Array<{
-    empresa_id: number;
+    empresa_id: string;
     porcentaje: number;
     responsabilidades?: string[];
   }>;

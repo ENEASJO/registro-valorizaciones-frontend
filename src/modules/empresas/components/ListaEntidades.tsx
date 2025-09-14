@@ -67,7 +67,7 @@ const ListaEntidades = ({
   onEliminar
 }: ListaEntidadesProps) => {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
-  const [menuAbierto, setMenuAbierto] = useState<number | null>(null);
+  const [menuAbierto, setMenuAbierto] = useState<string | null>(null);
 
   // Filtrar entidades localmente
   const entidadesFiltradas = useMemo(() => {
