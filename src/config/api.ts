@@ -280,22 +280,22 @@ export const API_ENDPOINTS = {
   // Consultas RUC - Endpoints actualizados para el backend working
   consultaRuc: `${API_BASE_URL}/consultar-ruc`,  // POST endpoint
   consultaRucConsolidada: `${API_BASE_URL}/consulta-ruc-consolidada`,  // GET endpoint
-  
+
   // Empresas - Endpoints Neon integrados
-  empresas: `${API_BASE_URL}/api/empresas`,              // CRUD completo
+  empresas: `${API_BASE_URL}/api/empresas`,              // CRUD completo - SIN CACHE BUSTING
   empresasGuardadas: `${API_BASE_URL}/api/empresas`, // Listar guardadas (mismo endpoint)
   empresasSearch: `${API_BASE_URL}/api/empresas-guardadas/search`, // Buscar
   empresasStats: `${API_BASE_URL}/api/empresas-guardadas/stats`,   // Estadísticas
-  
+
   // Obras - Neon integrado
   obras: `${API_BASE_URL}/obras`,
-  
+
   // Valorizaciones - Neon integrado
   valorizaciones: `${API_BASE_URL}/valorizaciones`,
-  
+
   // Health check
   health: `${API_BASE_URL}/health`,
-  
+
   // OSCE - Extracción de consorcios con Playwright (usando endpoint consolidado que incluye OSCE)
   consultaOsce: `${API_BASE_URL}/consulta-osce`, // Temporalmente deshabilitado - usar consultaRucConsolidada en su lugar
   buscar: `${API_BASE_URL}/buscar`

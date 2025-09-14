@@ -240,8 +240,8 @@ export const useEmpresas = () => {
 
     try {
       // Usar el endpoint correcto con ID (Neon soporta tanto ID como RUC)
-      // Nota: No usar API_ENDPOINTS.empresas porque ya tiene cache busting
-      const response = await fetch(`${API_BASE_URL}/api/empresas/${id}`, {
+      // Importante: API_ENDPOINTS.empresas no tiene cache busting para evitar malformar URLs
+      const response = await fetch(`${API_ENDPOINTS.empresas}/${id}`, {
         method: 'DELETE'
       });
 
