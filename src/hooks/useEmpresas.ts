@@ -21,6 +21,12 @@ interface NeonApiResponse<T> {
   message?: string;
 }
 
+// Interface específica para la respuesta de empresas
+interface EmpresasResponse {
+  empresas: EmpresaNeonResponse[];
+  total: number;
+}
+
 interface EmpresaNeonResponse {
   id: string;
   codigo: string;
@@ -93,7 +99,7 @@ export const useEmpresas = () => {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
+      const result: NeonApiResponse<EmpresasResponse> = await response.json();
 
       // Debug: Verificar la estructura de la respuesta
       console.log('📊 DEBUG: Estructura completa de la respuesta:', result);
@@ -102,9 +108,9 @@ export const useEmpresas = () => {
       console.log('📊 DEBUG: result.data:', result.data);
 
       if (result.success && result.data) {
-        // Asegurarse de que data sea un array
-        const dataArray = Array.isArray(result.data) ? result.data : [result.data];
-        console.log('📊 DEBUG: dataArray después de conversión:', dataArray);
+        // La API devuelve data como objeto con propiedades 'empresas' y 'total'
+        const dataArray = result.data.empresas || [];
+        console.log('📊 DEBUG: Array de empresas extraído:', dataArray);
 
         // Convertir respuesta de API a formato Empresa
         let empresasFromAPI: Empresa[] = dataArray.map(mapearEmpresaFromAPI);
