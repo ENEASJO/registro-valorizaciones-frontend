@@ -193,13 +193,13 @@ const FormularioEmpresa = ({
       email: email,
       celular: celular,
       direccion: direccion,
-      representantes: (data.representantes || []).map(miembro => ({
+      representantes: (data.representantes || []).map((miembro, index) => ({
         nombre: miembro.nombre || '',
         cargo: miembro.cargo || 'REPRESENTANTE',
         numero_documento: miembro.numero_documento || '',
         tipo_documento: (miembro.tipo_documento as 'DNI' | 'CE' | 'PASSPORT') || 'DNI',
         fuente: (miembro.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'SUNAT',
-        es_principal: false,
+        es_principal: index === 0, // Marcar el primero como principal automáticamente
         activo: true
       })),
       representante_principal_id: 0,
@@ -325,13 +325,13 @@ const FormularioEmpresa = ({
             : '';
 
           // Process representatives from the consolidated response
-          const representantesProcesados = (data.representantes || []).map(rep => ({
+          const representantesProcesados = (data.representantes || []).map((rep, index) => ({
             nombre: rep.nombre || '',
             cargo: rep.cargo || 'SOCIO',
             numero_documento: rep.documento || rep.numero_documento || '',
             tipo_documento: 'DNI' as 'DNI' | 'CE' | 'PASSPORT',
             fuente: (rep.fuente as 'SUNAT' | 'OECE' | 'MANUAL' | 'AMBOS') || 'OECE',
-            es_principal: false,
+            es_principal: index === 0, // Marcar el primero como principal automáticamente
             activo: true
           }));
 
