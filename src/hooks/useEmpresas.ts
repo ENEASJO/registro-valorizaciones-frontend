@@ -239,8 +239,13 @@ export const useEmpresas = () => {
     setError(null);
 
     try {
-      // Construir URL directamente para evitar cualquier cache busting
-      const deleteUrl = `${API_BASE_URL}/api/empresas/${id}`;
+      // Construir URL hardcoded para evitar cualquier interceptor o modificación
+      const baseUrl = 'https://registro-valorizaciones-backend-503600768755.southamerica-west1.run.app';
+      const deleteUrl = `${baseUrl}/api/empresas/${id}`;
+
+      // Debug: Mostrar la URL antes del fetch
+      console.log('🔍 DELETE URL antes de fetch:', deleteUrl);
+
       const response = await fetch(deleteUrl, {
         method: 'DELETE'
       });
