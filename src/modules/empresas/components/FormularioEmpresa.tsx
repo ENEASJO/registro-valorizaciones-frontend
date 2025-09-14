@@ -425,9 +425,7 @@ const FormularioEmpresa = ({
         fuentes_consultadas: formData.fuentes_consultadas || [],
         capacidad_contratacion: formData.capacidad_contratacion || null
       };
-      console.log('📤 Enviando datos al backend:', JSON.stringify(apiData, null, 2));
-      console.log('📊 Total representantes a guardar:', apiData.representantes.length);
-      console.log('📋 Detalle de representantes:', apiData.representantes);
+      console.log('📤 Enviando datos al backend:', apiData);
       await onSubmit(apiData);
       onClose();
     } catch (error) {
