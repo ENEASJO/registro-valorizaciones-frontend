@@ -239,8 +239,9 @@ export const useEmpresas = () => {
     setError(null);
 
     try {
-      // Usar el endpoint especial sin cache busting para DELETE
-      const response = await fetch(`${EMPRESAS_ENDPOINT}/${id}`, {
+      // Construir URL directamente para evitar cualquier cache busting
+      const deleteUrl = `${API_BASE_URL}/api/empresas/${id}`;
+      const response = await fetch(deleteUrl, {
         method: 'DELETE'
       });
 
