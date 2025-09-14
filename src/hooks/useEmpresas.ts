@@ -111,6 +111,7 @@ export const useEmpresas = () => {
         // La API devuelve data como objeto con propiedades 'empresas' y 'total'
         const dataArray = result.data.empresas || [];
         console.log('📊 DEBUG: Array de empresas extraído:', dataArray);
+        console.log('📊 DEBUG: IDs de empresas disponibles:', dataArray.map(e => e.id));
 
         // Convertir respuesta de API a formato Empresa
         let empresasFromAPI: Empresa[] = dataArray.map(mapearEmpresaFromAPI);
@@ -261,6 +262,7 @@ export const useEmpresas = () => {
 
       // Debug: Mostrar la URL antes del fetch
       console.log('🔍 DELETE URL antes de fetch:', deleteUrl);
+      console.log('🔍 Intentando eliminar empresa con ID:', id);
 
       const response = await fetch(deleteUrl, {
         method: 'DELETE'
