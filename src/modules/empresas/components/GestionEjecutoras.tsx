@@ -116,8 +116,8 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
       return;
     }
     try {
-      if (entidad.tipo_entidad === 'EMPRESA' && entidad.empresa_id) {
-        await eliminarEmpresa(entidad.empresa_id);
+      if (entidad.tipo_entidad === 'EMPRESA' && entidad.id) {
+        await eliminarEmpresa(entidad.id);
         onMostrarMensaje?.('success', 'Empresa ejecutora eliminada correctamente');
       } else {
         onMostrarMensaje?.('error', 'La eliminación de consorcios aún no está implementada');

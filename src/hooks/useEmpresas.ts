@@ -234,7 +234,7 @@ export const useEmpresas = () => {
   }, [cargarEmpresas]);
 
   // Eliminar empresa usando el endpoint correcto de Neon
-  const eliminarEmpresa = useCallback(async (id: number): Promise<boolean> => {
+  const eliminarEmpresa = useCallback(async (id: string): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
