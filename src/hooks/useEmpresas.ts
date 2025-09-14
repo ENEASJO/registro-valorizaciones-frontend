@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { API_ENDPOINTS, API_BASE_URL } from '../config/api';
+import { API_ENDPOINTS, API_BASE_URL, EMPRESAS_ENDPOINT } from '../config/api';
 import type { 
   Empresa, 
   EntidadContratistaDetalle,
@@ -239,9 +239,8 @@ export const useEmpresas = () => {
     setError(null);
 
     try {
-      // Usar el endpoint correcto con ID (Neon soporta tanto ID como RUC)
-      // Importante: API_ENDPOINTS.empresas no tiene cache busting para evitar malformar URLs
-      const response = await fetch(`${API_ENDPOINTS.empresas}/${id}`, {
+      // Usar el endpoint especial sin cache busting para DELETE
+      const response = await fetch(`${EMPRESAS_ENDPOINT}/${id}`, {
         method: 'DELETE'
       });
 
