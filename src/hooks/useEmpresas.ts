@@ -158,16 +158,16 @@ export const useEmpresas = () => {
       const result: NeonApiResponse<EmpresasResponse> = await response.json();
 
       // Debug: Verificar la estructura de la respuesta
-      console.log('📊 DEBUG: Estructura completa de la respuesta:', result);
-      console.log('📊 DEBUG: Tipo de result.data:', typeof result.data);
-      console.log('📊 DEBUG: result.data es array?:', Array.isArray(result.data));
-      console.log('📊 DEBUG: result.data:', result.data);
+      // console.log('📊 DEBUG: Estructura completa de la respuesta:', result);
+      // console.log('📊 DEBUG: Tipo de result.data:', typeof result.data);
+      // console.log('📊 DEBUG: result.data es array?:', Array.isArray(result.data));
+      // console.log('📊 DEBUG: result.data:', result.data);
 
       if (result.success && result.data) {
         // La API devuelve data como objeto con propiedades 'empresas' y 'total'
         const dataArray = result.data.empresas || [];
-        console.log('📊 DEBUG: Array de empresas extraído:', dataArray);
-        console.log('📊 DEBUG: IDs de empresas disponibles:', dataArray.map(e => e.id));
+        // console.log('📊 DEBUG: Array de empresas extraído:', dataArray);
+        // console.log('📊 DEBUG: IDs de empresas disponibles:', dataArray.map(e => e.id));
 
         // Convertir respuesta de API a formato Empresa
         let empresasFromAPI: Empresa[] = dataArray.map(mapearEmpresaFromAPI);
@@ -322,8 +322,8 @@ export const useEmpresas = () => {
       const deleteUrl = `${API_ENDPOINTS.empresas}/${id}`;
 
       // Debug: Mostrar la URL antes del fetch
-      console.log('🔍 DELETE URL antes de fetch:', deleteUrl);
-      console.log('🔍 Intentando eliminar empresa con ID:', id);
+      // console.log('🔍 DELETE URL antes de fetch:', deleteUrl);
+      // console.log('🔍 Intentando eliminar empresa con ID:', id);
 
       const response = await fetch(deleteUrl, {
         method: 'DELETE'
@@ -347,7 +347,7 @@ export const useEmpresas = () => {
       try {
         const result = await response.json();
         if (result.message) {
-          console.log('✅ Eliminación exitosa:', result.message);
+          // console.log('✅ Eliminación exitosa:', result.message);
         }
         // Refrescar la lista después de la eliminación
         await cargarEmpresas();

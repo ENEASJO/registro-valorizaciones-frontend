@@ -125,11 +125,11 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
   const empresa = entidad.datos_empresa!;
 
   // Debug: Log de empresa y contactos
-  console.log('🔍 DEBUG - Empresa en DetalleEmpresa:', empresa);
-  console.log('🔍 DEBUG - Email:', empresa.email);
-  console.log('🔍 DEBUG - Teléfono:', empresa.telefono);
-  console.log('🔍 DEBUG - Representantes:', empresa.representantes);
-  console.log('🔍 DEBUG - Total representantes:', empresa.representantes?.length || 0);
+  // console.log('🔍 DEBUG - Empresa en DetalleEmpresa:', empresa);
+  // console.log('🔍 DEBUG - Email:', empresa.email);
+  // console.log('🔍 DEBUG - Teléfono:', empresa.telefono);
+  // console.log('🔍 DEBUG - Representantes:', empresa.representantes);
+  // console.log('🔍 DEBUG - Total representantes:', empresa.representantes?.length || 0);
 
   return (
     <div className="space-y-8">

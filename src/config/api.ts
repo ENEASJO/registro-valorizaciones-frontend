@@ -4,7 +4,7 @@
 
 // Debug: Imprimir variables de entorno en desarrollo
 if (import.meta.env.DEV) {
-  console.log('🔧 Variables de entorno (DEV):', {
+  // console.log('🔧 Variables de entorno (DEV):', {
     VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
     VITE_ENVIRONMENT: import.meta.env.VITE_ENVIRONMENT,
     MODE: import.meta.env.MODE,

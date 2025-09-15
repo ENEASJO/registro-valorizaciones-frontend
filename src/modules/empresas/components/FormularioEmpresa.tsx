@@ -442,7 +442,7 @@ const FormularioEmpresa = ({
         datos_sunat: formData.datos_sunat || null,
         datos_osce: formData.datos_osce || null
       };
-      console.log('📤 Enviando datos al backend:', apiData);
+      // console.log('📤 Enviando datos al backend:', apiData);
       await onSubmit(apiData);
       onClose();
     } catch (error) {

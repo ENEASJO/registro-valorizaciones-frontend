@@ -7,13 +7,13 @@ import { registerServiceWorker } from './utils/service-worker-manager'
 // Register Service Worker for production only
 if (import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    console.log('🛡️ Main.tsx: Registering Service Worker...');
+    // console.log('🛡️ Main.tsx: Registering Service Worker...');
     registerServiceWorker()
       .then((registration) => {
-        console.log('✅ Main.tsx: Service Worker registered successfully:', registration);
+        // console.log('✅ Main.tsx: Service Worker registered successfully:', registration);
       })
       .catch((error) => {
-        console.error('❌ Main.tsx: Service Worker registration failed:', error);
+        // console.error('❌ Main.tsx: Service Worker registration failed:', error);
       });
   });
 }

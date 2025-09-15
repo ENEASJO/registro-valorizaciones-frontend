@@ -265,7 +265,7 @@ export async function consultarRucAPI(ruc: string): Promise<ResultadoConsultaRuc
       };
     }
     const response_data = await response.json();
-    console.log('🔍 Respuesta del backend (consolidado):', response_data);
+    // console.log('🔍 Respuesta del backend (consolidado):', response_data);
 
     // Verificar estructura de respuesta
     if (!response_data || typeof response_data !== 'object') {

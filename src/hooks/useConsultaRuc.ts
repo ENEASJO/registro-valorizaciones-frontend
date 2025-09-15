@@ -251,7 +251,7 @@ export function useConsultaRuc(): EstadoConsultaRuc & AccionesConsultaRuc {
         // Ejecutar callback para auto-rellenar formulario
         try {
           autorellenarCallback(resultado.datos);
-          console.log('Formulario auto-completado exitosamente');
+          // console.log('Formulario auto-completado exitosamente');
         } catch (error) {
           console.error('Error al auto-completar formulario:', error);
         }
