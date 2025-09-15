@@ -143,7 +143,7 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
                   <label className="block text-sm font-medium text-gray-500">RUC</label>
                   <div className="flex items-center gap-2 mt-1">
                     <Hash className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-900 font-mono">{empresa.ruc}</span>
+                    <span className="text-gray-900 font-mono">{empresa.datos_empresa?.ruc}</span>
                   </div>
                 </div>
                 <div>
@@ -159,7 +159,7 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
 
               <div>
                 <label className="block text-sm font-medium text-gray-500">Razón Social</label>
-                <p className="mt-1 text-gray-900 font-medium">{empresa.razon_social}</p>
+                <p className="mt-1 text-gray-900 font-medium">{empresa.datos_empresa?.razon_social}</p>
               </div>
 
               {empresa.nombre_comercial && (
@@ -172,10 +172,10 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
               <div>
                 <label className="block text-sm font-medium text-gray-500">Fechas</label>
                 <div className="mt-1 space-y-1">
-                  {empresa.fecha_constitucion && (
+                  {empresa.datos_empresa?.fecha_constitucion && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Building2 className="w-4 h-4" />
-                      Constitución: {new Date(empresa.fecha_constitucion).toLocaleDateString('es-PE')}
+                      Constitución: {new Date(empresa.datos_empresa.fecha_constitucion).toLocaleDateString('es-PE')}
                     </div>
                   )}
                   <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -189,19 +189,19 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
                 </div>
               </div>
 
-              {empresa.capital_social && (
+              {empresa.datos_empresa?.capital_social && (
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Capital Social</label>
                   <p className="mt-1 text-gray-900 font-medium">
-                    S/ {empresa.capital_social.toLocaleString('es-PE')}
+                    S/ {empresa.datos_empresa.capital_social.toLocaleString('es-PE')}
                   </p>
                 </div>
               )}
 
-              {empresa.numero_registro_nacional && (
+              {empresa.datos_empresa?.numero_registro_nacional && (
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Número de Registro Nacional</label>
-                  <p className="mt-1 text-gray-900 font-mono">{empresa.numero_registro_nacional}</p>
+                  <p className="mt-1 text-gray-900 font-mono">{empresa.datos_empresa.numero_registro_nacional}</p>
                 </div>
               )}
             </div>
@@ -284,7 +284,7 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
         </div>
 
           {/* Contactos de la empresa */}
-          {empresa.contactos && empresa.contactos.length > 0 && (
+          {empresa.datos_empresa?.contactos && empresa.datos_empresa.contactos.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Contactos Adicionales</h3>
               <div className="space-y-3">
@@ -348,54 +348,54 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
           )}
 
           {/* Datos de contacto y ubicación */}
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Contacto</h3>
-            <div className="space-y-3">
-              {empresa.email && (
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <a href={`mailto:${empresa.email}`} className="text-primary-600 hover:text-primary-700">
-                      {empresa.email}
-                    </a>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Contacto</h3>
+              <div className="space-y-3">
+                {empresa.datos_empresa?.email && (
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <a href={`mailto:${empresa.datos_empresa.email}`} className="text-primary-600 hover:text-primary-700">
+                        {empresa.datos_empresa.email}
+                      </a>
+                    </div>
                   </div>
-                </div>
-              )}
-              
-              {empresa.telefono && (
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-gray-400" />
-                  <div>
-                    <a href={`tel:${empresa.telefono}`} className="text-primary-600 hover:text-primary-700">
-                      {empresa.telefono}
-                    </a>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {empresa.direccion && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                  <div>
-                    <p className="text-gray-900">{empresa.direccion}</p>
-                    {(empresa.distrito || empresa.provincia || empresa.departamento) && (
-                      <p className="text-sm text-gray-600">
-                        {[empresa.distrito, empresa.provincia, empresa.departamento].filter(Boolean).join(', ')}
-                      </p>
-                    )}
+                {empresa.datos_empresa?.telefono && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-gray-400" />
+                    <div>
+                      <a href={`tel:${empresa.datos_empresa.telefono}`} className="text-primary-600 hover:text-primary-700">
+                        {empresa.datos_empresa.telefono}
+                      </a>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+
+                {empresa.datos_empresa?.direccion && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                    <div>
+                      <p className="text-gray-900">{empresa.datos_empresa.direccion}</p>
+                      {(empresa.datos_empresa.distrito || empresa.datos_empresa.provincia || empresa.datos_empresa.departamento) && (
+                        <p className="text-sm text-gray-600">
+                          {[empresa.datos_empresa.distrito, empresa.datos_empresa.provincia, empresa.datos_empresa.departamento].filter(Boolean).join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
           {/* Especialidades */}
-          {empresa.especialidades && empresa.especialidades.length > 0 && (
+          {empresa.datos_empresa?.especialidades && empresa.datos_empresa.especialidades.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Especialidades</h3>
               <div className="flex flex-wrap gap-2">
-                {empresa.especialidades.map((especialidad) => (
+                {empresa.datos_empresa.especialidades.map((especialidad) => (
                   <span
                     key={especialidad}
                     className="px-3 py-2 bg-primary-100 text-primary-800 text-sm rounded-lg font-medium"
@@ -417,7 +417,7 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
             <div>
               <h4 className="font-semibold text-blue-900">Tipo de Empresa</h4>
               <p className="text-blue-700 text-sm">
-                {empresa.tipo_empresa || 'No especificado'}
+                {empresa.datos_empresa?.tipo_empresa || 'No especificado'}
               </p>
             </div>
           </div>
@@ -439,7 +439,7 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
             <div>
               <h4 className="font-semibold text-purple-900">Categoría</h4>
               <p className="text-purple-700 text-sm">
-                {empresa.categoria_contratista ? `Categoría ${empresa.categoria_contratista}` : 'No especificada'}
+                {empresa.datos_empresa?.categoria_contratista ? `Categoría ${empresa.datos_empresa.categoria_contratista}` : 'No especificada'}
               </p>
             </div>
           </div>
@@ -447,40 +447,40 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
       </div>
 
       {/* Datos de SUNAT */}
-      {empresa.datos_sunat && (
+      {empresa.datos_empresa?.datos_sunat && (
         <div className="bg-blue-50 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-blue-900 mb-4">Información SUNAT</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {empresa.datos_sunat.contribuyente_condicion && (
+            {empresa.datos_empresa.datos_sunat.contribuyente_condicion && (
               <div>
                 <label className="block text-sm font-medium text-blue-700">Condición del Contribuyente</label>
-                <p className="mt-1 text-blue-900">{empresa.datos_sunat.contribuyente_condicion}</p>
+                <p className="mt-1 text-blue-900">{empresa.datos_empresa.datos_sunat.contribuyente_condicion}</p>
               </div>
             )}
-            {empresa.datos_sunat.contribuyente_tipo && (
+            {empresa.datos_empresa.datos_sunat.contribuyente_tipo && (
               <div>
                 <label className="block text-sm font-medium text-blue-700">Tipo de Contribuyente</label>
-                <p className="mt-1 text-blue-900">{empresa.datos_sunat.contribuyente_tipo}</p>
+                <p className="mt-1 text-blue-900">{empresa.datos_empresa.datos_sunat.contribuyente_tipo}</p>
               </div>
             )}
-            {empresa.datos_sunat.estado_sunat && (
+            {empresa.datos_empresa.datos_sunat.estado_sunat && (
               <div>
                 <label className="block text-sm font-medium text-blue-700">Estado en SUNAT</label>
-                <p className="mt-1 text-blue-900">{empresa.datos_sunat.estado_sunat}</p>
+                <p className="mt-1 text-blue-900">{empresa.datos_empresa.datos_sunat.estado_sunat}</p>
               </div>
             )}
-            {empresa.datos_sunat.fecha_inscripcion && (
+            {empresa.datos_empresa.datos_sunat.fecha_inscripcion && (
               <div>
                 <label className="block text-sm font-medium text-blue-700">Fecha de Inscripción</label>
                 <p className="mt-1 text-blue-900">
-                  {new Date(empresa.datos_sunat.fecha_inscripcion).toLocaleDateString('es-PE')}
+                  {new Date(empresa.datos_empresa.datos_sunat.fecha_inscripcion).toLocaleDateString('es-PE')}
                 </p>
               </div>
             )}
-            {empresa.datos_sunat.domicilio_fiscal && (
+            {empresa.datos_empresa.datos_sunat.domicilio_fiscal && (
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-blue-700">Domicilio Fiscal</label>
-                <p className="mt-1 text-blue-900">{empresa.datos_sunat.domicilio_fiscal}</p>
+                <p className="mt-1 text-blue-900">{empresa.datos_empresa.datos_sunat.domicilio_fiscal}</p>
               </div>
             )}
           </div>
@@ -488,36 +488,36 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
       )}
 
       {/* Datos de OSCE */}
-      {empresa.datos_osce && (
+      {empresa.datos_empresa?.datos_osce && (
         <div className="bg-purple-50 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-purple-900 mb-4">Información OSCE</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {empresa.datos_osce.estado_osce && (
+            {empresa.datos_empresa.datos_osce.estado_osce && (
               <div>
                 <label className="block text-sm font-medium text-purple-700">Estado en OSCE</label>
-                <p className="mt-1 text-purple-900">{empresa.datos_osce.estado_osce}</p>
+                <p className="mt-1 text-purple-900">{empresa.datos_empresa.datos_osce.estado_osce}</p>
               </div>
             )}
-            {empresa.datos_osce.fecha_inscripcion && (
+            {empresa.datos_empresa.datos_osce.fecha_inscripcion && (
               <div>
                 <label className="block text-sm font-medium text-purple-700">Fecha de Inscripción</label>
                 <p className="mt-1 text-purple-900">
-                  {new Date(empresa.datos_osce.fecha_inscripcion).toLocaleDateString('es-PE')}
+                  {new Date(empresa.datos_empresa.datos_osce.fecha_inscripcion).toLocaleDateString('es-PE')}
                 </p>
               </div>
             )}
-            {empresa.datos_osce.fecha_baja && (
+            {empresa.datos_empresa.datos_osce.fecha_baja && (
               <div>
                 <label className="block text-sm font-medium text-purple-700">Fecha de Baja</label>
                 <p className="mt-1 text-purple-900">
-                  {new Date(empresa.datos_osce.fecha_baja).toLocaleDateString('es-PE')}
+                  {new Date(empresa.datos_empresa.datos_osce.fecha_baja).toLocaleDateString('es-PE')}
                 </p>
               </div>
             )}
-            {empresa.datos_osce.cantidad_trabajadores && (
+            {empresa.datos_empresa.datos_osce.cantidad_trabajadores && (
               <div>
                 <label className="block text-sm font-medium text-purple-700">Cantidad de Trabajadores</label>
-                <p className="mt-1 text-purple-900">{empresa.datos_osce.cantidad_trabajadores}</p>
+                <p className="mt-1 text-purple-900">{empresa.datos_empresa.datos_osce.cantidad_trabajadores}</p>
               </div>
             )}
           </div>
@@ -525,11 +525,11 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
       )}
 
       {/* Fuentes consultadas */}
-      {empresa.fuentes_consultadas && empresa.fuentes_consultadas.length > 0 && (
+      {empresa.datos_empresa?.fuentes_consultadas && empresa.datos_empresa.fuentes_consultadas.length > 0 && (
         <div className="bg-gray-50 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Fuentes Consultadas</h3>
           <div className="space-y-2">
-            {empresa.fuentes_consultadas.map((fuente, index) => (
+            {empresa.datos_empresa.fuentes_consultadas.map((fuente, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-gray-500" />
                 <span className="text-gray-700">{fuente}</span>
