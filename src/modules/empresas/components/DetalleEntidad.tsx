@@ -124,8 +124,11 @@ const DetalleEntidad = ({ entidad, isOpen, onClose, onEditar }: DetalleEntidadPr
 const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => {
   const empresa = entidad.datos_empresa!;
 
-  // Debug: Log de representantes
+  // Debug: Log de empresa y contactos
   console.log('🔍 DEBUG - Empresa en DetalleEmpresa:', empresa);
+  console.log('🔍 DEBUG - Email:', empresa.email);
+  console.log('🔍 DEBUG - Teléfono:', empresa.telefono);
+  console.log('🔍 DEBUG - Celular:', empresa.celular);
   console.log('🔍 DEBUG - Representantes:', empresa.representantes);
   console.log('🔍 DEBUG - Total representantes:', empresa.representantes?.length || 0);
 
