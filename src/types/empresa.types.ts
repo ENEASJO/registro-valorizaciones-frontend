@@ -509,7 +509,7 @@ export interface EmpresaAuditoria {
  * Respuesta de representante legal desde la API
  */
 export interface RepresentanteResponse {
-  id: number;
+  id: string;
   nombre: string;
   cargo: string;
   numero_documento: string;
