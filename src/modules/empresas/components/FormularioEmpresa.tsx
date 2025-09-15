@@ -419,7 +419,7 @@ const FormularioEmpresa = ({
         dni: formData.dni || null,
         tipo_empresa: formData.tipo_empresa,
         email: formData.email || null,
-        celular: formData.celular || null,
+        telefono: formData.celular || null, // Map celular to telefono for backend compatibility
         direccion: formData.direccion || null,
         representantes: isPersonaNatural(formData.ruc) ? [] : formData.representantes.map(rep => ({
           nombre: rep.nombre,
