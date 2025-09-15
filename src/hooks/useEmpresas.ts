@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { API_ENDPOINTS, API_BASE_URL, EMPRESAS_ENDPOINT } from '../config/api';
-import type { 
-  Empresa, 
+import type {
+  Empresa,
   EntidadContratistaDetalle,
   EmpresaForm,
   FiltrosEntidadContratista,
@@ -10,7 +10,8 @@ import type {
   ConsorcioCompleto,
   EstadoGeneral,
   EspecialidadEmpresa,
-  CategoriaContratista
+  CategoriaContratista,
+  RepresentanteResponse
 } from '../types/empresa.types';
 
 // Interfaces para respuestas de la API de Neon
@@ -40,6 +41,8 @@ interface EmpresaNeonResponse {
   estado: string;
   categoria_contratista?: string; // Añadir el campo que viene del backend
   especialidades?: string[];
+  representantes?: RepresentanteResponse[];
+  total_representantes?: number;
   created_at: string;
   updated_at: string;
 }
@@ -71,6 +74,8 @@ const mapearEmpresaFromAPI = (apiEmpresa: EmpresaNeonResponse): Empresa => ({
   categoria_contratista: apiEmpresa.categoria_contratista as CategoriaContratista, // Función: EJECUTORA/SUPERVISORA
   categoria_contratista_capacidad: undefined, // Para las categorías A, B, C, D, E (futuro)
   especialidades: (apiEmpresa.especialidades as EspecialidadEmpresa[]) || [],
+  representantes: apiEmpresa.representantes,
+  total_representantes: apiEmpresa.total_representantes || apiEmpresa.representantes?.length || 0,
   activo: true,
   created_at: apiEmpresa.created_at,
   updated_at: apiEmpresa.updated_at

@@ -121,7 +121,12 @@ const DetalleEntidad = ({ entidad, isOpen, onClose, onEditar }: DetalleEntidadPr
 // Componente para mostrar detalle de empresa
 const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => {
   const empresa = entidad.datos_empresa!;
-  
+
+  // Debug: Log de representantes
+  console.log('🔍 DEBUG - Empresa en DetalleEmpresa:', empresa);
+  console.log('🔍 DEBUG - Representantes:', empresa.representantes);
+  console.log('🔍 DEBUG - Total representantes:', empresa.representantes?.length || 0);
+
   return (
     <div className="space-y-8">
       {/* Información básica */}
