@@ -282,8 +282,8 @@ export const API_ENDPOINTS = {
   consultaRucConsolidada: `${API_BASE_URL}/consulta-ruc-consolidada`,  // GET endpoint
 
   // Empresas - Endpoints Neon integrados
-  empresas: `${API_BASE_URL}/api/empresas`,              // CRUD completo
-  empresasGuardadas: `${API_BASE_URL}/api/empresas`, // Listar guardadas (mismo endpoint)
+  empresas: `${API_BASE_URL}/empresas`,              // CRUD completo
+  empresasGuardadas: `${API_BASE_URL}/empresas`, // Listar guardadas (mismo endpoint)
   empresasSearch: `${API_BASE_URL}/api/empresas-guardadas/search`, // Buscar
   empresasStats: `${API_BASE_URL}/api/empresas-guardadas/stats`,   // Estadísticas
 
@@ -302,7 +302,7 @@ export const API_ENDPOINTS = {
 } as const;
 
 // Endpoint especial para empresas sin cache busting (para DELETE y PUT)
-export const EMPRESAS_ENDPOINT = `${API_BASE_URL}/api/empresas`;
+export const EMPRESAS_ENDPOINT = `${API_BASE_URL}/empresas`;
 
 // Agregar parámetro de versión para evitar caché (en producción también)
 if (import.meta.env.DEV || import.meta.env.PROD) {
