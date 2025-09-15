@@ -521,7 +521,8 @@ export const useEntidadesContratistas = () => {
         tipo_empresa: empresa.tipo_empresa,
         categoria_contratista: empresa.categoria_contratista,
         categoria_contratista_capacidad: empresa.categoria_contratista_capacidad,
-        especialidades: empresa.especialidades
+        especialidades: empresa.especialidades,
+        representantes: empresa.representantes
       },
       datos_consorcio: undefined,
       empresas_participantes: undefined

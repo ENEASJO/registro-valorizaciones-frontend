@@ -178,26 +178,79 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
             </div>
           </div>
 
-          {/* Representante Legal */}
+          {/* Representantes Legales */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Representante Legal</h3>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">
-                    {empresa.representante_legal || 'No especificado'}
-                  </p>
-                  {empresa.dni_representante && (
-                    <p className="text-sm text-gray-600">
-                      DNI: {empresa.dni_representante}
-                    </p>
-                  )}
-                </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Representantes Legales</h3>
+
+            {empresa.representantes && empresa.representantes.length > 0 ? (
+              <div className="space-y-3">
+                {empresa.representantes.map((representante, index) => (
+                  <div key={representante.id} className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                        representante.es_principal
+                          ? 'bg-yellow-100 text-yellow-600'
+                          : 'bg-gray-100 text-gray-600'
+                      }`}>
+                        {representante.es_principal ? (
+                          <Crown className="w-5 h-5" />
+                        ) : (
+                          <User className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-medium text-gray-900">
+                            {representante.nombre}
+                          </p>
+                          {representante.es_principal && (
+                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                              <Crown className="w-3 h-3" />
+                              Principal
+                            </span>
+                          )}
+                        </div>
+
+                        {representante.cargo && (
+                          <p className="text-sm text-gray-600 mb-1">
+                            Cargo: {representante.cargo}
+                          </p>
+                        )}
+
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                          <p className="text-gray-600">
+                            {representante.tipo_documento || 'DNI'}: {representante.numero_documento}
+                          </p>
+
+                          {representante.fuente && (
+                            <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                              {representante.fuente}
+                            </span>
+                          )}
+
+                          {representante.participacion && (
+                            <span className="text-gray-600">
+                              Participación: {representante.participacion}
+                            </span>
+                          )}
+                        </div>
+
+                        {representante.fecha_desde && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Desde: {new Date(representante.fecha_desde).toLocaleDateString('es-PE')}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="bg-gray-50 rounded-lg p-6 text-center">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p className="text-gray-500">No hay representantes legales registrados</p>
+              </div>
+            )}
           </div>
         </div>
 

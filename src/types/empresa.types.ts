@@ -66,7 +66,7 @@ export interface Empresa extends AuditoriaBase {
   ruc: string;
   razon_social: string;
   nombre_comercial?: string;
-  
+
   // Datos de contacto
   email?: string;
   telefono?: string;
@@ -76,27 +76,31 @@ export interface Empresa extends AuditoriaBase {
   provincia?: string;
   departamento?: string;
   ubigeo?: string;
-  
+
   // Datos legales y financieros
   representante_legal?: string;
   dni_representante?: string;
   capital_social?: number;
   fecha_constitucion?: string;
-  
+
   // Estados y clasificación
   estado: EstadoGeneral;
   tipo_empresa: TipoEmpresa;
   categoria_contratista?: CategoriaContratista; // Función del contratista (EJECUTORA/SUPERVISORA)
   categoria_contratista_capacidad?: CategoriaContratistaCapacidad; // Capacidad OSCE (A, B, C, D, E)
-  
+
   // Especialidades
   especialidades?: EspecialidadEmpresa[];
-  
+
   // Documentos y certificaciones
   numero_registro_nacional?: string;
   vigencia_registro_desde?: string;
   vigencia_registro_hasta?: string;
-  
+
+  // Representantes legales
+  representantes?: RepresentanteResponse[];
+  total_representantes?: number;
+
   // Metadatos
   observaciones?: string;
   activo: boolean;
@@ -492,6 +496,27 @@ export interface EmpresaAuditoria {
 }
 
 // =================================================================
+// INTERFACES PARA RESPUESTAS DE API
+// =================================================================
+
+/**
+ * Respuesta de representante legal desde la API
+ */
+export interface RepresentanteResponse {
+  id: number;
+  nombre: string;
+  cargo: string;
+  numero_documento: string;
+  tipo_documento?: string;
+  fuente?: string;
+  participacion?: string;
+  fecha_desde?: string;
+  es_principal: boolean;
+  estado: string;
+  created_at: string;
+}
+
+// =================================================================
 // INTERFACES PARA VISTAS Y CONSULTAS COMPLEJAS
 // =================================================================
 
@@ -516,6 +541,7 @@ export interface EntidadContratistaDetalle extends EntidadContratista {
     categoria_contratista?: CategoriaContratista; // Función (EJECUTORA/SUPERVISORA)
     categoria_contratista_capacidad?: CategoriaContratistaCapacidad; // Capacidad OSCE (A,B,C,D,E)
     especialidades?: EspecialidadEmpresa[];
+    representantes?: RepresentanteResponse[];
   };
   
   datos_consorcio?: {
