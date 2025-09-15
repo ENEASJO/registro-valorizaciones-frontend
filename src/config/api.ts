@@ -29,7 +29,7 @@ const getBackendUrl = () => {
   
   // En producción usa Cloud Run - URL unificada
   if (import.meta.env.PROD) {
-    return 'https://registro-valorizaciones-503600768755.southamerica-west1.run.app';
+    return 'https://registro-valorizaciones-backend-503600768755.southamerica-west1.run.app';
   }
   
   // En desarrollo usa localhost
