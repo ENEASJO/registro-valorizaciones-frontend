@@ -1,13 +1,25 @@
 // Service Worker para interceptar peticiones HTTP y convertirlas a HTTPS
-const TARGET_DOMAIN = 'registro-valorizaciones-503600768755.southamerica-west1.run.app';
+const TARGET_DOMAIN = 'registro-valorizaciones-backend-503600768755.southamerica-west1.run.app';
 const TARGET_DOMAINS = [
-  'registro-valorizaciones-503600768755.southamerica-west1.run.app',
+  'registro-valorizaciones-backend-503600768755.southamerica-west1.run.app',
   'localhost:8000'
 ];
 
 self.addEventListener('install', (event) => {
   console.log('🛠️ Service Worker instalado');
   self.skipWaiting();
+
+  // Forzar la limpieza de cachés antiguas
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          console.log('🗑️ Eliminando caché:', cacheName);
+          return caches.delete(cacheName);
+        })
+      );
+    })
+  );
 });
 
 self.addEventListener('activate', (event) => {
