@@ -318,9 +318,8 @@ export const useEmpresas = () => {
     setError(null);
 
     try {
-      // Construir URL hardcoded para evitar cualquier interceptor o modificación
-      const baseUrl = 'https://registro-valorizaciones-backend-503600768755.southamerica-west1.run.app';
-      const deleteUrl = `${baseUrl}/api/empresas/${id}`;
+      // Usar endpoint de empresas para eliminar
+      const deleteUrl = `${API_ENDPOINTS.empresas}/${id}`;
 
       // Debug: Mostrar la URL antes del fetch
       console.log('🔍 DELETE URL antes de fetch:', deleteUrl);
