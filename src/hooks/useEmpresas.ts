@@ -273,7 +273,7 @@ export const useEmpresas = () => {
     setError(null);
     
     try {
-      const response = await fetch(`${API_ENDPOINTS.empresas}/${id}`, {
+      const response = await fetch(`${API_ENDPOINTS.empresas}${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -319,7 +319,7 @@ export const useEmpresas = () => {
 
     try {
       // Usar endpoint de empresas para eliminar
-      const deleteUrl = `${API_ENDPOINTS.empresas}/${id}`;
+      const deleteUrl = `${API_ENDPOINTS.empresas}${id}`;
 
       // Debug: Mostrar la URL antes del fetch
       // console.log('🔍 DELETE URL antes de fetch:', deleteUrl);
