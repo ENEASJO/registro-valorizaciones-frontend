@@ -79,6 +79,9 @@ interface FormularioData {
   estado_osce?: string;
   fuentes_consultadas: string[];
   capacidad_contratacion?: string;
+  // Datos crudos del scraping
+  datos_sunat?: any;
+  datos_osce?: any;
 }
 interface FormularioEmpresaProps {
   isOpen: boolean;
@@ -111,7 +114,9 @@ const FormularioEmpresa = ({
     representante_principal_id: 0,
     estado: 'ACTIVO',
     especialidades_oece: [],
-    fuentes_consultadas: []
+    fuentes_consultadas: [],
+    datos_sunat: undefined,
+    datos_osce: undefined
   });
   // Estados del proceso
   const [consultando, setConsultando] = useState(false);
@@ -138,7 +143,9 @@ const FormularioEmpresa = ({
         representante_principal_id: 0,
         estado: 'ACTIVO',
         especialidades_oece: [],
-        fuentes_consultadas: []
+        fuentes_consultadas: [],
+        datos_sunat: undefined,
+        datos_osce: undefined
       });
       setDatosObtenidos(false);
       setError('');
@@ -207,7 +214,9 @@ const FormularioEmpresa = ({
       estado_sunat: data.registro?.estado_sunat as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO' | undefined,
       estado_osce: data.registro?.estado_osce,
       fuentes_consultadas: data.fuentes_consultadas || [],
-      capacidad_contratacion: data.registro?.capacidad_contratacion
+      capacidad_contratacion: data.registro?.capacidad_contratacion,
+      datos_sunat: data.datos_sunat,
+      datos_osce: data.datos_osce
     };
 
     React.startTransition(() => {
@@ -305,7 +314,9 @@ const FormularioEmpresa = ({
             estado: (data.estado === 'ACTIVO' ? 'ACTIVO' : data.estado === 'INACTIVO' ? 'INACTIVO' : 'SUSPENDIDO') as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_sunat: 'ACTIVO',
             fuentes_consultadas: data.fuentes || ['SUNAT', 'OSCE'],
-            capacidad_contratacion: data.capacidad_contratacion || undefined
+            capacidad_contratacion: data.capacidad_contratacion || undefined,
+            datos_sunat: data.datos_sunat,
+            datos_osce: data.datos_osce
           }));
           setDatosObtenidos(true);
           setCurrentStep(2);
@@ -352,7 +363,9 @@ const FormularioEmpresa = ({
             estado_sunat: 'ACTIVO' as 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO',
             estado_osce: '',
             fuentes_consultadas: data.fuentes || ['SUNAT', 'OSCE'],
-            capacidad_contratacion: data.capacidad_contratacion || ''
+            capacidad_contratacion: data.capacidad_contratacion || '',
+            datos_sunat: data.datos_sunat,
+            datos_osce: data.datos_osce
           }));
           setDatosObtenidos(true);
           setCurrentStep(2);
