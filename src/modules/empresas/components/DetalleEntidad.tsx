@@ -1,11 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, 
-  Building2, 
-  Users, 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  X,
+  Building2,
+  Users,
+  Mail,
+  Phone,
+  Smartphone,
+  MapPin,
   Calendar,
   Crown,
   User,
@@ -14,7 +15,8 @@ import {
   Star,
   Award,
   Briefcase,
-  Edit
+  Edit,
+  Database
 } from 'lucide-react';
 import type { EntidadContratistaDetalle } from '../../../types/empresa.types';
 
@@ -170,6 +172,12 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
               <div>
                 <label className="block text-sm font-medium text-gray-500">Fechas</label>
                 <div className="mt-1 space-y-1">
+                  {empresa.fecha_constitucion && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Building2 className="w-4 h-4" />
+                      Constitución: {new Date(empresa.fecha_constitucion).toLocaleDateString('es-PE')}
+                    </div>
+                  )}
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Calendar className="w-4 h-4" />
                     Registrado: {new Date(entidad.created_at).toLocaleDateString('es-PE')}
@@ -180,6 +188,22 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
                   </div>
                 </div>
               </div>
+
+              {empresa.capital_social && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-500">Capital Social</label>
+                  <p className="mt-1 text-gray-900 font-medium">
+                    S/ {empresa.capital_social.toLocaleString('es-PE')}
+                  </p>
+                </div>
+              )}
+
+              {empresa.numero_registro_nacional && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-500">Número de Registro Nacional</label>
+                  <p className="mt-1 text-gray-900 font-mono">{empresa.numero_registro_nacional}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -259,7 +283,71 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
           </div>
         </div>
 
-        {/* Datos de contacto y ubicación */}
+          {/* Contactos de la empresa */}
+          {empresa.contactos && empresa.contactos.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Contactos Adicionales</h3>
+              <div className="space-y-3">
+                {empresa.contactos.map((contacto, index) => (
+                  <div key={index} className="bg-gray-50 rounded-lg p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h4 className="font-medium text-gray-900">{contacto.nombre}</h4>
+                          {contacto.cargo && (
+                            <span className="text-sm text-gray-600">({contacto.cargo})</span>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          {contacto.email && (
+                            <div className="flex items-center gap-2">
+                              <Mail className="w-4 h-4 text-gray-400" />
+                              <a href={`mailto:${contacto.email}`} className="text-primary-600 hover:text-primary-700 text-sm">
+                                {contacto.email}
+                              </a>
+                            </div>
+                          )}
+
+                          {contacto.telefono && (
+                            <div className="flex items-center gap-2">
+                              <Phone className="w-4 h-4 text-gray-400" />
+                              <a href={`tel:${contacto.telefono}`} className="text-primary-600 hover:text-primary-700 text-sm">
+                                {contacto.telefono}
+                              </a>
+                            </div>
+                          )}
+
+                          {contacto.celular && (
+                            <div className="flex items-center gap-2">
+                              <Smartphone className="w-4 h-4 text-gray-400" />
+                              <a href={`tel:${contacto.celular}`} className="text-primary-600 hover:text-primary-700 text-sm">
+                                {contacto.celular}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+
+                        {contacto.departamento && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            Ubicación: {[contacto.departamento, contacto.provincia, contacto.distrito].filter(Boolean).join(', ')}
+                          </p>
+                        )}
+                      </div>
+
+                      {contacto.fuente && (
+                        <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                          {contacto.fuente}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Datos de contacto y ubicación */}
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Contacto</h3>
@@ -291,9 +379,9 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
                   <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
                   <div>
                     <p className="text-gray-900">{empresa.direccion}</p>
-                    {(empresa.distrito || empresa.provincia) && (
+                    {(empresa.distrito || empresa.provincia || empresa.departamento) && (
                       <p className="text-sm text-gray-600">
-                        {[empresa.distrito, empresa.provincia].filter(Boolean).join(', ')}
+                        {[empresa.distrito, empresa.provincia, empresa.departamento].filter(Boolean).join(', ')}
                       </p>
                     )}
                   </div>
@@ -357,6 +445,99 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
           </div>
         </div>
       </div>
+
+      {/* Datos de SUNAT */}
+      {empresa.datos_sunat && (
+        <div className="bg-blue-50 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-blue-900 mb-4">Información SUNAT</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {empresa.datos_sunat.contribuyente_condicion && (
+              <div>
+                <label className="block text-sm font-medium text-blue-700">Condición del Contribuyente</label>
+                <p className="mt-1 text-blue-900">{empresa.datos_sunat.contribuyente_condicion}</p>
+              </div>
+            )}
+            {empresa.datos_sunat.contribuyente_tipo && (
+              <div>
+                <label className="block text-sm font-medium text-blue-700">Tipo de Contribuyente</label>
+                <p className="mt-1 text-blue-900">{empresa.datos_sunat.contribuyente_tipo}</p>
+              </div>
+            )}
+            {empresa.datos_sunat.estado_sunat && (
+              <div>
+                <label className="block text-sm font-medium text-blue-700">Estado en SUNAT</label>
+                <p className="mt-1 text-blue-900">{empresa.datos_sunat.estado_sunat}</p>
+              </div>
+            )}
+            {empresa.datos_sunat.fecha_inscripcion && (
+              <div>
+                <label className="block text-sm font-medium text-blue-700">Fecha de Inscripción</label>
+                <p className="mt-1 text-blue-900">
+                  {new Date(empresa.datos_sunat.fecha_inscripcion).toLocaleDateString('es-PE')}
+                </p>
+              </div>
+            )}
+            {empresa.datos_sunat.domicilio_fiscal && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-blue-700">Domicilio Fiscal</label>
+                <p className="mt-1 text-blue-900">{empresa.datos_sunat.domicilio_fiscal}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Datos de OSCE */}
+      {empresa.datos_osce && (
+        <div className="bg-purple-50 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-purple-900 mb-4">Información OSCE</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {empresa.datos_osce.estado_osce && (
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Estado en OSCE</label>
+                <p className="mt-1 text-purple-900">{empresa.datos_osce.estado_osce}</p>
+              </div>
+            )}
+            {empresa.datos_osce.fecha_inscripcion && (
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Fecha de Inscripción</label>
+                <p className="mt-1 text-purple-900">
+                  {new Date(empresa.datos_osce.fecha_inscripcion).toLocaleDateString('es-PE')}
+                </p>
+              </div>
+            )}
+            {empresa.datos_osce.fecha_baja && (
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Fecha de Baja</label>
+                <p className="mt-1 text-purple-900">
+                  {new Date(empresa.datos_osce.fecha_baja).toLocaleDateString('es-PE')}
+                </p>
+              </div>
+            )}
+            {empresa.datos_osce.cantidad_trabajadores && (
+              <div>
+                <label className="block text-sm font-medium text-purple-700">Cantidad de Trabajadores</label>
+                <p className="mt-1 text-purple-900">{empresa.datos_osce.cantidad_trabajadores}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Fuentes consultadas */}
+      {empresa.fuentes_consultadas && empresa.fuentes_consultadas.length > 0 && (
+        <div className="bg-gray-50 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Fuentes Consultadas</h3>
+          <div className="space-y-2">
+            {empresa.fuentes_consultadas.map((fuente, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-700">{fuente}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

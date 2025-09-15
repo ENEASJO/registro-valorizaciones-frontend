@@ -101,6 +101,12 @@ export interface Empresa extends AuditoriaBase {
   representantes?: RepresentanteResponse[];
   total_representantes?: number;
 
+  // Datos extendidos del scraping
+  datos_sunat?: any;
+  datos_osce?: any;
+  fuentes_consultadas?: string[];
+  contactos?: any[];
+
   // Metadatos
   observaciones?: string;
   activo: boolean;
@@ -542,6 +548,13 @@ export interface EntidadContratistaDetalle extends EntidadContratista {
     categoria_contratista_capacidad?: CategoriaContratistaCapacidad; // Capacidad OSCE (A,B,C,D,E)
     especialidades?: EspecialidadEmpresa[];
     representantes?: RepresentanteResponse[];
+    capital_social?: number;
+    fecha_constitucion?: string;
+    numero_registro_nacional?: string;
+    datos_sunat?: any;
+    datos_osce?: any;
+    fuentes_consultadas?: string[];
+    contactos?: any[];
   };
   
   datos_consorcio?: {

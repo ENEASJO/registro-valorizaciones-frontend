@@ -11,6 +11,7 @@ import type {
   EstadoGeneral,
   EspecialidadEmpresa,
   CategoriaContratista,
+  TipoEmpresa,
   RepresentanteResponse
 } from '../types/empresa.types';
 
@@ -35,14 +36,26 @@ interface EmpresaNeonResponse {
   razon_social: string;
   email?: string;
   celular?: string;
+  telefono?: string;
   direccion?: string;
+  distrito?: string;
+  provincia?: string;
+  departamento?: string;
   representante_legal?: string;
   dni_representante?: string;
   estado: string;
+  tipo_empresa?: string;
   categoria_contratista?: string; // Añadir el campo que viene del backend
   especialidades?: string[];
+  datos_sunat?: any;
+  datos_osce?: any;
+  fuentes_consultadas?: string[];
+  contactos?: any[];
   representantes?: RepresentanteResponse[];
   total_representantes?: number;
+  capital_social?: number;
+  fecha_constitucion?: string;
+  numero_registro_nacional?: string;
   created_at: string;
   updated_at: string;
 }
@@ -54,6 +67,47 @@ interface EstadisticasEmpresas {
   por_estado: Record<string, number>;
 }
 
+// Función auxiliar para transformar Empresa a EntidadContratistaDetalle
+const transformarEmpresaAEntidadContratista = (empresa: Empresa): EntidadContratistaDetalle => {
+  return {
+    // Campos de EntidadContratista
+    id: empresa.id,
+    tipo_entidad: 'EMPRESA',
+    nombre_completo: empresa.razon_social,
+    ruc_principal: empresa.ruc,
+    estado: empresa.estado,
+    activo: empresa.activo,
+    created_at: empresa.created_at,
+    updated_at: empresa.updated_at,
+
+    // Datos de la empresa
+    datos_empresa: {
+      ruc: empresa.ruc,
+      razon_social: empresa.razon_social,
+      nombre_comercial: empresa.nombre_comercial,
+      email: empresa.email,
+      telefono: empresa.telefono,
+      direccion: empresa.direccion,
+      distrito: empresa.distrito,
+      provincia: empresa.provincia,
+      departamento: empresa.departamento,
+      representante_legal: empresa.representante_legal,
+      dni_representante: empresa.dni_representante,
+      tipo_empresa: empresa.tipo_empresa,
+      categoria_contratista: empresa.categoria_contratista,
+      especialidades: empresa.especialidades,
+      representantes: empresa.representantes,
+      capital_social: empresa.capital_social,
+      fecha_constitucion: empresa.fecha_constitucion,
+      numero_registro_nacional: empresa.numero_registro_nacional,
+      datos_sunat: empresa.datos_sunat,
+      datos_osce: empresa.datos_osce,
+      fuentes_consultadas: empresa.fuentes_consultadas,
+      contactos: empresa.contactos
+    }
+  };
+};
+
 // Función auxiliar para mapear respuesta de API a tipo Empresa
 const mapearEmpresaFromAPI = (apiEmpresa: EmpresaNeonResponse): Empresa => ({
   id: apiEmpresa.id, // Mantener el UUID original
@@ -62,27 +116,30 @@ const mapearEmpresaFromAPI = (apiEmpresa: EmpresaNeonResponse): Empresa => ({
   razon_social: apiEmpresa.razon_social,
   nombre_comercial: apiEmpresa.razon_social, // Usar razón social como nombre comercial por defecto
   email: apiEmpresa.email,
-  telefono: apiEmpresa.celular,
+  telefono: apiEmpresa.telefono || apiEmpresa.celular,
   direccion: apiEmpresa.direccion,
-  distrito: undefined,
-  provincia: undefined,
-  departamento: undefined,
+  distrito: apiEmpresa.distrito,
+  provincia: apiEmpresa.provincia,
+  departamento: apiEmpresa.departamento,
   representante_legal: apiEmpresa.representante_legal,
   dni_representante: apiEmpresa.dni_representante,
   estado: (apiEmpresa.estado as EstadoGeneral) || 'ACTIVO',
-  tipo_empresa: 'SAC', // Valor por defecto, podría mejorarse
+  tipo_empresa: (apiEmpresa.tipo_empresa as TipoEmpresa) || 'SAC',
   categoria_contratista: apiEmpresa.categoria_contratista as CategoriaContratista, // Función: EJECUTORA/SUPERVISORA
   categoria_contratista_capacidad: undefined, // Para las categorías A, B, C, D, E (futuro)
   especialidades: (apiEmpresa.especialidades as EspecialidadEmpresa[]) || [],
   representantes: apiEmpresa.representantes,
   total_representantes: apiEmpresa.total_representantes || apiEmpresa.representantes?.length || 0,
+  capital_social: apiEmpresa.capital_social,
+  fecha_constitucion: apiEmpresa.fecha_constitucion,
+  numero_registro_nacional: apiEmpresa.numero_registro_nacional,
   activo: true,
   created_at: apiEmpresa.created_at,
   updated_at: apiEmpresa.updated_at
 });
 
 export const useEmpresas = () => {
-  const [empresas, setEmpresas] = useState<Empresa[]>([]);
+  const [empresas, setEmpresas] = useState<EntidadContratistaDetalle[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -153,7 +210,9 @@ export const useEmpresas = () => {
           );
         }
         
-        setEmpresas(empresasFromAPI);
+        // Transformar empresas a EntidadContratistaDetalle
+        const entidadesContratistas = empresasFromAPI.map(transformarEmpresaAEntidadContratista);
+        setEmpresas(entidadesContratistas);
       } else {
         setEmpresas([]);
       }
@@ -167,7 +226,7 @@ export const useEmpresas = () => {
   }, []);
 
   // Crear nueva empresa usando el endpoint de Neon
-  const crearEmpresa = useCallback(async (empresaData: EmpresaForm): Promise<Empresa | null> => {
+  const crearEmpresa = useCallback(async (empresaData: EmpresaForm): Promise<EntidadContratistaDetalle | null> => {
     setLoading(true);
     setError(null);
     
@@ -188,11 +247,13 @@ export const useEmpresas = () => {
       
       if (result.success && result.data) {
         const nuevaEmpresa = mapearEmpresaFromAPI(result.data);
-        
+
         // Refrescar la lista después de la creación exitosa
         await cargarEmpresas();
-        
-        return nuevaEmpresa;
+
+        // Transformar a EntidadContratistaDetalle
+        const entidadContratista = transformarEmpresaAEntidadContratista(nuevaEmpresa);
+        return entidadContratista;
       } else {
         throw new Error(result.message || 'Error en la respuesta del servidor');
       }
@@ -207,7 +268,7 @@ export const useEmpresas = () => {
   }, [cargarEmpresas]);
 
   // Actualizar empresa usando PUT al endpoint de Neon
-  const actualizarEmpresa = useCallback(async (id: string, empresaData: Partial<EmpresaForm>): Promise<Empresa | null> => {
+  const actualizarEmpresa = useCallback(async (id: string, empresaData: Partial<EmpresaForm>): Promise<EntidadContratistaDetalle | null> => {
     setLoading(true);
     setError(null);
     
@@ -231,11 +292,13 @@ export const useEmpresas = () => {
       
       if (result.success && result.data) {
         const empresaActualizada = mapearEmpresaFromAPI(result.data);
-        
+
         // Refrescar la lista después de la actualización
         await cargarEmpresas();
-        
-        return empresaActualizada;
+
+        // Transformar a EntidadContratistaDetalle
+        const entidadContratista = transformarEmpresaAEntidadContratista(empresaActualizada);
+        return entidadContratista;
       } else {
         throw new Error(result.message || 'Error en la respuesta del servidor');
       }
@@ -306,7 +369,7 @@ export const useEmpresas = () => {
   }, [empresas, cargarEmpresas]);
 
   // Obtener empresa por RUC usando el endpoint de Neon
-  const obtenerEmpresaPorId = useCallback(async (id: string): Promise<Empresa | null> => {
+  const obtenerEmpresaPorId = useCallback(async (id: string): Promise<EntidadContratistaDetalle | null> => {
     // Primero buscar en la lista local
     const empresaLocal = empresas.find(e => e.id === id);
     if (empresaLocal) {
@@ -320,7 +383,7 @@ export const useEmpresas = () => {
   }, [empresas]);
   
   // Obtener empresa por RUC (nuevo método)
-  const obtenerEmpresaPorRuc = useCallback(async (ruc: string): Promise<Empresa | null> => {
+  const obtenerEmpresaPorRuc = useCallback(async (ruc: string): Promise<EntidadContratistaDetalle | null> => {
     setLoading(true);
     setError(null);
     
@@ -337,7 +400,8 @@ export const useEmpresas = () => {
       const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
       
       if (result.success && result.data) {
-        return mapearEmpresaFromAPI(result.data);
+        const empresa = mapearEmpresaFromAPI(result.data);
+        return transformarEmpresaAEntidadContratista(empresa);
       }
       
       return null;
@@ -351,7 +415,7 @@ export const useEmpresas = () => {
   }, []);
   
   // Buscar empresas usando el endpoint de búsqueda de Neon
-  const buscarEmpresas = useCallback(async (query: string): Promise<Empresa[]> => {
+  const buscarEmpresas = useCallback(async (query: string): Promise<EntidadContratistaDetalle[]> => {
     if (!query.trim()) {
       return [];
     }
@@ -369,7 +433,8 @@ export const useEmpresas = () => {
       const result: NeonApiResponse<EmpresaNeonResponse[]> = await response.json();
       
       if (result.success && result.data) {
-        return result.data.map(mapearEmpresaFromAPI);
+        const empresas = result.data.map(mapearEmpresaFromAPI);
+        return empresas.map(transformarEmpresaAEntidadContratista);
       }
       
       return [];
@@ -498,40 +563,7 @@ export const useEntidadesContratistas = () => {
 
   // Combinar empresas y consorcios en una vista unificada
   const entidades: EntidadContratistaDetalle[] = [
-    ...empresas.map(empresa => ({
-      id: empresa.id,
-      tipo_entidad: 'EMPRESA' as const,
-      empresa_id: empresa.id,
-      consorcio_id: undefined,
-      nombre_completo: empresa.razon_social,
-      ruc_principal: empresa.ruc,
-      capacidad_contratacion_anual: undefined,
-      experiencia_anos: undefined,
-      estado: empresa.estado,
-      activo: empresa.activo,
-      created_at: empresa.created_at,
-      updated_at: empresa.updated_at,
-      datos_empresa: {
-        ruc: empresa.ruc,
-        razon_social: empresa.razon_social,
-        nombre_comercial: empresa.nombre_comercial,
-        email: empresa.email,
-        telefono: empresa.telefono,
-        direccion: empresa.direccion,
-        distrito: empresa.distrito,
-        provincia: empresa.provincia,
-        departamento: empresa.departamento,
-        representante_legal: empresa.representante_legal,
-        dni_representante: empresa.dni_representante,
-        tipo_empresa: empresa.tipo_empresa,
-        categoria_contratista: empresa.categoria_contratista,
-        categoria_contratista_capacidad: empresa.categoria_contratista_capacidad,
-        especialidades: empresa.especialidades,
-        representantes: empresa.representantes
-      },
-      datos_consorcio: undefined,
-      empresas_participantes: undefined
-    })),
+    ...empresas,
     ...consorcios.map(consorcio => ({
       id: consorcio.id + 1000, // Offset para evitar conflictos de ID
       tipo_entidad: 'CONSORCIO' as const,
