@@ -423,7 +423,10 @@ const FormularioEmpresa = ({
         estado_sunat: formData.estado_sunat || null,
         estado_osce: formData.estado_osce || null,
         fuentes_consultadas: formData.fuentes_consultadas || [],
-        capacidad_contratacion: formData.capacidad_contratacion || null
+        capacidad_contratacion: formData.capacidad_contratacion || null,
+        // Incluir datos crudos del scraping para que el backend pueda procesarlos
+        datos_sunat: formData.datos_sunat || null,
+        datos_osce: formData.datos_osce || null
       };
       console.log('📤 Enviando datos al backend:', apiData);
       await onSubmit(apiData);
