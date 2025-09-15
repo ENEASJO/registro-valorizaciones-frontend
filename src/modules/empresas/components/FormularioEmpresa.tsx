@@ -420,6 +420,7 @@ const FormularioEmpresa = ({
         tipo_empresa: formData.tipo_empresa,
         email: formData.email || null,
         telefono: formData.celular || null, // Map celular to telefono for backend compatibility
+        celular: formData.celular || null, // Include celular field as well
         direccion: formData.direccion || null,
         representantes: isPersonaNatural(formData.ruc) ? [] : formData.representantes.map(rep => ({
           nombre: rep.nombre,

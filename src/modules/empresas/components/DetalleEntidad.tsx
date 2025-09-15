@@ -128,7 +128,6 @@ const DetalleEmpresa = ({ entidad }: { entidad: EntidadContratistaDetalle }) => 
   console.log('🔍 DEBUG - Empresa en DetalleEmpresa:', empresa);
   console.log('🔍 DEBUG - Email:', empresa.email);
   console.log('🔍 DEBUG - Teléfono:', empresa.telefono);
-  console.log('🔍 DEBUG - Celular:', empresa.celular);
   console.log('🔍 DEBUG - Representantes:', empresa.representantes);
   console.log('🔍 DEBUG - Total representantes:', empresa.representantes?.length || 0);
 
