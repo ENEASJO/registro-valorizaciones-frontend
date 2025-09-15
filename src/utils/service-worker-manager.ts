@@ -35,7 +35,7 @@ export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration
       
       // Register the Service Worker with cache busting
       const timestamp = Date.now();
-      const serviceWorkerUrl = `/service-worker.js?v=${timestamp}`;
+      const serviceWorkerUrl = `/service-worker.js?v=${timestamp}&force=1`;
       const registration = await navigator.serviceWorker.register(serviceWorkerUrl, {
         scope: '/'
       });
@@ -163,6 +163,23 @@ export const forceServiceWorkerControl = async (): Promise<void> => {
       console.log('🔄 Service Worker update triggered');
     } catch (error) {
       console.warn('⚠️ Failed to trigger Service Worker update:', error);
+    }
+  }
+};
+
+/**
+ * Clear all Service Worker caches
+ */
+export const clearServiceWorkerCaches = async (): Promise<void> => {
+  if ('caches' in window) {
+    try {
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames.map(cacheName => caches.delete(cacheName))
+      );
+      console.log('🗑️ Service Worker caches cleared');
+    } catch (error) {
+      console.warn('⚠️ Failed to clear Service Worker caches:', error);
     }
   }
 };
