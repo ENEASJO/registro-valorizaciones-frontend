@@ -138,7 +138,7 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
   if (navigator.serviceWorker.controller) {
     console.log('🔄 Service Worker activo detectado, forzando recarga en 2 segundos...');
     setTimeout(() => {
-      window.location.reload(true); // true para forzar recarga desde el servidor
+      window.location.reload(); // Recargar la página
     }, 2000);
   }
 }
