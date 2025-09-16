@@ -82,34 +82,64 @@ if (import.meta.env.PROD && typeof window !== 'undefined') {
   };
 }
 
-// Service Worker registration - DESACTIVADO TEMPORALMENTE para resolver problemas
+// Service Worker ELIMINACIÓN COMPLETA para resolver problemas
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  console.log('🚫 Desactivando Service Worker temporalmente...');
+  console.log('🚫 Iniciando eliminación completa de Service Workers...');
 
-  // Intento inmediato de desregistro
-  navigator.serviceWorker.getRegistrations().then(registrations => {
-    registrations.forEach(registration => {
-      console.log('🔄 Desinstalando Service Worker:', registration);
-      registration.unregister();
-    });
-  });
+  const removeServiceWorkers = async () => {
+    try {
+      // Obtener todos los registros
+      const registrations = await navigator.serviceWorker.getRegistrations();
 
-  // Segundo intento después de un breve retraso
-  setTimeout(() => {
-    navigator.serviceWorker.getRegistrations().then(registrations => {
       if (registrations.length > 0) {
-        console.log('🔄 Segundo intento de desinstalación...');
-        registrations.forEach(registration => {
-          registration.unregister();
-        });
-      }
-    });
-  }, 1000);
+        console.log(`🔍 Encontrados ${registrations.length} Service Workers...`);
 
-  // Forzar recarga de la página para limpiar cualquier estado residual
+        // Desregistrar cada Service Worker
+        const unregisterPromises = registrations.map(registration => {
+          console.log('🗑️ Desinstalando Service Worker:', registration.scope);
+          return registration.unregister();
+        });
+
+        await Promise.all(unregisterPromises);
+        console.log('✅ Todos los Service Workers han sido desinstalados');
+
+        // Esperar un momento y verificar nuevamente
+        setTimeout(async () => {
+          const remainingRegistrations = await navigator.serviceWorker.getRegistrations();
+          if (remainingRegistrations.length > 0) {
+            console.log('⚠️ Aún quedan Service Workers, intentando nuevamente...');
+            remainingRegistrations.forEach(reg => reg.unregister());
+          } else {
+            console.log('✅ Verificación completa: No quedan Service Workers');
+          }
+        }, 1000);
+      } else {
+        console.log('✅ No se encontraron Service Workers registrados');
+      }
+    } catch (error) {
+      console.error('❌ Error al eliminar Service Workers:', error);
+    }
+  };
+
+  // Iniciar la eliminación
+  removeServiceWorkers();
+
+  // También intentar con el método más agresivo
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(registration => {
+      registration.unregister();
+      console.log('🗑️ Service Worker desinstalado desde ready state');
+    }).catch(error => {
+      console.log('No había Service Worker en ready state:', error);
+    });
+  }
+
+  // Forzar recarga si hay un Service Worker activo
   if (navigator.serviceWorker.controller) {
-    console.log('🔄 Forzando recarga para limpiar Service Worker...');
-    window.location.reload();
+    console.log('🔄 Service Worker activo detectado, forzando recarga en 2 segundos...');
+    setTimeout(() => {
+      window.location.reload(true); // true para forzar recarga desde el servidor
+    }, 2000);
   }
 }
 

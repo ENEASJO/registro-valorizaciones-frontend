@@ -8,67 +8,31 @@ let serviceWorkerRegistration: ServiceWorkerRegistration | null = null;
 let readinessCheckPromise: Promise<void> | null = null;
 
 /**
- * Register Service Worker and wait for it to be ready
+ * Service Worker DESACTIVADO - En lugar de registrar, eliminar
  */
 export const registerServiceWorker = async (): Promise<ServiceWorkerRegistration> => {
+  console.log('🚫 Service Worker desactivado en service-worker-manager.ts');
+
   if (!('serviceWorker' in navigator)) {
     throw new Error('Service Worker not supported in this browser');
   }
 
-  // If already registered and ready, return existing registration
-  if (serviceWorkerReady && serviceWorkerRegistration) {
-    console.log('✅ Service Worker already registered and ready');
-    return serviceWorkerRegistration;
-  }
-
-  // If there's an ongoing registration check, wait for it
-  if (readinessCheckPromise) {
-    console.log('⏳ Waiting for existing Service Worker registration...');
-    await readinessCheckPromise;
-    return serviceWorkerRegistration!;
-  }
-
-  // Create a new registration promise
-  readinessCheckPromise = (async (): Promise<void> => {
-    try {
-      console.log('🛡️ Registering Service Worker...');
-      
-      // Register the Service Worker with cache busting
-      const timestamp = Date.now();
-      const serviceWorkerUrl = `/service-worker.js?v=${timestamp}&force=1`;
-      const registration = await navigator.serviceWorker.register(serviceWorkerUrl, {
-        scope: '/'
-      });
-      
-      console.log('🛡️ Service Worker registered:', registration);
-      serviceWorkerRegistration = registration;
-
-      // Check if already active
-      if (registration.active) {
-        console.log('✅ Service Worker already active');
-        serviceWorkerReady = true;
-        return;
-      }
-
-      // Wait for activation
-      console.log('⏳ Waiting for Service Worker activation...');
-      await waitForServiceWorkerActivation(registration);
-      
-      console.log('✅ Service Worker is ready and active');
-      serviceWorkerReady = true;
-      
-      return;
-    } catch (error) {
-      console.error('❌ Service Worker registration failed:', error);
-      throw error;
-    } finally {
-      readinessCheckPromise = null;
+  // En lugar de registrar, eliminar cualquier Service Worker existente
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    if (registrations.length > 0) {
+      console.log(`🗑️ Eliminando ${registrations.length} Service Workers desde service-worker-manager...`);
+      await Promise.all(registrations.map(reg => reg.unregister()));
+      console.log('✅ Service Workers eliminados');
     }
-  })();
 
-  // Wait for the registration to complete and return the result
-  await readinessCheckPromise;
-  return serviceWorkerRegistration!;
+    // Simular un registro exitoso para no romper el código que depende de esto
+    serviceWorkerReady = true;
+    return {} as ServiceWorkerRegistration;
+  } catch (error) {
+    console.error('❌ Error al eliminar Service Workers:', error);
+    throw error;
+  }
 };
 
 /**
@@ -123,30 +87,13 @@ export const isServiceWorkerReady = (): boolean => {
 };
 
 /**
- * Wait for Service Worker to be ready (with timeout)
+ * Wait for Service Worker to be ready (with timeout) - DESACTIVADO
  */
 export const waitForServiceWorker = async (timeoutMs = 10000): Promise<void> => {
-  if (serviceWorkerReady) {
-    console.log('✅ Service Worker already ready');
-    return;
-  }
-
-  console.log('⏳ Waiting for Service Worker readiness...');
-  
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Service Worker readiness timeout')), timeoutMs);
-  });
-
-  try {
-    await Promise.race([
-      registerServiceWorker(),
-      timeoutPromise
-    ]);
-    console.log('✅ Service Worker is ready for API calls');
-  } catch (error) {
-    console.warn('⚠️ Service Worker not ready, proceeding anyway:', error);
-    // Don't throw error, allow API calls to proceed
-  }
+  console.log('🚫 Service Worker desactivado - continuando sin Service Worker');
+  // Simular que el Service Worker está listo para no romper el flujo
+  serviceWorkerReady = true;
+  return;
 };
 
 /**
