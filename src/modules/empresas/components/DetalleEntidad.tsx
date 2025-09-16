@@ -31,14 +31,6 @@ const InitialsAvatar: React.FC<{ name: string; size?: 'sm' | 'md' | 'lg' }> = ({
   );
 };
 
-// Tab Panel Component
-const TabPanel: React.FC<{ active: boolean; children: React.ReactNode }> = ({ active, children }) => {
-  return (
-    <div className={`${active ? 'block' : 'hidden'} animate-fadeIn`}>
-      {children}
-    </div>
-  );
-};
 
 // Accordion Component
 const Accordion: React.FC<{ title: string; icon: React.ReactNode; defaultOpen?: boolean; children: React.ReactNode }> = ({
@@ -131,7 +123,6 @@ const DetalleEntidad: React.FC<DetalleEntidadProps> = ({ entidad, isOpen, onClos
     return null;
   }
 
-  const [activeTab, setActiveTab] = useState('general');
   const [empresa, setEmpresa] = useState(entidad);
   const [loading, setLoading] = useState(false);
 
@@ -551,74 +542,16 @@ const DetalleEntidad: React.FC<DetalleEntidadProps> = ({ entidad, isOpen, onClos
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="bg-gray-50 border-b border-gray-200">
-            <nav className="flex space-x-8 px-8">
-              <button
-                onClick={() => setActiveTab('general')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'general'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Información General
-              </button>
-              <button
-                onClick={() => setActiveTab('representantes')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors relative ${
-                  activeTab === 'representantes'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Representantes
-                {empresa.datos_empresa?.representantes && empresa.datos_empresa.representantes.length > 0 && (
-                  <span className="absolute -top-1 -right-2 w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
-                    {empresa.datos_empresa.representantes.length}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('contacto')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'contacto'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Contacto y Ubicación
-              </button>
-              <button
-                onClick={() => setActiveTab('fiscal')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === 'fiscal'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Información Fiscal
-              </button>
-            </nav>
-          </div>
+          {/* Content - Single Section */}
+          <div className="flex-1 overflow-y-auto px-8 py-6 space-y-8">
+            {/* Información General */}
+            {esEmpresaIndividual ? <DetalleEmpresa /> : <DetalleConsorcio />}
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto px-8 py-6">
-            <TabPanel active={activeTab === 'general'}>
-              {esEmpresaIndividual ? <DetalleEmpresa /> : <DetalleConsorcio />}
-            </TabPanel>
+            {/* Contacto y Ubicación */}
+            <ContactoYUbicacion />
 
-            <TabPanel active={activeTab === 'representantes'}>
-              <DetalleEmpresa />
-            </TabPanel>
-
-            <TabPanel active={activeTab === 'contacto'}>
-              <ContactoYUbicacion />
-            </TabPanel>
-
-            <TabPanel active={activeTab === 'fiscal'}>
-              <InformacionFiscal />
-            </TabPanel>
+            {/* Información Fiscal */}
+            <InformacionFiscal />
           </div>
 
           {/* Footer con Acciones Rápidas */}
