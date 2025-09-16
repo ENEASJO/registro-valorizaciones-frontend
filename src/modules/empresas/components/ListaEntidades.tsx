@@ -1,19 +1,26 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Building2, 
-  Users, 
-  Search, 
-  Filter, 
-  Eye, 
-  Edit, 
-  Trash, 
-  Mail, 
-  Phone, 
+  Building2,
+  Users,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash,
+  Mail,
+  Phone,
   MapPin,
   Crown,
   MoreVertical,
-  Calendar
+  Calendar,
+  Star,
+  Award,
+  CheckCircle,
+  TrendingUp,
+  Clock,
+  Globe,
+  Briefcase
 } from 'lucide-react';
 import type { 
   EntidadContratistaDetalle, 
@@ -325,232 +332,269 @@ const ListaEntidades = ({
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {entidadesFiltradas.map((entidad, index) => (
             <motion.div
               key={entidad.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
+              className="group bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-xl hover:border-blue-200 transition-all duration-300 overflow-hidden"
             >
-              <div className="p-6">
+              {/* Header con gradiente */}
+              <div className={`bg-gradient-to-r p-6 ${
+                entidad.tipo_entidad === 'EMPRESA'
+                  ? entidad.datos_empresa?.categoria_contratista === 'EJECUTORA'
+                    ? 'from-blue-500 to-blue-600'
+                    : entidad.datos_empresa?.categoria_contratista === 'SUPERVISORA'
+                    ? 'from-green-500 to-green-600'
+                    : 'from-gray-500 to-gray-600'
+                  : 'from-purple-500 to-purple-600'
+              }`}>
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4 flex-1">
-                    {/* Icono con indicador de rol */}
+                  <div className="flex items-start gap-4">
+                    {/* Avatar mejorado */}
                     <div className="relative">
-                      <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${
-                        entidad.tipo_entidad === 'EMPRESA' 
-                          ? 'bg-blue-100 text-blue-600' 
-                          : 'bg-purple-100 text-purple-600'
-                      }`}>
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center border border-white/30">
                         {entidad.tipo_entidad === 'EMPRESA' ? (
-                          <Building2 className="w-6 h-6" />
+                          <Building2 className="w-8 h-8 text-white" />
                         ) : (
-                          <Users className="w-6 h-6" />
+                          <Users className="w-8 h-8 text-white" />
                         )}
                       </div>
-                      {/* Badge indicador de rol basado en datos reales */}
+                      {/* Badge de categoría */}
                       {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa?.categoria_contratista && (
-                        entidad.datos_empresa.categoria_contratista === 'EJECUTORA' ? (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center" title="Empresa Ejecutora">
-                            <span className="text-white text-xs font-bold">E</span>
-                          </div>
-                        ) : (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" title="Empresa Supervisora">
-                            <span className="text-white text-xs font-bold">S</span>
-                          </div>
-                        )
+                        <div className={`absolute -bottom-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white ${
+                          entidad.datos_empresa.categoria_contratista === 'EJECUTORA' ? 'bg-blue-500' : 'bg-green-500'
+                        }`}>
+                          {entidad.datos_empresa.categoria_contratista.charAt(0)}
+                        </div>
                       )}
                     </div>
 
-                    {/* Información principal */}
+                    {/* Info principal */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
-                          {entidad.nombre_completo}
-                        </h3>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          entidad.tipo_entidad === 'EMPRESA' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
-                        }`}>
+                      <h3 className="text-xl font-bold text-white mb-1 truncate">
+                        {entidad.nombre_completo}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium">
                           {entidad.tipo_entidad === 'EMPRESA' ? 'Empresa' : 'Consorcio'}
                         </span>
-                        {/* Badge de rol basado en datos reales */}
                         {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa?.categoria_contratista && (
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ${
-                            entidad.datos_empresa.categoria_contratista === 'EJECUTORA' ? 'bg-blue-500' : 'bg-green-500'
-                          }`}>
+                          <span className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium">
                             {entidad.datos_empresa.categoria_contratista}
                           </span>
                         )}
-                        {entidad.tipo_entidad === 'CONSORCIO' && entidad.empresas_participantes?.some(ep => ep.es_lider) && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                            <Crown className="w-3 h-3" />
-                            Con Líder
+                        {entidad.estado === 'ACTIVO' && (
+                          <span className="px-3 py-1 bg-green-400/20 backdrop-blur-sm rounded-full text-green-100 text-sm font-medium flex items-center gap-1">
+                            <CheckCircle className="w-4 h-4" />
+                            Activo
                           </span>
                         )}
                       </div>
-
-                      {/* Información específica por tipo */}
-                      {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span className="font-mono">RUC: {entidad.datos_empresa.ruc}</span>
-                            {entidad.datos_empresa.categoria_contratista && (
-                              <span className="px-2 py-1 bg-gradient-to-r from-orange-100 to-yellow-100 text-orange-800 rounded text-xs font-medium border border-orange-200">
-                                Categoría {entidad.datos_empresa.categoria_contratista}
-                              </span>
-                            )}
-                            {/* Indicador visual adicional de especialización */}
-                            {Math.random() > 0.7 && (
-                              <span className="px-2 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 rounded text-xs font-medium border border-purple-200">
-                                ⭐ Especializada
-                              </span>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-6 text-sm text-gray-600">
-                            {entidad.datos_empresa.email && (
-                              <div className="flex items-center gap-1">
-                                <Mail className="w-4 h-4" />
-                                {entidad.datos_empresa.email}
-                              </div>
-                            )}
-                            {entidad.datos_empresa.telefono && (
-                              <div className="flex items-center gap-1">
-                                <Phone className="w-4 h-4" />
-                                {entidad.datos_empresa.telefono}
-                              </div>
-                            )}
-                            {entidad.datos_empresa.direccion && (
-                              <div className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" />
-                                {entidad.datos_empresa.direccion}
-                              </div>
-                            )}
-                          </div>
-
-                          {entidad.datos_empresa.especialidades && entidad.datos_empresa.especialidades.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {entidad.datos_empresa.especialidades.slice(0, 3).map((esp, index) => (
-                                <span key={esp} className={`px-2 py-1 text-xs rounded font-medium ${
-                                  index === 0 ? 'bg-blue-100 text-blue-800 border border-blue-200' :
-                                  index === 1 ? 'bg-green-100 text-green-800 border border-green-200' :
-                                  'bg-purple-100 text-purple-800 border border-purple-200'
-                                }`}>
-                                  {esp.replace('_', ' ')}
-                                </span>
-                              ))}
-                              {entidad.datos_empresa.especialidades.length > 3 && (
-                                <span className="px-2 py-1 bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 text-xs rounded font-medium border border-gray-300">
-                                  +{entidad.datos_empresa.especialidades.length - 3} más
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {entidad.tipo_entidad === 'CONSORCIO' && entidad.datos_consorcio && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span className="flex items-center gap-1">
-                              <Users className="w-4 h-4" />
-                              <span className="font-medium">{entidad.empresas_participantes?.length || 0}</span> empresas
-                            </span>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              Constituido: <span className="font-medium">{new Date(entidad.datos_consorcio.fecha_constitucion).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-
-                          <div className="text-sm text-gray-600">
-                            Líder: {entidad.datos_consorcio.empresa_lider_nombre}
-                          </div>
-
-                          {entidad.datos_consorcio.descripcion && (
-                            <p className="text-sm text-gray-600 line-clamp-2">
-                              {entidad.datos_consorcio.descripcion}
-                            </p>
-                          )}
-
-                          {/* Empresas participantes */}
-                          {entidad.empresas_participantes && entidad.empresas_participantes.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {entidad.empresas_participantes.slice(0, 2).map(ep => (
-                                <span key={ep.empresa_id} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded flex items-center gap-1">
-                                  {ep.es_lider && <Crown className="w-3 h-3 text-yellow-600" />}
-                                  {ep.empresa_nombre} ({ep.porcentaje_participacion}%)
-                                </span>
-                              ))}
-                              {entidad.empresas_participantes.length > 2 && (
-                                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                                  +{entidad.empresas_participantes.length - 2} más
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  {/* Estado y acciones */}
-                  <div className="flex items-start gap-3">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor(entidad.estado)}`}>
+                  {/* Estado flotante */}
+                  <div className="relative">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      entidad.estado === 'ACTIVO'
+                        ? 'bg-green-100 text-green-800'
+                        : entidad.estado === 'INACTIVO'
+                        ? 'bg-gray-100 text-gray-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
                       {entidad.estado}
                     </span>
+                  </div>
+                </div>
+              </div>
 
-                    {/* Menú de acciones */}
-                    <div className="relative">
-                      <button
-                        onClick={() => setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id)}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+              {/* Contenido principal */}
+              <div className="p-6 space-y-4">
+                {/* Información clave */}
+                <div className="space-y-3">
+                  {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa && (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500">RUC</span>
+                        <span className="font-mono text-sm font-semibold text-gray-900">
+                          {entidad.datos_empresa.ruc}
+                        </span>
+                      </div>
 
-                      {menuAbierto === entidad.id && (
-                        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                          <div className="py-1">
+                      {/* Contacto rápido */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {entidad.datos_empresa.email && (
+                          <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
+                            <Mail className="w-4 h-4 text-blue-600" />
+                            <span className="text-sm text-gray-700 truncate">{entidad.datos_empresa.email}</span>
+                          </div>
+                        )}
+                        {entidad.datos_empresa.telefono && (
+                          <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
+                            <Phone className="w-4 h-4 text-green-600" />
+                            <span className="text-sm text-gray-700">{entidad.datos_empresa.telefono}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Ubicación */}
+                      {entidad.datos_empresa.direccion && (
+                        <div className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                          <MapPin className="w-4 h-4 text-gray-600 mt-0.5" />
+                          <span className="text-sm text-gray-700">{entidad.datos_empresa.direccion}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {entidad.tipo_entidad === 'CONSORCIO' && entidad.datos_consorcio && (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500">Empresas Participantes</span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          {entidad.empresas_participantes?.length || 0}
+                        </span>
+                      </div>
+
+                      <div className="p-3 bg-purple-50 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1">Empresa Líder</div>
+                        <div className="font-medium text-gray-900">{entidad.datos_consorcio.empresa_lider_nombre}</div>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Calendar className="w-4 h-4" />
+                        <span>Constituido: {new Date(entidad.datos_consorcio.fecha_constitucion).toLocaleDateString()}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Especialidades o Participantes */}
+                <div className="space-y-2">
+                  {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa?.especialidades && entidad.datos_empresa.especialidades.length > 0 && (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <Star className="w-4 h-4 text-yellow-500" />
+                        <span className="text-sm font-medium text-gray-700">Especialidades</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {entidad.datos_empresa.especialidades.slice(0, 4).map((esp) => (
+                          <span
+                            key={esp}
+                            className="px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-blue-700 text-xs rounded-lg font-medium"
+                          >
+                            {esp.replace('_', ' ')}
+                          </span>
+                        ))}
+                        {entidad.datos_empresa.especialidades.length > 4 && (
+                          <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg font-medium">
+                            +{entidad.datos_empresa.especialidades.length - 4}
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {entidad.tipo_entidad === 'CONSORCIO' && entidad.empresas_participantes && entidad.empresas_participantes.length > 0 && (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-purple-500" />
+                        <span className="text-sm font-medium text-gray-700">Participantes</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {entidad.empresas_participantes.slice(0, 3).map((ep) => (
+                          <span
+                            key={ep.empresa_id}
+                            className={`px-3 py-1 text-xs rounded-lg font-medium flex items-center gap-1 ${
+                              ep.es_lider
+                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                                : 'bg-gray-100 text-gray-700'
+                            }`}
+                          >
+                            {ep.es_lider && <Crown className="w-3 h-3" />}
+                            {ep.empresa_nombre.split(' ')[0]} ({ep.porcentaje_participacion}%)
+                          </span>
+                        ))}
+                        {entidad.empresas_participantes.length > 3 && (
+                          <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-lg font-medium">
+                            +{entidad.empresas_participantes.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Indicadores adicionales */}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    {entidad.tipo_entidad === 'EMPRESA' && entidad.datos_empresa?.fecha_constitucion && (
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        <span>{new Date(entidad.datos_empresa.fecha_constitucion).getFullYear()}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      <span>Actualizado hoy</span>
+                    </div>
+                  </div>
+
+                  {/* Menú de acciones mejorado */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id)}
+                      className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors group-hover:bg-gray-50"
+                    >
+                      <MoreVertical className="w-4 h-4" />
+                    </button>
+
+                    {menuAbierto === entidad.id && (
+                      <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 z-20 overflow-hidden">
+                        <div className="py-2">
+                          <button
+                            onClick={() => {
+                              onVerDetalle(entidad);
+                              setMenuAbierto(null);
+                            }}
+                            className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                          >
+                            <Eye className="w-4 h-4" />
+                            Ver detalles completos
+                          </button>
+                          {onEditar && (
                             <button
                               onClick={() => {
-                                onVerDetalle(entidad);
+                                onEditar(entidad);
                                 setMenuAbierto(null);
                               }}
-                              className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
                             >
-                              <Eye className="w-4 h-4" />
-                              Ver Detalle
+                              <Edit className="w-4 h-4" />
+                              Editar información
                             </button>
-                            {onEditar && (
-                              <button
-                                onClick={() => {
-                                  onEditar(entidad);
-                                  setMenuAbierto(null);
-                                }}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                              >
-                                <Edit className="w-4 h-4" />
-                                Editar
-                              </button>
-                            )}
-                            {onEliminar && (
+                          )}
+                          {onEliminar && (
+                            <>
+                              <div className="border-t border-gray-100 my-1"></div>
                               <button
                                 onClick={() => {
                                   onEliminar(entidad);
                                   setMenuAbierto(null);
                                 }}
-                                className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                className="flex items-center gap-3 w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
                               >
                                 <Trash className="w-4 h-4" />
-                                Eliminar
+                                Eliminar empresa
                               </button>
-                            )}
-                          </div>
+                            </>
+                          )}
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
