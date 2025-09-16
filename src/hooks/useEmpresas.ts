@@ -231,6 +231,9 @@ export const useEmpresas = () => {
     setError(null);
     
     try {
+      console.log('📤 Enviando solicitud a:', API_ENDPOINTS.empresas);
+      console.log('📤 Datos enviados:', empresaData);
+
       const response = await fetch(API_ENDPOINTS.empresas, {
         method: 'POST',
         headers: {
@@ -240,10 +243,35 @@ export const useEmpresas = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        console.error('❌ Error en respuesta HTTP:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url
+        });
+
+        // Try to get more error details
+        try {
+          const errorText = await response.text();
+          console.error('❌ Cuerpo del error:', errorText);
+
+          // Try to parse as JSON to get the specific error message
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.detail) {
+              throw new Error(errorJson.detail);
+            }
+          } catch (parseError) {
+            // If not JSON or no detail, use the generic error
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+        } catch (e) {
+          console.error('❌ No se pudo leer el cuerpo del error');
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       }
 
       const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
+      console.log('✅ Respuesta recibida:', result);
       
       if (result.success && result.data) {
         const nuevaEmpresa = mapearEmpresaFromAPI(result.data);
@@ -285,7 +313,26 @@ export const useEmpresas = () => {
         if (response.status === 404) {
           throw new Error('Empresa no encontrada');
         }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+        // Try to get more error details
+        try {
+          const errorText = await response.text();
+          console.error('❌ Cuerpo del error:', errorText);
+
+          // Try to parse as JSON to get the specific error message
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.detail) {
+              throw new Error(errorJson.detail);
+            }
+          } catch (parseError) {
+            // If not JSON or no detail, use the generic error
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+        } catch (e) {
+          console.error('❌ No se pudo leer el cuerpo del error');
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       }
 
       const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
@@ -333,7 +380,26 @@ export const useEmpresas = () => {
         if (response.status === 404) {
           throw new Error('Empresa no encontrada');
         }
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+
+        // Try to get more error details
+        try {
+          const errorText = await response.text();
+          console.error('❌ Cuerpo del error:', errorText);
+
+          // Try to parse as JSON to get the specific error message
+          try {
+            const errorJson = JSON.parse(errorText);
+            if (errorJson.detail) {
+              throw new Error(errorJson.detail);
+            }
+          } catch (parseError) {
+            // If not JSON or no detail, use the generic error
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+        } catch (e) {
+          console.error('❌ No se pudo leer el cuerpo del error');
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       }
 
       // Para status 204 (No Content), no hay cuerpo de respuesta
