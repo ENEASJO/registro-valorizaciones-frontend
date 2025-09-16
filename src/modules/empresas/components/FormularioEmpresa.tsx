@@ -68,6 +68,11 @@ interface FormularioData {
   email: string;
   celular: string;
   direccion: string;
+  // Ubicación
+  departamento?: string;
+  provincia?: string;
+  distrito?: string;
+  ubigeo?: string;
   // Representantes (only for juridical entities)
   representantes: import('../../../types/empresa.types').RepresentanteFormulario[];
   representante_principal_id: number;
@@ -110,6 +115,10 @@ const FormularioEmpresa = ({
     email: '',
     celular: '',
     direccion: '',
+    departamento: '',
+    provincia: '',
+    distrito: '',
+    ubigeo: '',
     representantes: [],
     representante_principal_id: 0,
     estado: 'ACTIVO',
@@ -139,6 +148,10 @@ const FormularioEmpresa = ({
         email: '',
         celular: '',
         direccion: '',
+        departamento: '',
+        provincia: '',
+        distrito: '',
+        ubigeo: '',
         representantes: [],
         representante_principal_id: 0,
         estado: 'ACTIVO',
@@ -308,6 +321,10 @@ const FormularioEmpresa = ({
             email: data.email || contacto.email || '',
             celular: data.telefono || telefono || '',
             direccion: data.direccion || '',
+            departamento: data.departamento || '',
+            provincia: data.provincia || '',
+            distrito: data.distrito || '',
+            ubigeo: data.ubigeo || '',
             representantes: [], // Natural persons don't have separate representatives
             representante_principal_id: 0,
             especialidades_oece: [],
@@ -356,6 +373,10 @@ const FormularioEmpresa = ({
             email: data.email || contacto.email || '',
             celular: data.telefono || telefono || '',
             direccion: data.direccion || '',
+            departamento: data.departamento || '',
+            provincia: data.provincia || '',
+            distrito: data.distrito || '',
+            ubigeo: data.ubigeo || '',
             representantes: representantesProcesados,
             representante_principal_id: representantePrincipalId,
             especialidades_oece: data.especialidades || [],
