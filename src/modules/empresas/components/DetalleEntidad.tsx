@@ -126,20 +126,18 @@ const ContactInfo: React.FC<{
 };
 
 const DetalleEntidad: React.FC<DetalleEntidadProps> = ({ entidad, isOpen, onClose, onEdit }) => {
-  const [activeTab, setActiveTab] = useState('general');
-  const [empresa, setEmpresa] = useState(entidad);
-  const [loading, setLoading] = useState(false);
-
   // Si no hay entidad o el modal no está abierto, no renderizar nada
   if (!entidad || !isOpen) {
     return null;
   }
 
+  const [activeTab, setActiveTab] = useState('general');
+  const [empresa, setEmpresa] = useState(entidad);
+  const [loading, setLoading] = useState(false);
+
   // Actualizar el estado de empresa cuando cambia la prop
   useEffect(() => {
-    if (entidad) {
-      setEmpresa(entidad);
-    }
+    setEmpresa(entidad);
   }, [entidad]);
 
   // Determinar si es empresa individual o consorcio
