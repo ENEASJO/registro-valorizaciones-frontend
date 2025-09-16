@@ -85,11 +85,32 @@ if (import.meta.env.PROD && typeof window !== 'undefined') {
 // Service Worker registration - DESACTIVADO TEMPORALMENTE para resolver problemas
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   console.log('🚫 Desactivando Service Worker temporalmente...');
+
+  // Intento inmediato de desregistro
   navigator.serviceWorker.getRegistrations().then(registrations => {
     registrations.forEach(registration => {
+      console.log('🔄 Desinstalando Service Worker:', registration);
       registration.unregister();
     });
   });
+
+  // Segundo intento después de un breve retraso
+  setTimeout(() => {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      if (registrations.length > 0) {
+        console.log('🔄 Segundo intento de desinstalación...');
+        registrations.forEach(registration => {
+          registration.unregister();
+        });
+      }
+    });
+  }, 1000);
+
+  // Forzar recarga de la página para limpiar cualquier estado residual
+  if (navigator.serviceWorker.controller) {
+    console.log('🔄 Forzando recarga para limpiar Service Worker...');
+    window.location.reload();
+  }
 }
 
 // Debug en producción
