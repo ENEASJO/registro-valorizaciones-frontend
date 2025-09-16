@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/layout/Layout';
 import NotFound from './components/NotFound';
 import Dashboard from './modules/dashboard/Dashboard';
@@ -11,8 +12,9 @@ import Configuracion from './modules/configuracion/Configuracion';
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
+      <ThemeProvider>
+        <Routes>
+          <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           {/* Redirigir /empresas directamente a ejecutoras */}
           <Route path="empresas" element={<GestionEjecutoras />} />
@@ -29,6 +31,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      </ThemeProvider>
     </Router>
   )
 }
