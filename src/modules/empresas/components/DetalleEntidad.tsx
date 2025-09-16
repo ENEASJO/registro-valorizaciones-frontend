@@ -3,7 +3,7 @@ import { X, Edit, Building, Users, MapPin, Phone, Mail, Globe, Download, Share, 
 import type { EntidadContratistaDetalle } from '../../../types/empresa.types';
 
 interface DetalleEntidadProps {
-  entidad: EntidadContratistaDetalle;
+  entidad: EntidadContratistaDetalle | null;
   isOpen: boolean;
   onClose: () => void;
   onEdit?: (entidad: EntidadContratistaDetalle) => void;
@@ -129,6 +129,18 @@ const DetalleEntidad: React.FC<DetalleEntidadProps> = ({ entidad, isOpen, onClos
   const [activeTab, setActiveTab] = useState('general');
   const [empresa, setEmpresa] = useState(entidad);
   const [loading, setLoading] = useState(false);
+
+  // Si no hay entidad o el modal no está abierto, no renderizar nada
+  if (!entidad || !isOpen) {
+    return null;
+  }
+
+  // Actualizar el estado de empresa cuando cambia la prop
+  useEffect(() => {
+    if (entidad) {
+      setEmpresa(entidad);
+    }
+  }, [entidad]);
 
   // Determinar si es empresa individual o consorcio
   const esEmpresaIndividual = empresa.tipo_entidad === 'EMPRESA' || !empresa.datos_consorcio?.empresa_lider_id;
