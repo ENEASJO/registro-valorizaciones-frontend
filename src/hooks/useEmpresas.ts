@@ -270,21 +270,18 @@ export const useEmpresas = () => {
         }
       }
 
-      const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
-      console.log('✅ Respuesta recibida:', result);
-      
-      if (result.success && result.data) {
-        const nuevaEmpresa = mapearEmpresaFromAPI(result.data);
+      const empresaResponse = await response.json();
+      console.log('✅ Respuesta recibida:', empresaResponse);
 
-        // Refrescar la lista después de la creación exitosa
-        await cargarEmpresas();
+      // El backend devuelve directamente la empresa creada (EmpresaResponse)
+      const nuevaEmpresa = mapearEmpresaFromAPI(empresaResponse);
 
-        // Transformar a EntidadContratistaDetalle
-        const entidadContratista = transformarEmpresaAEntidadContratista(nuevaEmpresa);
-        return entidadContratista;
-      } else {
-        throw new Error(result.message || 'Error en la respuesta del servidor');
-      }
+      // Refrescar la lista después de la creación exitosa
+      await cargarEmpresas();
+
+      // Transformar a EntidadContratistaDetalle
+      const entidadContratista = transformarEmpresaAEntidadContratista(nuevaEmpresa);
+      return entidadContratista;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al crear empresa';
       setError(errorMessage);
@@ -335,20 +332,17 @@ export const useEmpresas = () => {
         }
       }
 
-      const result: NeonApiResponse<EmpresaNeonResponse> = await response.json();
-      
-      if (result.success && result.data) {
-        const empresaActualizada = mapearEmpresaFromAPI(result.data);
+      const empresaResponse = await response.json();
 
-        // Refrescar la lista después de la actualización
-        await cargarEmpresas();
+      // El backend devuelve directamente la empresa actualizada (EmpresaResponse)
+      const empresaActualizada = mapearEmpresaFromAPI(empresaResponse);
 
-        // Transformar a EntidadContratistaDetalle
-        const entidadContratista = transformarEmpresaAEntidadContratista(empresaActualizada);
-        return entidadContratista;
-      } else {
-        throw new Error(result.message || 'Error en la respuesta del servidor');
-      }
+      // Refrescar la lista después de la actualización
+      await cargarEmpresas();
+
+      // Transformar a EntidadContratistaDetalle
+      const entidadContratista = transformarEmpresaAEntidadContratista(empresaActualizada);
+      return entidadContratista;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al actualizar empresa';
       setError(errorMessage);
