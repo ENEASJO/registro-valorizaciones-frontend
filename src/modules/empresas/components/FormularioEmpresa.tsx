@@ -413,15 +413,21 @@ const FormularioEmpresa = ({
     }
     try {
       // Transform data to match backend API schema
+      // Only send fields that the backend expects based on the error message
       const apiData = {
         ruc: formData.ruc,
         razon_social: formData.razon_social,
+        nombre_comercial: formData.razon_social, // Backend expects this field even though it should be optional
         dni: formData.dni || null,
         tipo_empresa: formData.tipo_empresa,
         email: formData.email || null,
-        telefono: formData.celular || null, // Map celular to telefono for backend compatibility
-        celular: formData.celular || null, // Include celular field as well
+        telefono: formData.celular || null,
+        celular: formData.celular || null,
         direccion: formData.direccion || null,
+        departamento: formData.departamento || null,
+        provincia: formData.provincia || null,
+        distrito: formData.distrito || null,
+        ubigeo: formData.ubigeo || null,
         representantes: isPersonaNatural(formData.ruc) ? [] : formData.representantes.map(rep => ({
           nombre: rep.nombre,
           cargo: rep.cargo || 'REPRESENTANTE',
@@ -434,18 +440,16 @@ const FormularioEmpresa = ({
         representante_principal_id: isPersonaNatural(formData.ruc) ? 0 : formData.representante_principal_id,
         estado: formData.estado,
         especialidades_oece: formData.especialidades_oece || [],
-        estado_sunat: formData.estado_sunat || null,
-        estado_osce: formData.estado_osce || null,
         fuentes_consultadas: formData.fuentes_consultadas || [],
-        capacidad_contratacion: formData.capacidad_contratacion || null,
-        // Incluir datos crudos del scraping para que el backend pueda procesarlos
-        datos_sunat: formData.datos_sunat || null,
-        datos_osce: formData.datos_osce || null
+        // Add this field that the backend expects
+        categoria_contratista: 'EJECUTORA'
       };
-      // console.log('📤 Enviando datos al backend:', apiData);
+
+      console.log('📤 Enviando datos al backend:', apiData);
       await onSubmit(apiData);
       onClose();
     } catch (error) {
+      console.error('Error en handleSubmit:', error);
       setError('Error al guardar la empresa');
     }
   };
