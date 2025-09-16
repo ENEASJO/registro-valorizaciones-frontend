@@ -90,21 +90,19 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
   // Handler para crear/actualizar empresa ejecutora
   const handleSubmitEmpresa = async (empresaData: EmpresaForm) => {
     try {
-      // Asegurar que la empresa se marque como EJECUTORA
-      const empresaConCategoria = {
-        ...empresaData,
-        categoria_contratista: 'EJECUTORA' as const
-      };
-      
+      // The categoria_contratista is now set in the form component
+
       if (empresaEditando) {
         onMostrarMensaje?.('success', 'Empresa ejecutora actualizada correctamente');
       } else {
-        await crearEmpresa(empresaConCategoria);
+        console.log('📤 Enviando empresa a crearEmpresa:', empresaData);
+        await crearEmpresa(empresaData);
         onMostrarMensaje?.('success', 'Empresa ejecutora registrada correctamente');
       }
       cerrarModal();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error al procesar empresa ejecutora';
+      console.error('Error en handleSubmitEmpresa:', error);
       onMostrarMensaje?.('error', errorMessage);
       throw error;
     }
@@ -259,7 +257,7 @@ const GestionEjecutoras = ({ onVolverADashboard, onMostrarMensaje }: GestionEjec
         entidad={entidadSeleccionada}
         isOpen={modalAbierto === 'detalle'}
         onClose={cerrarModal}
-        onEditar={() => {
+        onEdit={() => {
           if (entidadSeleccionada) {
             cerrarModal();
             abrirModalEmpresa(entidadSeleccionada);

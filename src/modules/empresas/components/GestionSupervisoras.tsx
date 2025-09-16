@@ -291,7 +291,7 @@ const GestionSupervisoras = ({ onVolverADashboard, onMostrarMensaje }: GestionSu
         entidad={entidadSeleccionada}
         isOpen={modalAbierto === 'detalle'}
         onClose={cerrarModal}
-        onEditar={() => {
+        onEdit={() => {
           if (entidadSeleccionada) {
             cerrarModal();
             abrirModalEmpresa(entidadSeleccionada);
