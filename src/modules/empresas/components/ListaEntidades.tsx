@@ -684,17 +684,26 @@ const ListaEntidades = ({
           ))}
         </div>
 
-        {/* Menú contextual único - versión simplificada */}
+        {/* Menú contextual único - versión de debugging */}
         {menuAbierto && (
           <div
             data-menu-id={menuAbierto}
-            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[99999] overflow-hidden"
+            className="fixed w-48 bg-red-500 rounded-lg shadow-xl border-4 border-yellow-400 z-[9999999] overflow-visible"
             style={{
-              top: `${menuPositions[menuAbierto]?.top || 100}px`,
-              left: `${menuPositions[menuAbierto]?.left || 100}px`,
+              top: '200px',
+              left: '200px',
+              position: 'fixed',
+              transform: 'none',
+              margin: 0,
+              padding: 0,
             }}
           >
-            <div className="py-1">
+            <div className="py-1 bg-red-500">
+              <div className="text-white text-center text-lg font-bold p-4">
+                ¡MENÚ DE PRUEBA!
+                <br />
+                ¿VES ESTO?
+              </div>
               <button
                 onClick={() => {
                   const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
@@ -703,11 +712,8 @@ const ListaEntidades = ({
                     setMenuAbierto(null);
                   }
                 }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700"
               >
-                <Eye className="w-4 h-4" />
-                Ver detalles
-              </button>
               {onEditar && (
                 <button
                   onClick={() => {
