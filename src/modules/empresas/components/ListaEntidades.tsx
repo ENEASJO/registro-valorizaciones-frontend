@@ -714,6 +714,9 @@ const ListaEntidades = ({
                 }}
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700"
               >
+                <Eye className="w-4 h-4" />
+                Ver detalles
+              </button>
               {onEditar && (
                 <button
                   onClick={() => {
