@@ -166,7 +166,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
               )}
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -297,28 +297,28 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                 <Tabs.List className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
                   <Tabs.Trigger 
                     value="general"
-                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 dark:text-gray-300 hover:text-gray-900 flex items-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
                     Información General
                   </Tabs.Trigger>
                   <Tabs.Trigger 
                     value="entidades"
-                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 dark:text-gray-300 hover:text-gray-900 flex items-center gap-2"
                   >
                     <Building2 className="w-4 h-4" />
                     Entidades
                   </Tabs.Trigger>
                   <Tabs.Trigger 
                     value="plantel"
-                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 dark:text-gray-300 hover:text-gray-900 flex items-center gap-2"
                   >
                     <Users className="w-4 h-4" />
                     Plantel ({profesionales.length})
                   </Tabs.Trigger>
                   <Tabs.Trigger 
                     value="valorizaciones"
-                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    className="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-gray-900 text-gray-600 dark:text-gray-300 hover:text-gray-900 flex items-center gap-2"
                   >
                     <BarChart className="w-4 h-4" />
                     Valorizaciones ({valorizaciones.length})

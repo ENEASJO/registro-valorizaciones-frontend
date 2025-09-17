@@ -262,15 +262,15 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
         >
           <div className="text-center">
             <div className="w-2 h-2 bg-red-400 rounded-full mx-auto mb-1"></div>
-            <span className="text-gray-500">0-40</span>
+            <span className="text-gray-500 dark:text-gray-300">0-40</span>
           </div>
           <div className="text-center">
             <div className="w-2 h-2 bg-amber-400 rounded-full mx-auto mb-1"></div>
-            <span className="text-gray-500">40-80</span>
+            <span className="text-gray-500 dark:text-gray-300">40-80</span>
           </div>
           <div className="text-center">
             <div className="w-2 h-2 bg-green-400 rounded-full mx-auto mb-1"></div>
-            <span className="text-gray-500">80-100</span>
+            <span className="text-gray-500 dark:text-gray-300">80-100</span>
           </div>
         </motion.div>
       )}
@@ -285,15 +285,15 @@ const PerformanceGauge: React.FC<PerformanceGaugeProps> = ({
         <div className="grid grid-cols-3 gap-4 text-xs">
           <div>
             <div className="font-medium text-gray-900">{Math.round(sanitizedValue * 0.24)}</div>
-            <div className="text-gray-500">En tiempo</div>
+            <div className="text-gray-500 dark:text-gray-300">En tiempo</div>
           </div>
           <div>
             <div className="font-medium text-gray-900">{Math.round((100 - sanitizedValue) * 0.24)}</div>
-            <div className="text-gray-500">Retrasadas</div>
+            <div className="text-gray-500 dark:text-gray-300">Retrasadas</div>
           </div>
           <div>
             <div className="font-medium text-gray-900">24</div>
-            <div className="text-gray-500">Total</div>
+            <div className="text-gray-500 dark:text-gray-300">Total</div>
           </div>
         </div>
       </motion.div>

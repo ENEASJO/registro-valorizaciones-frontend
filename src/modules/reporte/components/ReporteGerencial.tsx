@@ -560,7 +560,7 @@ const ReporteGerencial: React.FC<ReporteGerencialProps> = ({ datos, filtros }) =
                   </td>
                   <td className="py-3 px-4">
                     <div className="font-medium text-gray-900">{contratista.nombre}</div>
-                    <div className="text-xs text-gray-500">ID: {contratista.id}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">ID: {contratista.id}</div>
                   </td>
                   <td className="py-3 px-4 text-center font-medium text-blue-600">
                     {contratista.obrasEnEjecucion}

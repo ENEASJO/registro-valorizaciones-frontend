@@ -488,7 +488,7 @@ const PlantelProfesional: React.FC<PlantelProfesionalProps> = ({
                           className={`input-field pr-8 ${profesional.errors?.porcentaje_participacion ? 'border-red-300' : ''}`}
                           placeholder="100"
                         />
-                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">
                           %
                         </span>
                       </div>
@@ -578,7 +578,7 @@ const PlantelProfesional: React.FC<PlantelProfesionalProps> = ({
                         <span className="text-lg font-semibold text-gray-900">
                           {profesional.porcentaje_participacion}%
                         </span>
-                        <p className="text-xs text-gray-500">Participación</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-300">Participación</p>
                       </div>
 
                       {/* Estado de disponibilidad */}
@@ -598,14 +598,14 @@ const PlantelProfesional: React.FC<PlantelProfesionalProps> = ({
                           <button
                             type="button"
                             onClick={() => editarProfesional(profesional.id!)}
-                            className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
                           >
                             <Edit3 className="w-4 h-4" />
                           </button>
                           <button
                             type="button"
                             onClick={() => eliminarProfesional(profesional.id!)}
-                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                           >
                             <Trash className="w-4 h-4" />
                           </button>
@@ -649,9 +649,9 @@ const PlantelProfesional: React.FC<PlantelProfesionalProps> = ({
       {/* Estado vacío */}
       {profesionalesForm.length === 0 && !mostrarFormulario && (
         <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <User className="w-12 h-12 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">Sin profesionales asignados</h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             Agrega profesionales al plantel técnico de la obra
           </p>
           {!readonly && (

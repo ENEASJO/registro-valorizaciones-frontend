@@ -96,7 +96,7 @@ const ValorizacionSupervision = () => {
       case 'PRESENTADA':
         return <Clock className="w-5 h-5 text-yellow-500" />;
       case 'BORRADOR':
-        return <Edit3 className="w-5 h-5 text-gray-500" />;
+        return <Edit3 className="w-5 h-5 text-gray-500 dark:text-gray-300" />;
       case 'OBSERVADA':
         return <AlertCircle className="w-5 h-5 text-orange-500" />;
       case 'PAGADA':
@@ -104,7 +104,7 @@ const ValorizacionSupervision = () => {
       case 'RECHAZADA':
         return <Archive className="w-5 h-5 text-red-500" />;
       default:
-        return <Clock className="w-5 h-5 text-gray-500" />;
+        return <Clock className="w-5 h-5 text-gray-500 dark:text-gray-300" />;
     }
   };
 
@@ -201,7 +201,7 @@ const ValorizacionSupervision = () => {
               <p className="text-green-600 font-medium">Control de servicios de supervisión</p>
             </div>
           </div>
-          <p className="text-gray-600 mt-2 ml-15">
+          <p className="text-gray-600 dark:text-gray-300 mt-2 ml-15">
             Gestión y seguimiento de valorizaciones de servicios de supervisión técnica
           </p>
         </div>
@@ -263,7 +263,7 @@ const ValorizacionSupervision = () => {
           {/* Filtros principales */}
           <div className="flex gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />;
               <input
                 type="text"
                 placeholder="Buscar por número, obra o empresa..."
@@ -384,7 +384,7 @@ const ValorizacionSupervision = () => {
           </div>
         ) : valorizacionesSupervision.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <FileText className="w-12 h-12 text-gray-400 dark:text-gray-300 mx-auto mb-4" />;
             <p className="text-gray-600">No hay valorizaciones de supervisión para mostrar</p>
             <button 
               onClick={abrirFormulario}
@@ -439,7 +439,7 @@ const ValorizacionSupervision = () => {
                           <div className="text-sm font-medium text-gray-900">
                             N° {val.numero_valorizacion}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-300">
                             SUP-{val.numero_valorizacion}
                           </div>
                         </div>
@@ -450,7 +450,7 @@ const ValorizacionSupervision = () => {
                       <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
                         {getNombreObra(String(val.obra_id))}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-300">
                         {getNombreSupervisora(String(val.obra_id))}
                       </div>
                     </td>
@@ -460,7 +460,7 @@ const ValorizacionSupervision = () => {
                         {new Date(val.periodo_inicio).toLocaleDateString('es-PE')} - {' '}
                         {new Date(val.periodo_fin).toLocaleDateString('es-PE')}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-300">
                         {String('dias_calendario_periodo' in val ? val.dias_calendario_periodo : 0)} días calendario
                       </div>
                     </td>
@@ -469,7 +469,7 @@ const ValorizacionSupervision = () => {
                       <div className="text-sm font-semibold text-gray-900">
                         {formatearMoneda(val.monto_bruto)}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-300">
                         Neto: {formatearMoneda(val.monto_neto)}
                       </div>
                     </td>
@@ -478,7 +478,7 @@ const ValorizacionSupervision = () => {
                       <div className="text-sm text-gray-900">
                         {String('dias_efectivos_trabajados' in val ? val.dias_efectivos_trabajados : 0)} días
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-300">
                         de {String('dias_calendario_periodo' in val ? val.dias_calendario_periodo : 0)} calendario
                       </div>
                     </td>
@@ -508,7 +508,7 @@ const ValorizacionSupervision = () => {
                         </button>
                         <button 
                           onClick={(e) => e.stopPropagation()}
-                          className="text-gray-600 hover:text-gray-900" 
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900" 
                           title="Descargar PDF"
                         >
                           <Download className="w-4 h-4" />

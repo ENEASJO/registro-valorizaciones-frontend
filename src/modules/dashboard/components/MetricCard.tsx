@@ -151,7 +151,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ metric, index, onClick }) => {
         </div>
 
         {/* Título */}
-        <h3 className="text-sm font-medium text-gray-600 mb-2">
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
           {metric.title}
         </h3>
 

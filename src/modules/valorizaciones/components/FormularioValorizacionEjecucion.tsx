@@ -196,7 +196,7 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Nueva Valorización de Ejecución</h1>
-            <p className="text-gray-600 mt-1">Crear valorización mensual de avance de obra</p>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Crear valorización mensual de avance de obra</p>
           </div>
         </div>
         <div className="flex gap-3">
@@ -546,7 +546,7 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
             readonly={false}
           />
           {partidasSeleccionadas.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-300">
               <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
               <p>Seleccione partidas para valorizar</p>
             </div>

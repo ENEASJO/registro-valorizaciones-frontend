@@ -124,7 +124,7 @@ const Dashboard = () => {
                 >
                   {getGreeting()}, Administrador
                 </motion.h1>
-                <div className="flex items-center gap-4 text-gray-600">
+                <div className="flex items-center gap-4 text-gray-600 dark:text-gray-300">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     <span className="font-medium">
@@ -154,7 +154,7 @@ const Dashboard = () => {
                       className={`px-3 py-2 text-sm font-medium rounded-md transition-all ${
                         currentPeriod === period
                           ? 'bg-white text-gray-900 shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
+                          : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100'
                       }`}
                     >
                       {period === 'today' && 'Hoy'}
@@ -181,7 +181,7 @@ const Dashboard = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={toggleDarkMode}
-                  className="p-3 bg-gray-200 text-gray-700 rounded-xl shadow-lg hover:bg-gray-300 transition-colors"
+                  className="p-3 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 rounded-xl shadow-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
                 </motion.button>
@@ -198,24 +198,24 @@ const Dashboard = () => {
               <div className="text-center p-3 bg-blue-50 rounded-lg">
                 <Zap className="w-5 h-5 text-blue-600 mx-auto mb-1" />
                 <div className="text-xl font-bold text-blue-600">{eficienciaGeneral}%</div>
-                <div className="text-xs text-gray-600">Eficiencia</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Eficiencia</div>
               </div>
               <div className="text-center p-3 bg-purple-50 rounded-lg">
                 <Target className="w-5 h-5 text-purple-600 mx-auto mb-1" />
                 <div className="text-xl font-bold text-purple-600">{obrasActivas}</div>
-                <div className="text-xs text-gray-600">Obras Activas</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Obras Activas</div>
               </div>
               <div className="text-center p-3 bg-green-50 rounded-lg">
                 <Award className="w-5 h-5 text-green-600 mx-auto mb-1" />
                 <div className="text-xl font-bold text-green-600">
                   {formatCurrency(Number(totalInversion)).replace('PEN', '').trim()}
                 </div>
-                <div className="text-xs text-gray-600">Inversión Total</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Inversión Total</div>
               </div>
               <div className="text-center p-3 bg-red-50 rounded-lg">
                 <Activity className="w-5 h-5 text-red-600 mx-auto mb-1" />
                 <div className="text-xl font-bold text-red-600">{alertasCriticas}</div>
-                <div className="text-xs text-gray-600">Alertas Críticas</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Alertas Críticas</div>
               </div>
             </motion.div>
           </div>
@@ -243,7 +243,7 @@ const Dashboard = () => {
             className="xl:col-span-2 p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl"
           >
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-gray-900">Evolución de Inversión</h3>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Evolución de Inversión</h3>
               <div className="flex items-center gap-2 text-sm">
                 <div className="flex items-center gap-1">
                   <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -354,7 +354,7 @@ const Dashboard = () => {
             transition={{ delay: 0.8 }}
             className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl"
           >
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Distribución por Categoría</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Distribución por Categoría</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -386,7 +386,7 @@ const Dashboard = () => {
             transition={{ delay: 0.9 }}
             className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl"
           >
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Top 5 Contratistas</h3>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Top 5 Contratistas</h3>
             <div className="space-y-4">
               {contratistasRanking.map((contratista, index) => (
                 <motion.div
@@ -405,13 +405,13 @@ const Dashboard = () => {
                     {index + 1}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{contratista.nombre}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{contratista.nombre}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-300">
                       {contratista.obrasCompletadas} obras • {contratista.eficiencia}% eficiencia
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-gray-900 dark:text-gray-100">
                       {formatCurrency(contratista.valorTotal)}
                     </p>
                     <div className={`text-xs flex items-center gap-1 ${
@@ -484,7 +484,7 @@ const Dashboard = () => {
             transition={{ delay: 1.3 }}
             className="p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 shadow-xl"
           >
-            <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-blue-600" />
               Próximas Valorizaciones
             </h3>
@@ -502,7 +502,7 @@ const Dashboard = () => {
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-gray-900 text-sm">{valorizacion.obra}</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{valorizacion.obra}</h4>
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       valorizacion.estado === 'Vencida' ? 'bg-red-100 text-red-700' :
                       valorizacion.estado === 'Crítica' ? 'bg-amber-100 text-amber-700' :
@@ -511,9 +511,9 @@ const Dashboard = () => {
                       {valorizacion.estado}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-600 mb-2">{valorizacion.contratista}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">{valorizacion.contratista}</p>
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold text-gray-900 dark:text-gray-100">
                       {formatCurrency(valorizacion.monto)}
                     </span>
                     <span className={`text-xs font-medium ${
@@ -569,7 +569,7 @@ const Dashboard = () => {
           >
             <div className="p-6 bg-white rounded-2xl shadow-xl flex items-center gap-4">
               <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
-              <span className="text-gray-900 font-medium">Actualizando datos...</span>
+              <span className="text-gray-900 dark:text-gray-100 font-medium">Actualizando datos...</span>
             </div>
           </motion.div>
         )}

@@ -25,7 +25,7 @@ const Empresas = () => {
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
           Gestión de Empresas Contratistas
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
           Sistema integral para la administración de empresas ejecutoras y supervisoras 
           en proyectos de infraestructura municipal
         </p>

@@ -182,7 +182,7 @@ const Reporte = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Centro de Reportes</h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 dark:text-gray-300 mt-1">
                 Sistema profesional de generación y análisis de reportes
               </p>
             </div>
@@ -327,7 +327,7 @@ const Reporte = () => {
                     <h3 className="text-lg font-semibold text-gray-900">
                       Opciones de Presentación
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                       Personaliza el contenido de tu reporte
                     </p>
                   </div>
@@ -371,7 +371,7 @@ const Reporte = () => {
                       <h3 className="text-lg font-semibold text-gray-900">
                         Vista Previa - {TIPOS_REPORTE[tipoReporteActivo]}
                       </h3>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                         {filtros.fechaInicio} al {filtros.fechaFin}
                       </p>
                     </div>
@@ -406,7 +406,7 @@ const Reporte = () => {
               >
                 <div className="p-6 border-b border-gray-200">
                   <h3 className="text-lg font-semibold text-gray-900">Historial de Reportes</h3>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                     {reportes.length} reportes generados
                   </p>
                 </div>
@@ -475,7 +475,7 @@ const Reporte = () => {
                   
                   {reportes.length === 0 && (
                     <div className="p-12 text-center">
-                      <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                      <History className="w-12 h-12 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
                       <h3 className="text-lg font-medium text-gray-900">No hay reportes generados</h3>
                       <p className="text-gray-600">Genera tu primer reporte para verlo aquí</p>
                     </div>
@@ -497,7 +497,7 @@ const Reporte = () => {
               </h3>
               <button
                 onClick={() => setMostrarExportador(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

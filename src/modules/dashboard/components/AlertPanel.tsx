@@ -246,7 +246,7 @@ const AlertPanel: React.FC<AlertPanelProps> = ({
                         e.stopPropagation();
                         onDismiss(alert.id);
                       }}
-                      className="flex-shrink-0 p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 rounded-full hover:bg-white/50 dark:hover:bg-gray-800/50 transition-colors"
+                      className="flex-shrink-0 p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 rounded-full hover:bg-white/50 dark:hover:bg-gray-800/50 transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </motion.button>

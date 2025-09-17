@@ -69,7 +69,7 @@ const ExportadorReporte = ({
     PDF: 'text-red-600 bg-red-100 border-red-200',
     EXCEL: 'text-green-600 bg-green-100 border-green-200',
     WORD: 'text-blue-600 bg-blue-100 border-blue-200',
-    CSV: 'text-gray-600 bg-gray-100 border-gray-200'
+    CSV: 'text-gray-600 dark:text-gray-300 bg-gray-100 border-gray-200'
   };
 
   const actualizarConfiguracion = <K extends keyof ConfiguracionExportacion>(
@@ -159,7 +159,7 @@ const ExportadorReporte = ({
           
           <button
             onClick={() => setMostrarConfiguracion(!mostrarConfiguracion)}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <Settings className="w-4 h-4" />
             Configuración
@@ -181,7 +181,7 @@ const ExportadorReporte = ({
                 className={`p-4 border-2 rounded-lg transition-all ${
                   configuracion.formato === key
                     ? `${coloresFormato[key as FormatoExportacion]} border-current`
-                    : 'border-gray-200 hover:border-gray-300 text-gray-600 hover:text-gray-800'
+                    : 'border-gray-200 hover:border-gray-300 text-gray-600 dark:text-gray-300 hover:text-gray-800'
                 }`}
               >
                 <div className="flex flex-col items-center gap-2">
@@ -270,7 +270,7 @@ const ExportadorReporte = ({
                 </h4>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                       Orientación
                     </label>
                     <select
@@ -284,7 +284,7 @@ const ExportadorReporte = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                       Tamaño de Página
                     </label>
                     <select
@@ -299,7 +299,7 @@ const ExportadorReporte = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                       Margen (mm)
                     </label>
                     <input
@@ -313,7 +313,7 @@ const ExportadorReporte = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                       Tamaño de Fuente
                     </label>
                     <input
@@ -340,7 +340,7 @@ const ExportadorReporte = ({
                 </div>
 
                 <div className="mt-3">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Marca de Agua (opcional)
                   </label>
                   <input
@@ -437,7 +437,7 @@ const ExportadorReporte = ({
                 </div>
                 <button
                   onClick={() => setResultado(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100"
                 >
                   <X className="w-4 h-4" />
                 </button>

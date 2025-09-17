@@ -47,7 +47,7 @@ const BreadcrumbEmpresas = ({ tipo, onNavigate }: BreadcrumbEmpresasProps) => {
         return (
           <div key={item.label} className="flex items-center">
             {index > 0 && (
-              <span className="mx-2 text-gray-400">/</span>
+              <span className="mx-2 text-gray-400 dark:text-gray-300">/</span>
             )}
             <button
               onClick={item.onClick}
@@ -58,7 +58,7 @@ const BreadcrumbEmpresas = ({ tipo, onNavigate }: BreadcrumbEmpresasProps) => {
                     : tipo === 'supervisoras'
                     ? 'text-green-600 bg-green-50 font-medium'
                     : 'text-gray-900 bg-gray-50 font-medium'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  : 'text-gray-500 dark:text-gray-300 hover:text-gray-700 hover:bg-gray-50'
               }`}
             >
               <Icon className="w-4 h-4" />

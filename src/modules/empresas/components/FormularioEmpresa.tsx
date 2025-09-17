@@ -625,7 +625,7 @@ const FormularioEmpresa = ({
                   {rep.nombre}
                 </h4>
                 <UserCheck className={`w-5 h-5 ${
-                  formData.representante_principal_id === index ? 'text-blue-600' : 'text-gray-400'
+                  formData.representante_principal_id === index ? 'text-blue-600' : 'text-gray-400 dark:text-gray-300'
                 }`} />
               </div>
               <div className="space-y-2">
@@ -638,7 +638,7 @@ const FormularioEmpresa = ({
                     {rep.cargo || 'SOCIO'}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 font-mono">
+                <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">
                   DNI: {rep.numero_documento}
                 </p>
                 {rep.fecha_desde && (
@@ -701,7 +701,7 @@ const FormularioEmpresa = ({
           </div>
           {formData.capacidad_contratacion && (
             <div className="mt-4 p-3 bg-white rounded-lg border border-orange-200">
-              <span className="text-sm text-gray-600 font-medium">
+              <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">
                 Capacidad: {formData.capacidad_contratacion}
               </span>
             </div>
@@ -846,7 +846,7 @@ const FormularioEmpresa = ({
                     placeholder="12345678"
                     maxLength={8}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                     Extraído automáticamente del RUC o ingrese manualmente
                   </p>
                 </div>
@@ -892,7 +892,7 @@ const FormularioEmpresa = ({
                     Email Corporativo
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
                     <input
                       key={`email-${renderKey}`}
                       type="email"
@@ -910,7 +910,7 @@ const FormularioEmpresa = ({
                     Teléfono / Celular
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
                     <input
                       key={`celular-${renderKey}`}
                       type="text"
@@ -929,7 +929,7 @@ const FormularioEmpresa = ({
                   {isPersonaNatural(formData.ruc) ? 'DIRECCIÓN:' : 'Dirección Completa'}
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
+                  <MapPin className="absolute left-3 top-4 w-5 h-5 text-gray-400 dark:text-gray-300" />
                   <textarea
                     value={formData.direccion}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {

@@ -174,7 +174,7 @@ const ReporteFinanciero: React.FC<ReporteFinancieroProps> = ({ datos, filtros })
               <p className="text-2xl font-bold text-green-600">
                 {formatearMoneda(datos.resumenEjecutivo.inversionEjecutada)}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 {formatearPorcentaje(datos.resumenEjecutivo.porcentajeEjecucion)} del total
               </p>
             </div>
@@ -191,7 +191,7 @@ const ReporteFinanciero: React.FC<ReporteFinancieroProps> = ({ datos, filtros })
               <p className="text-2xl font-bold text-blue-600">
                 {formatearMoneda(datos.resumenEjecutivo.saldoPorEjecutar)}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 {formatearPorcentaje(100 - datos.resumenEjecutivo.porcentajeEjecucion)} restante
               </p>
             </div>
@@ -206,7 +206,7 @@ const ReporteFinanciero: React.FC<ReporteFinancieroProps> = ({ datos, filtros })
             <div>
               <p className="text-sm text-gray-600">Obras Activas</p>
               <p className="text-2xl font-bold text-purple-600">{datos.resumenEjecutivo.obrasActivas}</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 {datos.resumenEjecutivo.obrasTerminadas} terminadas
               </p>
             </div>
@@ -221,7 +221,7 @@ const ReporteFinanciero: React.FC<ReporteFinancieroProps> = ({ datos, filtros })
             <div>
               <p className="text-sm text-gray-600">ROI</p>
               <p className="text-2xl font-bold text-amber-600">{formatearPorcentaje(datos.indicadores.roi)}</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 TIR: {formatearPorcentaje(datos.indicadores.tir)}
               </p>
             </div>
@@ -540,7 +540,7 @@ const ReporteFinanciero: React.FC<ReporteFinancieroProps> = ({ datos, filtros })
                 <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4">
                     <div className="font-medium text-gray-900">{obra.obraNombre}</div>
-                    <div className="text-xs text-gray-500">ID: {obra.obraId}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">ID: {obra.obraId}</div>
                   </td>
                   <td className="py-3 px-4 text-right font-medium text-gray-900">
                     {formatearMoneda(obra.montoContratado)}

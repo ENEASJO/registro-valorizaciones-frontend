@@ -226,7 +226,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Nueva Valorización de Supervisión</h1>
-            <p className="text-gray-600 mt-1">Crear valorización de supervisión basada en días efectivos trabajados</p>
+            <p className="text-gray-600 dark:text-gray-300 mt-1">Crear valorización de supervisión basada en días efectivos trabajados</p>
           </div>
         </div>
         <div className="flex gap-3">
@@ -330,7 +330,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
           {/* Datos generales */}
           <div className="card">
             <div className="flex items-center gap-2 mb-4">
-              <Users className="w-5 h-5 text-gray-500" />
+              <Users className="w-5 h-5 text-gray-500 dark:text-gray-300" />
               <h2 className="text-xl font-semibold text-gray-900">Información General</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -408,7 +408,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
                   readOnly
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                   Calculada automáticamente: Monto supervisión / Días plazo
                 </p>
               </div>
@@ -441,7 +441,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
           {/* Control de días */}
           <div className="card">
             <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-5 h-5 text-gray-500" />
+              <Calendar className="w-5 h-5 text-gray-500 dark:text-gray-300" />
               <h2 className="text-xl font-semibold text-gray-900">Control de Días Trabajados</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -458,7 +458,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                   Días reales de supervisión efectiva (máximo {diasPeriodo} días)
                 </p>
               </div>
@@ -503,7 +503,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  <MoreHorizontal className="w-4 h-4 text-gray-500" />
+                  <MoreHorizontal className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                   Otros Motivos
                 </label>
                 <input
@@ -625,7 +625,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                   step="0.01"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
-                <p className="text-xs text-gray-500 mt-1">Penalidades aplicables por incumplimientos</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">Penalidades aplicables por incumplimientos</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">

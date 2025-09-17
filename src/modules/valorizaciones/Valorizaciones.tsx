@@ -171,7 +171,7 @@ const Valorizaciones = () => {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Valorizaciones</h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
             Control y seguimiento de valorizaciones de obras públicas municipales
           </p>
         </div>
@@ -512,7 +512,7 @@ const Valorizaciones = () => {
                         </button>
                         <button 
                           onClick={(e) => e.stopPropagation()}
-                          className="text-gray-600 hover:text-gray-900" 
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900" 
                           title="Descargar PDF"
                         >
                           <Download className="w-4 h-4" />

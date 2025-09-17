@@ -138,7 +138,7 @@ export const RegistrationSection: React.FC<RegistrationSectionProps> = ({
     if (estado.includes('ACTIVO') || estado.includes('HABILITADO')) return 'text-green-600 bg-green-100';
     if (estado.includes('SUSPENDIDO')) return 'text-yellow-600 bg-yellow-100';
     if (estado.includes('INACTIVO') || estado.includes('INHABILITADO')) return 'text-red-600 bg-red-100';
-    return 'text-gray-600 bg-gray-100';
+    return 'text-gray-600 dark:text-gray-300 bg-gray-100';
   };
   
   const manejarCambioEspecialidad = (especialidad: EspecialidadEmpresa, checked: boolean) => {
@@ -255,7 +255,7 @@ export const RegistrationSection: React.FC<RegistrationSectionProps> = ({
             ))}
           </select>
           {categoria_contratista && (
-            <p className="text-xs text-gray-600 mt-1">
+            <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">
               {CATEGORIAS_INFO[categoria_contratista]?.descripcion}
             </p>
           )}
@@ -515,7 +515,7 @@ export const RegistrationSection: React.FC<RegistrationSectionProps> = ({
             <Info className="w-4 h-4 text-gray-600" />
             <h4 className="text-sm font-medium text-gray-800">Información de Fuentes</h4>
           </div>
-          <div className="text-xs text-gray-600 space-y-1">
+          <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
             <p>• Los datos de registro provienen del sistema consolidado OECE</p>
             <p>• Las especialidades mostradas están validadas oficialmente</p>
             <p>• La capacidad de contratación es la registrada oficialmente</p>

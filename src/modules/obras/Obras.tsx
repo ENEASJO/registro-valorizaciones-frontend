@@ -166,7 +166,7 @@ const Obras = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Obras Públicas</h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
             Gestión integral de obras de infraestructura municipal
           </p>
         </div>
@@ -395,7 +395,7 @@ const Obras = () => {
           <div className="text-center py-12">
             <Construction className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No hay obras registradas</h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               Comienza creando la primera obra del sistema
             </p>
             <button 

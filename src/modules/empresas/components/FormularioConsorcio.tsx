@@ -366,7 +366,7 @@ const FormularioConsorcio = ({
                   <Users className="w-8 h-8 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Crear Nuevo Consorcio</h3>
-                <p className="text-gray-600 mb-8 max-w-lg mx-auto">
+                <p className="text-gray-600 dark:text-gray-300 mb-8 max-w-lg mx-auto">
                   Primero agregue la información del consorcio principal. Una vez creado, podrá añadir las empresas integrantes.
                 </p>
                 <div className="flex justify-center">
@@ -460,25 +460,25 @@ const FormularioConsorcio = ({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {consorcio.datosCompletos.tipo_contribuyente && (
                           <div>
-                            <p className="text-sm text-gray-600 font-medium">Tipo Contribuyente:</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Tipo Contribuyente:</p>
                             <p className="text-gray-900 font-semibold">{consorcio.datosCompletos.tipo_contribuyente}</p>
                           </div>
                         )}
                         {consorcio.datosCompletos.fecha_inscripcion && (
                           <div>
-                            <p className="text-sm text-gray-600 font-medium">Fecha Inscripción:</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Fecha Inscripción:</p>
                             <p className="text-gray-900">{consorcio.datosCompletos.fecha_inscripcion}</p>
                           </div>
                         )}
                         {consorcio.direccion && (
                           <div className="md:col-span-2">
-                            <p className="text-sm text-gray-600 font-medium">Dirección:</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Dirección:</p>
                             <p className="text-gray-900">{consorcio.direccion}</p>
                           </div>
                         )}
                         {consorcio.datosCompletos.tipo_persona !== 'NATURAL' && consorcio.datosCompletos.representantes_legales && consorcio.datosCompletos.representantes_legales.length > 0 && (
                           <div className="md:col-span-2">
-                            <p className="text-sm text-gray-600 font-medium">Representantes Legales:</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Representantes Legales:</p>
                             <div className="space-y-2 mt-2">
                               {consorcio.datosCompletos.representantes_legales.map((representante: any, index: number) => (
                                 <div key={index} className="bg-gray-50 p-2 rounded-lg border">
@@ -487,7 +487,7 @@ const FormularioConsorcio = ({
                                     <p className="text-blue-600 text-xs font-medium">{representante.cargo}</p>
                                   )}
                                   {representante.numero_documento && (
-                                    <p className="text-gray-600 text-xs">
+                                    <p className="text-gray-600 dark:text-gray-300 text-xs">
                                       {representante.tipo_documento || 'DNI'}: {representante.numero_documento}
                                     </p>
                                   )}
@@ -499,7 +499,7 @@ const FormularioConsorcio = ({
                         {/* Actividad Comercial */}
                         {consorcio.datosCompletos.actividades_economicas && consorcio.datosCompletos.actividades_economicas.length > 0 && (
                           <div className="md:col-span-2">
-                            <p className="text-sm text-gray-600 font-medium">Actividades Económicas:</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Actividades Económicas:</p>
                             <div className="mt-2 space-y-2">
                               {consorcio.datosCompletos.actividades_economicas.slice(0, 3).map((actividad: any, index: number) => (
                                 <div key={index} className="flex items-start gap-2">
@@ -519,7 +519,7 @@ const FormularioConsorcio = ({
                                 </div>
                               ))}
                               {consorcio.datosCompletos.actividades_economicas.length > 3 && (
-                                <p className="text-xs text-gray-500 italic">
+                                <p className="text-xs text-gray-500 dark:text-gray-300 italic">
                                   + {consorcio.datosCompletos.actividades_economicas.length - 3} actividades más
                                 </p>
                               )}
@@ -594,9 +594,9 @@ const FormularioConsorcio = ({
               </div>
               {integrantes.length === 0 && (
                 <div className="text-center py-8 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                  <Building2 className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500 font-medium">No hay integrantes agregados</p>
-                  <p className="text-sm text-gray-400 mt-1">Use el botón "Añadir Integrante" para agregar empresas</p>
+                  <Building2 className="w-12 h-12 text-gray-400 dark:text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-300 font-medium">No hay integrantes agregados</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-300 mt-1">Use el botón "Añadir Integrante" para agregar empresas</p>
                 </div>
               )}
               {integrantes.map((integrante: any, index: number) => (
@@ -620,7 +620,7 @@ const FormularioConsorcio = ({
                       </div>
                       {integrante.direccion && (
                         <div className="mb-4">
-                          <p className="text-sm text-gray-600 font-medium">Dirección:</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Dirección:</p>
                           <p className="text-gray-900">{integrante.direccion}</p>
                         </div>
                       )}
@@ -739,7 +739,7 @@ const FormularioConsorcio = ({
                       limpiarDatosRuc();
                       setErrors([]);
                     }}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 rounded-lg"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -801,10 +801,10 @@ const FormularioConsorcio = ({
                             {datosOriginalesRuc.tipo_persona === 'NATURAL' ? 'Nombre:' : 'Razón Social:'}
                           </span>
                           <p className="text-gray-900 font-semibold text-lg">{datosOriginalesRuc.razon_social}</p>
-                          <p className="text-gray-600 text-sm mt-1">RUC: {datosOriginalesRuc.ruc}</p>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {datosOriginalesRuc.ruc}</p>
                           {/* Show DNI for persona natural */}
                           {datosOriginalesRuc.tipo_persona === 'NATURAL' && datosOriginalesRuc.representantes_legales?.[0]?.numero_documento && (
-                            <p className="text-gray-600 text-sm">DNI: {datosOriginalesRuc.representantes_legales[0].numero_documento}</p>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">DNI: {datosOriginalesRuc.representantes_legales[0].numero_documento}</p>
                           )}
                         </div>
                         {/* Tipo de Contribuyente */}
@@ -858,12 +858,12 @@ const FormularioConsorcio = ({
                                     <p className="text-blue-600 text-sm font-medium">{representante.cargo}</p>
                                   )}
                                   {representante.numero_documento && (
-                                    <p className="text-gray-600 text-xs mt-1">
+                                    <p className="text-gray-600 dark:text-gray-300 text-xs mt-1">
                                       {representante.tipo_documento || 'DNI'}: {representante.numero_documento}
                                     </p>
                                   )}
                                   {representante.fecha_desde && (
-                                    <p className="text-gray-500 text-xs">Desde: {representante.fecha_desde}</p>
+                                    <p className="text-gray-500 dark:text-gray-300 text-xs">Desde: {representante.fecha_desde}</p>
                                   )}
                                 </div>
                               ))}
@@ -893,7 +893,7 @@ const FormularioConsorcio = ({
                                 </div>
                               ))}
                               {datosOriginalesRuc.actividades_economicas.length > 2 && (
-                                <p className="text-xs text-gray-500 italic">
+                                <p className="text-xs text-gray-500 dark:text-gray-300 italic">
                                   + {datosOriginalesRuc.actividades_economicas.length - 2} actividades más
                                 </p>
                               )}
@@ -957,7 +957,7 @@ const FormularioConsorcio = ({
                       limpiarDatosRuc();
                       setErrors([]);
                     }}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 rounded-lg"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -1018,7 +1018,7 @@ const FormularioConsorcio = ({
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                         placeholder="0.0"
                       />
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                         Porcentaje asignado en el consorcio (opcional, se puede ajustar después)
                       </p>
                     </div>
@@ -1040,10 +1040,10 @@ const FormularioConsorcio = ({
                             {datosOriginalesRuc.tipo_persona === 'NATURAL' ? 'Nombre:' : 'Razón Social:'}
                           </span>
                           <p className="text-gray-900 font-semibold text-lg">{datosOriginalesRuc.razon_social}</p>
-                          <p className="text-gray-600 text-sm mt-1">RUC: {datosOriginalesRuc.ruc}</p>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {datosOriginalesRuc.ruc}</p>
                           {/* Show DNI for persona natural */}
                           {datosOriginalesRuc.tipo_persona === 'NATURAL' && datosOriginalesRuc.representantes_legales?.[0]?.numero_documento && (
-                            <p className="text-gray-600 text-sm">DNI: {datosOriginalesRuc.representantes_legales[0].numero_documento}</p>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">DNI: {datosOriginalesRuc.representantes_legales[0].numero_documento}</p>
                           )}
                         </div>
                         {/* Tipo de Contribuyente */}
@@ -1097,12 +1097,12 @@ const FormularioConsorcio = ({
                                     <p className="text-blue-600 text-sm font-medium">{representante.cargo}</p>
                                   )}
                                   {representante.numero_documento && (
-                                    <p className="text-gray-600 text-xs mt-1">
+                                    <p className="text-gray-600 dark:text-gray-300 text-xs mt-1">
                                       {representante.tipo_documento || 'DNI'}: {representante.numero_documento}
                                     </p>
                                   )}
                                   {representante.fecha_desde && (
-                                    <p className="text-gray-500 text-xs">Desde: {representante.fecha_desde}</p>
+                                    <p className="text-gray-500 dark:text-gray-300 text-xs">Desde: {representante.fecha_desde}</p>
                                   )}
                                 </div>
                               ))}
@@ -1132,7 +1132,7 @@ const FormularioConsorcio = ({
                                 </div>
                               ))}
                               {datosOriginalesRuc.actividades_economicas.length > 2 && (
-                                <p className="text-xs text-gray-500 italic">
+                                <p className="text-xs text-gray-500 dark:text-gray-300 italic">
                                   + {datosOriginalesRuc.actividades_economicas.length - 2} actividades más
                                 </p>
                               )}

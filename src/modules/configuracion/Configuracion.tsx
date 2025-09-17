@@ -18,7 +18,7 @@ const Configuracion = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Configuración</h1>
-        <p className="text-gray-600 mt-2">Administra las preferencias y configuraciones del sistema</p>
+        <p className="text-gray-600 dark:text-gray-300 mt-2">Administra las preferencias y configuraciones del sistema</p>
       </div>
 
       <div className="flex gap-6">

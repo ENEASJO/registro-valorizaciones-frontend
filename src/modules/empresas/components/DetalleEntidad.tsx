@@ -52,7 +52,7 @@ const Accordion: React.FC<{ title: string; icon: React.ReactNode; defaultOpen?: 
           <span className="font-medium text-gray-900">{title}</span>
         </div>
         <div className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-          <ChevronDown className="w-5 h-5 text-gray-400" />
+          <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
         </div>
       </button>
       <div className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
@@ -73,12 +73,12 @@ const InfoCard: React.FC<{ icon: React.ReactNode; title: string; value: string; 
 }) => (
   <div className={`bg-white rounded-lg border border-gray-200 p-4 hover:shadow-sm transition-shadow ${className}`}>
     <div className="flex items-center gap-3">
-      <div className="flex-shrink-0 text-gray-400">
+      <div className="flex-shrink-0 text-gray-400 dark:text-gray-300">
         {icon}
       </div>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium text-gray-900 truncate">{title}</p>
-        <p className="text-sm text-gray-600 truncate">{value || 'No disponible'}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{value || 'No disponible'}</p>
       </div>
     </div>
   </div>
@@ -106,7 +106,7 @@ const ContactInfo: React.FC<{
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900 mb-1">{title}</p>
-        <p className="text-sm text-gray-600 truncate">{value || 'No disponible'}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 truncate">{value || 'No disponible'}</p>
       </div>
       {action && (
         <div className="flex-shrink-0">
@@ -145,7 +145,7 @@ const DetalleEntidad: React.FC<DetalleEntidadProps> = ({ entidad, isOpen, onClos
             <Users className="w-5 h-5" />
             Representantes Legales
             {datos?.representantes && datos.representantes.length > 0 && (
-              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              <span className="px-2 py-1 bg-gray-100 text-gray-600 dark:text-gray-300 text-xs rounded-full">
                 {datos.representantes.length}
               </span>
             )}
@@ -199,7 +199,7 @@ const DetalleEntidad: React.FC<DetalleEntidadProps> = ({ entidad, isOpen, onClos
                       <div className="flex items-center justify-between text-sm">
                         <span className="text-gray-500">Desde:</span>
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4 text-gray-400" />
+                          <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                           <span className="font-medium text-gray-900">
                             {new Date(representante.fecha_desde).toLocaleDateString('es-PE', {
                               day: '2-digit',

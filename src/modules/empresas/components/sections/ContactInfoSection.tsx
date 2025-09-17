@@ -207,7 +207,7 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           <Phone className="w-4 h-4 inline mr-1" />
-          Teléfono Celular <span className="text-gray-400 text-xs">(opcional)</span>
+          Teléfono Celular <span className="text-gray-400 dark:text-gray-300 text-xs">(opcional)</span>
         </label>
         <input
           type="tel"
@@ -264,7 +264,7 @@ export const ContactInfoSection: React.FC<ContactInfoSectionProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             <Building className="w-4 h-4 inline mr-1" />
-            Domicilio Fiscal <span className="text-gray-400 text-xs">(si es diferente)</span>
+            Domicilio Fiscal <span className="text-gray-400 dark:text-gray-300 text-xs">(si es diferente)</span>
           </label>
           <div className="relative">
             <textarea

@@ -156,7 +156,7 @@ const FiltrosAvanzados = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setMostrarFiltrosAvanzados(!mostrarFiltrosAvanzados)}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Settings className="w-4 h-4" />
               Avanzados
@@ -169,7 +169,7 @@ const FiltrosAvanzados = ({
             
             <button
               onClick={onReset}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="w-4 h-4" />
               Limpiar
@@ -403,7 +403,7 @@ const FiltrosAvanzados = ({
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Departamentos
                   </label>
                   <select
@@ -422,7 +422,7 @@ const FiltrosAvanzados = ({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Provincias
                   </label>
                   <input
@@ -432,7 +432,7 @@ const FiltrosAvanzados = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Distritos
                   </label>
                   <input
@@ -452,7 +452,7 @@ const FiltrosAvanzados = ({
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Monto Mínimo
                   </label>
                   <input
@@ -464,7 +464,7 @@ const FiltrosAvanzados = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                  <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                     Monto Máximo
                   </label>
                   <input
@@ -548,7 +548,7 @@ const FiltrosAvanzados = ({
           <div className="flex gap-3">
             <button
               onClick={onReset}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-colors"
             >
               Restaurar
             </button>

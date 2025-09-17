@@ -411,7 +411,7 @@ export const RepresentativesSection: React.FC<RepresentativesSectionProps> = ({
                       <button
                         type="button"
                         onClick={() => manejarEditarRepresentante(index)}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                        className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -419,7 +419,7 @@ export const RepresentativesSection: React.FC<RepresentativesSectionProps> = ({
                         <button
                           type="button"
                           onClick={() => onRemoveRepresentante(index)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                          className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -436,7 +436,7 @@ export const RepresentativesSection: React.FC<RepresentativesSectionProps> = ({
             <button
               type="button"
               onClick={() => setMostrarFormulario(true)}
-              className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600"
+              className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300 hover:text-blue-600"
             >
               <Plus className="w-5 h-5" />
               Agregar Representante
@@ -602,7 +602,7 @@ export const RepresentativesSection: React.FC<RepresentativesSectionProps> = ({
                       <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-semibold text-gray-900">{representante.nombre}</h4>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                             <span className="font-medium">Cargo:</span> {representante.cargo || 'No especificado'}
                           </p>
                           {representante.dni && (

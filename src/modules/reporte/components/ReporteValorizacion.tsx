@@ -91,7 +91,7 @@ const ReporteValorizacion = ({ datos, filtros }: ReporteValorizacionProps) => {
               <div className="grid grid-cols-3 gap-4">
                 <span className="text-sm font-medium text-gray-700">Ubicación:</span>
                 <span className="col-span-2 text-sm text-gray-900 flex items-center gap-1">
-                  <MapPin className="w-4 h-4 text-gray-500" />
+                  <MapPin className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                   {datos.obra.ubicacion}
                 </span>
               </div>
@@ -132,7 +132,7 @@ const ReporteValorizacion = ({ datos, filtros }: ReporteValorizacionProps) => {
               <div className="grid grid-cols-3 gap-4">
                 <span className="text-sm font-medium text-gray-700">Plazo:</span>
                 <span className="col-span-2 text-sm text-gray-900 flex items-center gap-1">
-                  <Calendar className="w-4 h-4 text-gray-500" />
+                  <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                   {datos.obra.plazoEjecucionDias} días
                 </span>
               </div>
@@ -164,22 +164,22 @@ const ReporteValorizacion = ({ datos, filtros }: ReporteValorizacionProps) => {
           
           <div className="p-6 space-y-3">
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Razón Social</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Razón Social</span>
               <p className="text-sm font-medium text-gray-900">{datos.contratista.nombre}</p>
             </div>
             
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">RUC</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">RUC</span>
               <p className="text-sm text-gray-900">{datos.contratista.ruc}</p>
             </div>
             
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Representante Legal</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Representante Legal</span>
               <p className="text-sm text-gray-900">{datos.contratista.representanteLegal}</p>
             </div>
             
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Dirección</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Dirección</span>
               <p className="text-sm text-gray-900">{datos.contratista.direccion}</p>
             </div>
             
@@ -213,22 +213,22 @@ const ReporteValorizacion = ({ datos, filtros }: ReporteValorizacionProps) => {
           
           <div className="p-6 space-y-3">
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Razón Social</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Razón Social</span>
               <p className="text-sm font-medium text-gray-900">{datos.supervisor.nombre}</p>
             </div>
             
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">RUC</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">RUC</span>
               <p className="text-sm text-gray-900">{datos.supervisor.ruc}</p>
             </div>
             
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Supervisor Responsable</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Supervisor Responsable</span>
               <p className="text-sm text-gray-900">{datos.supervisor.supervisorResponsable}</p>
             </div>
             
             <div>
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Dirección</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300 uppercase tracking-wide">Dirección</span>
               <p className="text-sm text-gray-900">{datos.supervisor.direccion}</p>
             </div>
             
@@ -500,7 +500,7 @@ const ReporteValorizacion = ({ datos, filtros }: ReporteValorizacionProps) => {
               <div className="border-t-2 border-gray-400 pt-2 mb-2">
                 <p className="font-semibold text-gray-900">{datos.firmas.residenteObra}</p>
                 <p className="text-sm text-gray-600">RESIDENTE DE OBRA</p>
-                <p className="text-xs text-gray-500">Contratista Ejecutor</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300">Contratista Ejecutor</p>
               </div>
             </div>
             
@@ -508,7 +508,7 @@ const ReporteValorizacion = ({ datos, filtros }: ReporteValorizacionProps) => {
               <div className="border-t-2 border-gray-400 pt-2 mb-2">
                 <p className="font-semibold text-gray-900">{datos.firmas.supervisorObra}</p>
                 <p className="text-sm text-gray-600">SUPERVISOR DE OBRA</p>
-                <p className="text-xs text-gray-500">Supervisor de Obra</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300">Supervisor de Obra</p>
               </div>
             </div>
             
@@ -516,7 +516,7 @@ const ReporteValorizacion = ({ datos, filtros }: ReporteValorizacionProps) => {
               <div className="border-t-2 border-gray-400 pt-2 mb-2">
                 <p className="font-semibold text-gray-900">{datos.firmas.responsableEntidad}</p>
                 <p className="text-sm text-gray-600">RESPONSABLE DE LA ENTIDAD</p>
-                <p className="text-xs text-gray-500">Entidad Contratante</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300">Entidad Contratante</p>
               </div>
             </div>
           </div>

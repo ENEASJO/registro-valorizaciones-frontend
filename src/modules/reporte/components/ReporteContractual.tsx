@@ -174,7 +174,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
             <div>
               <p className="text-sm text-gray-600">Contratos Vigentes</p>
               <p className="text-2xl font-bold text-purple-600">{datos.contratosVigentes.length}</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 {datos.contratosVigentes.filter(c => c.diasRestantes <= 90).length} próximos a vencer
               </p>
             </div>
@@ -191,7 +191,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
               <p className="text-2xl font-bold text-blue-600">
                 {formatearMoneda(datos.garantias.reduce((sum, g) => sum + g.montoGarantia, 0))}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 {datos.garantias.length} garantías activas
               </p>
             </div>
@@ -208,7 +208,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
               <p className="text-2xl font-bold text-amber-600">
                 {datos.vencimientos.filter(v => v.diasParaVencer <= 30).length}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 en los próximos 30 días
               </p>
             </div>
@@ -225,7 +225,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
               <p className="text-2xl font-bold text-green-600">
                 {formatearMoneda(datos.adicionalesDeductivos.reduce((sum, ad) => sum + ad.montoAprobado, 0))}
               </p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 {datos.adicionalesDeductivos.length} modificaciones
               </p>
             </div>
@@ -272,7 +272,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
                 <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4">
                     <div className="font-medium text-gray-900">{contrato.numeroContrato}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-300">
                       {new Date(contrato.fechaInicio).toLocaleDateString('es-PE')}
                     </div>
                   </td>
@@ -280,7 +280,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
                     <div className="font-medium text-gray-900 max-w-xs truncate">
                       {contrato.nombreObra}
                     </div>
-                    <div className="text-xs text-gray-500">ID: {contrato.obraId}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">ID: {contrato.obraId}</div>
                   </td>
                   <td className="py-3 px-4">
                     <div className="text-gray-900">{contrato.contratista}</div>
@@ -309,7 +309,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
                     }`}>
                       {contrato.diasRestantes} días
                     </span>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-300">
                       {new Date(contrato.fechaFinPrevista).toLocaleDateString('es-PE')}
                     </div>
                   </td>
@@ -482,11 +482,11 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
                       {vencimiento.tipo}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                     {vencimiento.accionRequerida}
                   </p>
                   <div className="flex items-center gap-4 text-sm">
-                    <span className="text-gray-500">
+                    <span className="text-gray-500 dark:text-gray-300">
                       Vence: {new Date(vencimiento.fechaVencimiento).toLocaleDateString('es-PE')}
                     </span>
                     <span className={`font-medium ${
@@ -623,11 +623,11 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
                 <h4 className="font-medium text-gray-900 mb-1">
                   {modificacion.concepto}
                 </h4>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                   {modificacion.obraNombre}
                 </p>
                 
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-300">
                   <span>
                     Solicitado: {new Date(modificacion.fechaSolicitud).toLocaleDateString('es-PE')}
                   </span>
@@ -687,7 +687,7 @@ const ReporteContractual: React.FC<ReporteContractualProps> = ({ datos, filtros 
                     <div className="font-medium text-gray-900 max-w-xs truncate">
                       {garantia.obraNombre}
                     </div>
-                    <div className="text-xs text-gray-500">ID: {garantia.obraId}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300">ID: {garantia.obraId}</div>
                   </td>
                   <td className="py-3 px-4">
                     <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">

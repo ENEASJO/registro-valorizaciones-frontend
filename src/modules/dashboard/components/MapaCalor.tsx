@@ -148,7 +148,7 @@ const MapaCalor: React.FC<MapaCalorProps> = ({
                 className={`px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
                   isActive
                     ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
                 }`}
               >
                 {m === 'inversion' && 'Inversión'}
@@ -313,11 +313,11 @@ const MapaCalor: React.FC<MapaCalorProps> = ({
       {/* Leyenda */}
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center gap-2">
-          <Info className="w-4 h-4 text-gray-500" />
+          <Info className="w-4 h-4 text-gray-500 dark:text-gray-300" />
           <span className="text-sm text-gray-600">Intensidad del color indica el valor relativo</span>
         </div>
         
-        <div className="flex items-center gap-4 text-xs text-gray-500">
+        <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-300">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 bg-gray-200 rounded-full"></div>
             <span>Menor</span>
@@ -344,21 +344,21 @@ const MapaCalor: React.FC<MapaCalorProps> = ({
             <Building className="w-4 h-4 text-blue-600" />
             <div>
               <span className="text-sm font-medium text-gray-700">Zona Urbana</span>
-              <p className="text-xs text-gray-500">Barrios de San Marcos ciudad</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">Barrios de San Marcos ciudad</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-green-600" />
             <div>
               <span className="text-sm font-medium text-gray-700">Centros Poblados</span>
-              <p className="text-xs text-gray-500">Agrupaciones de caseríos</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">Agrupaciones de caseríos</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Home className="w-4 h-4 text-orange-600" />
             <div>
               <span className="text-sm font-medium text-gray-700">Caseríos</span>
-              <p className="text-xs text-gray-500">Caseríos independientes</p>
+              <p className="text-xs text-gray-500 dark:text-gray-300">Caseríos independientes</p>
             </div>
           </div>
         </div>

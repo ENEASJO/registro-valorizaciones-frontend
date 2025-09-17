@@ -184,7 +184,7 @@ const ReporteAvanceObra: React.FC<ReporteAvanceObraProps> = ({ datos, filtros })
             <div>
               <p className="text-sm text-gray-600">Días Transcurridos</p>
               <p className="text-2xl font-bold text-amber-600">{datos.obra.diasTranscurridos}</p>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
                 de {datos.obra.diasTranscurridos + datos.obra.diasRestantes} días
               </p>
             </div>
@@ -371,7 +371,7 @@ const ReporteAvanceObra: React.FC<ReporteAvanceObraProps> = ({ datos, filtros })
                 }`} />
                 <div className="flex-shrink-0 text-right">
                   <div className="font-medium text-sm text-gray-900">{hito.hito}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 dark:text-gray-300">
                     {new Date(hito.fecha).toLocaleDateString('es-PE')}
                   </div>
                   <div className="text-xs font-medium text-blue-600">
@@ -417,7 +417,7 @@ const ReporteAvanceObra: React.FC<ReporteAvanceObraProps> = ({ datos, filtros })
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900 mb-1">{alerta.titulo}</h4>
-                    <p className="text-sm text-gray-600 mb-2">{alerta.descripcion}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{alerta.descripcion}</p>
                     {alerta.accionRequerida && (
                       <p className="text-sm font-medium text-blue-600">
                         Acción: {alerta.accionRequerida}
@@ -433,7 +433,7 @@ const ReporteAvanceObra: React.FC<ReporteAvanceObraProps> = ({ datos, filtros })
                     {alerta.criticidad}
                   </span>
                 </div>
-                <div className="text-xs text-gray-500 mt-2">
+                <div className="text-xs text-gray-500 dark:text-gray-300 mt-2">
                   Detectado: {new Date(alerta.fechaDeteccion).toLocaleDateString('es-PE')}
                 </div>
               </div>
@@ -475,7 +475,7 @@ const ReporteAvanceObra: React.FC<ReporteAvanceObraProps> = ({ datos, filtros })
                   </span>
                 </div>
                 
-                <p className="text-sm text-gray-600 mb-3">{recomendacion.descripcion}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{recomendacion.descripcion}</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   {recomendacion.beneficioEsperado && (
@@ -495,7 +495,7 @@ const ReporteAvanceObra: React.FC<ReporteAvanceObraProps> = ({ datos, filtros })
                 {recomendacion.plazoEjecucion && (
                   <div className="mt-2 text-xs">
                     <span className="font-medium text-purple-600">Plazo:</span>
-                    <span className="text-gray-600 ml-1">{recomendacion.plazoEjecucion}</span>
+                    <span className="text-gray-600 dark:text-gray-300 ml-1">{recomendacion.plazoEjecucion}</span>
                   </div>
                 )}
               </div>

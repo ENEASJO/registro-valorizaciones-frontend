@@ -24,7 +24,7 @@ const NotFound = () => {
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Página no encontrada</h1>
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             La ruta <code className="bg-gray-100 px-2 py-1 rounded text-sm">{location.pathname}</code> no existe.
           </p>
           {location.pathname === '/Backend' && (

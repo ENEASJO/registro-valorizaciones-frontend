@@ -195,7 +195,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                 <span className="ml-2">{valorizacion.estado.replace('_', ' ')}</span>
               </span>
             </h1>
-            <p className="text-gray-600 mt-1">
+            <p className="text-gray-600 dark:text-gray-300 mt-1">
               {tipo === 'ejecucion' ? 'Valorización de Ejecución' : 'Valorización de Supervisión'} - 
               {obra.numero_contrato}
             </p>
@@ -700,7 +700,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
       {activeTab === 'historial' && (
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
-            <GitBranch className="w-5 h-5 text-gray-500" />
+            <GitBranch className="w-5 h-5 text-gray-500 dark:text-gray-300" />
             <h2 className="text-xl font-semibold text-gray-900">Historial de Cambios</h2>
           </div>
           <div className="text-center py-8 text-gray-500 dark:text-gray-300">

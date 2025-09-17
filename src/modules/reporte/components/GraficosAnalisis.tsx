@@ -278,7 +278,7 @@ const GraficosAnalisis = ({ configuraciones, className = '' }: GraficosAnalisisP
         // Implementación similar para scatter plot si es necesario
         return <GraficoLinea config={config} />;
       default:
-        return <div className="text-center text-gray-500 py-8">Tipo de gráfico no soportado</div>;
+        return <div className="text-center text-gray-500 dark:text-gray-300 py-8">Tipo de gráfico no soportado</div>;
     }
   };
 
@@ -289,7 +289,7 @@ const GraficosAnalisis = ({ configuraciones, className = '' }: GraficosAnalisisP
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-gray-900">{config.titulo}</h3>
             {config.descripcion && (
-              <p className="text-sm text-gray-600 mt-1">{config.descripcion}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{config.descripcion}</p>
             )}
           </div>
           
@@ -301,7 +301,7 @@ const GraficosAnalisis = ({ configuraciones, className = '' }: GraficosAnalisisP
       
       {configuraciones.length === 0 && (
         <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-200">
-          <div className="text-gray-500">
+          <div className="text-gray-500 dark:text-gray-300">
             <div className="text-lg font-medium">No hay gráficos disponibles</div>
             <div className="text-sm mt-1">Configure los filtros para generar gráficos</div>
           </div>
