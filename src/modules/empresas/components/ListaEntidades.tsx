@@ -70,10 +70,14 @@ const ListaEntidades = ({
       // Filtro por búsqueda
       if (filtros.search) {
         const searchTerm = filtros.search.toLowerCase();
+        const nombre = entidad.nombre_completo || '';
+        const ruc = entidad.ruc_principal || '';
+        const representante = entidad.datos_empresa?.representante_legal || '';
+
         return (
-          entidad.nombre.toLowerCase().includes(searchTerm) ||
-          entidad.ruc.toLowerCase().includes(searchTerm) ||
-          (entidad.representante && entidad.representante.toLowerCase().includes(searchTerm))
+          nombre.toLowerCase().includes(searchTerm) ||
+          ruc.toLowerCase().includes(searchTerm) ||
+          (representante && representante.toLowerCase().includes(searchTerm))
         );
       }
       return true;
@@ -102,10 +106,10 @@ const ListaEntidades = ({
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
-                      {entidad.nombre}
+                      {entidad.nombre_completo || entidad.datos_empresa?.razon_social || 'Sin nombre'}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {entidad.ruc}
+                      {entidad.ruc_principal || entidad.datos_empresa?.ruc || 'Sin RUC'}
                     </p>
                   </div>
                 </div>
@@ -133,31 +137,31 @@ const ListaEntidades = ({
 
               {/* Información principal */}
               <div className="space-y-3">
-                {entidad.representante && (
+                {entidad.datos_empresa?.representante_legal && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <User className="w-4 h-4" />
-                    <span>{entidad.representante}</span>
+                    <span>{entidad.datos_empresa.representante_legal}</span>
                   </div>
                 )}
 
-                {entidad.telefono && (
+                {entidad.datos_empresa?.telefono && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Phone className="w-4 h-4" />
-                    <span>{entidad.telefono}</span>
+                    <span>{entidad.datos_empresa.telefono}</span>
                   </div>
                 )}
 
-                {entidad.email && (
+                {entidad.datos_empresa?.email && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Mail className="w-4 h-4" />
-                    <span className="truncate">{entidad.email}</span>
+                    <span className="truncate">{entidad.datos_empresa.email}</span>
                   </div>
                 )}
 
-                {entidad.direccion && (
+                {entidad.datos_empresa?.direccion && (
                   <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span className="line-clamp-2">{entidad.direccion}</span>
+                    <span className="line-clamp-2">{entidad.datos_empresa.direccion}</span>
                   </div>
                 )}
               </div>
