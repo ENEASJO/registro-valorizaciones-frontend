@@ -187,15 +187,23 @@ const ListaEntidades = ({
                 </div>
               </div>
 
-              {/* Información principal */}
-              <div className="space-y-3">
-                {entidad.datos_empresa?.representante_legal && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <User className="w-4 h-4" />
-                    <span>{entidad.datos_empresa.representante_legal}</span>
+              {/* Representante Principal */}
+              {entidad.datos_empresa?.representante_legal && (
+                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+                  <div className="flex items-center gap-2 mb-1">
+                    <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wide">
+                      Representante Principal
+                    </span>
                   </div>
-                )}
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {entidad.datos_empresa.representante_legal}
+                  </p>
+                </div>
+              )}
 
+              {/* Información de contacto */}
+              <div className="space-y-3">
                 {entidad.datos_empresa?.telefono && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <Phone className="w-4 h-4" />
