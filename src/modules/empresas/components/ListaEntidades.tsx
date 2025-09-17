@@ -88,7 +88,6 @@ const ListaEntidades = ({
       if (menuAbierto) {
         // Cerrar con Escape
         if (event instanceof KeyboardEvent && event.key === 'Escape') {
-          console.log('Cerrando menú con Escape');
           setMenuAbierto(null);
           return;
         }
@@ -98,14 +97,7 @@ const ListaEntidades = ({
           const menu = document.querySelector(`[data-menu-id="${menuAbierto}"]`);
           const clickedOnMenuButton = (event.target as HTMLElement).closest('button')?.querySelector('.menu-contextual-button');
 
-          console.log('Click detectado:', {
-            menuExists: !!menu,
-            clickedInsideMenu: menu && menu.contains(event.target as Node),
-            clickedOnMenuButton: !!clickedOnMenuButton
-          });
-
           if (menu && !menu.contains(event.target as Node) && !clickedOnMenuButton) {
-            console.log('Cerrando menú por clic fuera');
             setMenuAbierto(null);
           }
         }
@@ -605,22 +597,15 @@ const ListaEntidades = ({
                   <div className="relative">
                     <button
                       onClick={(e) => {
-                        console.log('=== CLICK EN MENÚ CONTEXTUAL ===', entidad.id);
-                        console.log('e.currentTarget:', e.currentTarget);
-                        console.log('menuAbierto actual:', menuAbierto);
                         e.stopPropagation();
 
                         // Toggle menú
                         if (menuAbierto === entidad.id) {
-                          console.log('Cerrando menú');
                           setMenuAbierto(null);
                         } else {
-                          console.log('Abriendo menú');
-
                           // Guardar referencia al botón y calcular posición ANTES de cualquier operación asíncrona
                           const button = e.currentTarget;
                           const rect = button.getBoundingClientRect();
-                          console.log('button rect:', rect);
                           const scrollY = window.scrollY || window.pageYOffset;
                           const menuWidth = 192; // w-48 = 192px
                           const windowWidth = window.innerWidth;
@@ -634,38 +619,19 @@ const ListaEntidades = ({
                             top: rect.bottom + scrollY + 8,
                             left: left
                           };
-                          console.log('Posición calculada:', finalPosition);
 
                           // Cerrar cualquier otro menú abierto primero
                           setMenuAbierto(null);
 
                           // Pequeño delay para asegurar que se cierre primero
                           setTimeout(() => {
-                            console.log('Estableciendo posición...');
                             setMenuPositions({
                               [entidad.id]: finalPosition
                             });
 
                             // Abrir el menú después de establecer la posición
                             setTimeout(() => {
-                              console.log('Abriendo menú definitivamente...');
                               setMenuAbierto(entidad.id);
-
-                              // Verificar después de un breve delay
-                              setTimeout(() => {
-                                const menuElement = document.querySelector(`[data-menu-id="${entidad.id}"]`);
-                                console.log('¿Menú encontrado en DOM?', menuElement);
-                                if (menuElement) {
-                                  console.log('Estilos calculados:', {
-                                    display: window.getComputedStyle(menuElement).display,
-                                    visibility: window.getComputedStyle(menuElement).visibility,
-                                    opacity: window.getComputedStyle(menuElement).opacity,
-                                    zIndex: window.getComputedStyle(menuElement).zIndex,
-                                    top: window.getComputedStyle(menuElement).top,
-                                    left: window.getComputedStyle(menuElement).left,
-                                  });
-                                }
-                              }, 100);
                             }, 10);
                           }, 10);
                         }
@@ -684,26 +650,17 @@ const ListaEntidades = ({
           ))}
         </div>
 
-        {/* Menú contextual único - versión de debugging */}
+        {/* Menú contextual único */}
         {menuAbierto && (
           <div
             data-menu-id={menuAbierto}
-            className="fixed w-48 bg-red-500 rounded-lg shadow-xl border-4 border-yellow-400 z-[9999999] overflow-visible"
+            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[99999] overflow-hidden"
             style={{
-              top: '200px',
-              left: '200px',
-              position: 'fixed',
-              transform: 'none',
-              margin: 0,
-              padding: 0,
+              top: `${menuPositions[menuAbierto]?.top || 100}px`,
+              left: `${menuPositions[menuAbierto]?.left || 100}px`,
             }}
           >
-            <div className="py-1 bg-red-500">
-              <div className="text-white text-center text-lg font-bold p-4">
-                ¡MENÚ DE PRUEBA!
-                <br />
-                ¿VES ESTO?
-              </div>
+            <div className="py-1">
               <button
                 onClick={() => {
                   const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
@@ -712,7 +669,7 @@ const ListaEntidades = ({
                     setMenuAbierto(null);
                   }
                 }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
               >
                 <Eye className="w-4 h-4" />
                 Ver detalles
