@@ -94,14 +94,17 @@ const ListaEntidades = ({
 
         // Cerrar al hacer clic fuera del menú
         if (event instanceof MouseEvent) {
-          const menu = document.querySelector(`[data-menu-id="${menuAbierto}"]`);
-          if (menu && !menu.contains(event.target as Node)) {
-            // Verificar si el clic no fue en un botón de menú
-            const menuButton = event.target as HTMLElement;
-            if (!menuButton.closest('button')?.innerHTML.includes('MoreVertical')) {
-              setMenuAbierto(null);
+          // Pequeño delay para asegurar que el menú exista en el DOM
+          setTimeout(() => {
+            const menu = document.querySelector(`[data-menu-id="${menuAbierto}"]`);
+            if (menu && !menu.contains(event.target as Node)) {
+              // Verificar si el clic no fue en un botón de menú
+              const menuButton = event.target as HTMLElement;
+              if (!menuButton.closest('button')?.innerHTML.includes('MoreVertical')) {
+                setMenuAbierto(null);
+              }
             }
-          }
+          }, 50);
         }
       }
     };
