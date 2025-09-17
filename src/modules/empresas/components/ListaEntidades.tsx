@@ -88,23 +88,26 @@ const ListaEntidades = ({
       if (menuAbierto) {
         // Cerrar con Escape
         if (event instanceof KeyboardEvent && event.key === 'Escape') {
+          console.log('Cerrando menú con Escape');
           setMenuAbierto(null);
           return;
         }
 
         // Cerrar al hacer clic fuera del menú
         if (event instanceof MouseEvent) {
-          // Pequeño delay para asegurar que el menú exista en el DOM
-          setTimeout(() => {
-            const menu = document.querySelector(`[data-menu-id="${menuAbierto}"]`);
-            if (menu && !menu.contains(event.target as Node)) {
-              // Verificar si el clic no fue en un botón de menú
-              const menuButton = event.target as HTMLElement;
-              if (!menuButton.closest('button')?.innerHTML.includes('MoreVertical')) {
-                setMenuAbierto(null);
-              }
-            }
-          }, 50);
+          const menu = document.querySelector(`[data-menu-id="${menuAbierto}"]`);
+          const clickedOnMenuButton = (event.target as HTMLElement).closest('button')?.querySelector('.menu-contextual-button');
+
+          console.log('Click detectado:', {
+            menuExists: !!menu,
+            clickedInsideMenu: menu && menu.contains(event.target as Node),
+            clickedOnMenuButton: !!clickedOnMenuButton
+          });
+
+          if (menu && !menu.contains(event.target as Node) && !clickedOnMenuButton) {
+            console.log('Cerrando menú por clic fuera');
+            setMenuAbierto(null);
+          }
         }
       }
     };
@@ -373,7 +376,8 @@ const ListaEntidades = ({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {entidadesFiltradas.map((entidad, index) => (
             <motion.div
               key={entidad.id}
@@ -601,7 +605,9 @@ const ListaEntidades = ({
                   <div className="relative">
                     <button
                       onClick={(e) => {
-                        console.log('Click en menú contextual', entidad.id);
+                        console.log('=== CLICK EN MENÚ CONTEXTUAL ===', entidad.id);
+                        console.log('e.currentTarget:', e.currentTarget);
+                        console.log('menuAbierto actual:', menuAbierto);
                         e.stopPropagation();
 
                         // Toggle menú
@@ -614,6 +620,7 @@ const ListaEntidades = ({
                           // Guardar referencia al botón y calcular posición ANTES de cualquier operación asíncrona
                           const button = e.currentTarget;
                           const rect = button.getBoundingClientRect();
+                          console.log('button rect:', rect);
                           const scrollY = window.scrollY || window.pageYOffset;
                           const menuWidth = 192; // w-48 = 192px
                           const windowWidth = window.innerWidth;
@@ -623,22 +630,42 @@ const ListaEntidades = ({
                           if (left < 10) left = 10;
                           if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
 
+                          const finalPosition = {
+                            top: rect.bottom + scrollY + 8,
+                            left: left
+                          };
+                          console.log('Posición calculada:', finalPosition);
+
                           // Cerrar cualquier otro menú abierto primero
                           setMenuAbierto(null);
 
                           // Pequeño delay para asegurar que se cierre primero
                           setTimeout(() => {
-                            console.log('Posición:', { top: rect.bottom + scrollY + 8, left });
+                            console.log('Estableciendo posición...');
                             setMenuPositions({
-                              [entidad.id]: {
-                                top: rect.bottom + scrollY + 8,
-                                left: left
-                              }
+                              [entidad.id]: finalPosition
                             });
 
                             // Abrir el menú después de establecer la posición
                             setTimeout(() => {
+                              console.log('Abriendo menú definitivamente...');
                               setMenuAbierto(entidad.id);
+
+                              // Verificar después de un breve delay
+                              setTimeout(() => {
+                                const menuElement = document.querySelector(`[data-menu-id="${entidad.id}"]`);
+                                console.log('¿Menú encontrado en DOM?', menuElement);
+                                if (menuElement) {
+                                  console.log('Estilos calculados:', {
+                                    display: window.getComputedStyle(menuElement).display,
+                                    visibility: window.getComputedStyle(menuElement).visibility,
+                                    opacity: window.getComputedStyle(menuElement).opacity,
+                                    zIndex: window.getComputedStyle(menuElement).zIndex,
+                                    top: window.getComputedStyle(menuElement).top,
+                                    left: window.getComputedStyle(menuElement).left,
+                                  });
+                                }
+                              }, 100);
                             }, 10);
                           }, 10);
                         }
@@ -647,71 +674,77 @@ const ListaEntidades = ({
                       style={{ cursor: 'pointer' }}
                       type="button"
                     >
-                      <MoreVertical className="w-4 h-4" />
+                      <MoreVertical className="w-4 h-4 menu-contextual-button" />
                     </button>
 
-                    {(() => {
-                      console.log('Renderizando menú:', entidad.id, 'menuAbierto:', menuAbierto, 'posición:', menuPositions[entidad.id]);
-                      if (menuAbierto === entidad.id) {
-                        return (
-                          <div
-                            data-menu-id={entidad.id}
-                            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
-                            style={{
-                              top: `${menuPositions[entidad.id]?.top || 100}px`,
-                              left: `${menuPositions[entidad.id]?.left || 100}px`,
-                            }}
-                          >
-                            <div className="py-1">
-                          <button
-                            onClick={() => {
-                              onVerDetalle(entidad);
-                              setMenuAbierto(null);
-                            }}
-                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-                          >
-                            <Eye className="w-4 h-4" />
-                            Ver detalles
-                          </button>
-                          {onEditar && (
-                            <button
-                              onClick={() => {
-                                onEditar(entidad);
-                                setMenuAbierto(null);
-                              }}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
-                            >
-                              <Edit className="w-4 h-4" />
-                              Editar
-                            </button>
-                          )}
-                          {onEliminar && (
-                            <>
-                              <div className="border-t border-gray-100 my-1"></div>
-                              <button
-                                onClick={() => {
-                                  onEliminar(entidad);
-                                  setMenuAbierto(null);
-                                }}
-                                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                              >
-                                <Trash className="w-4 h-4" />
-                                Eliminar
-                              </button>
-                            </>
-                          )}
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  })()}
                   </div>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
+
+        {/* Menú contextual único - versión simplificada */}
+        {menuAbierto && (
+          <div
+            data-menu-id={menuAbierto}
+            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[99999] overflow-hidden"
+            style={{
+              top: `${menuPositions[menuAbierto]?.top || 100}px`,
+              left: `${menuPositions[menuAbierto]?.left || 100}px`,
+            }}
+          >
+            <div className="py-1">
+              <button
+                onClick={() => {
+                  const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
+                  if (entidad) {
+                    onVerDetalle(entidad);
+                    setMenuAbierto(null);
+                  }
+                }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+              >
+                <Eye className="w-4 h-4" />
+                Ver detalles
+              </button>
+              {onEditar && (
+                <button
+                  onClick={() => {
+                    const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
+                    if (entidad) {
+                      onEditar(entidad);
+                      setMenuAbierto(null);
+                    }
+                  }}
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+                >
+                  <Edit className="w-4 h-4" />
+                  Editar
+                </button>
+              )}
+              {onEliminar && (
+                <>
+                  <div className="border-t border-gray-100 my-1"></div>
+                  <button
+                    onClick={() => {
+                      const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
+                      if (entidad) {
+                        onEliminar(entidad);
+                        setMenuAbierto(null);
+                      }
+                    }}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <Trash className="w-4 h-4" />
+                    Eliminar
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </>
       )}
     </div>
   );
