@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Building2,
@@ -64,6 +64,21 @@ const ListaEntidades = ({
   onEditar,
   onEliminar
 }: ListaEntidadesProps) => {
+  // Cerrar menús al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Cerrar todos los menús abiertos
+      document.querySelectorAll('.absolute:not(.hidden)').forEach(menu => {
+        if (!menu.contains(event.target as Node)) {
+          menu.classList.add('hidden');
+        }
+      });
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   // Filtrar entidades
   const entidadesFiltradas = useMemo(() => {
     return entidades.filter(entidad => {
@@ -113,26 +128,63 @@ const ListaEntidades = ({
                     </p>
                   </div>
                 </div>
-                <select
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === 'ver') {
-                      onVerDetalle(entidad);
-                    } else if (value === 'editar' && onEditar) {
-                      onEditar(entidad);
-                    } else if (value === 'eliminar' && onEliminar) {
-                      onEliminar(entidad);
-                    }
-                    e.target.value = '';
-                  }}
-                  className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-transparent border-none cursor-pointer appearance-none"
-                  aria-label="Más opciones"
-                >
-                  <option value="">⚙️</option>
-                  <option value="ver">👁️ Ver detalles</option>
-                  {onEditar && <option value="editar">✏️ Editar</option>}
-                  {onEliminar && <option value="eliminar">🗑️ Eliminar</option>}
-                </select>
+                <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const menu = e.currentTarget.nextElementSibling as HTMLElement;
+                      menu.classList.toggle('hidden');
+                    }}
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    aria-label="Más opciones"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
+                  <div className="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                    <button
+                      onClick={() => {
+                        onVerDetalle(entidad);
+                        // Cerrar menú
+                        const menu = (event.target as HTMLElement).closest('.absolute') as HTMLElement;
+                        menu.classList.add('hidden');
+                      }}
+                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Ver detalles
+                    </button>
+                    {onEditar && (
+                      <button
+                        onClick={() => {
+                          onEditar(entidad);
+                          const menu = (event.target as HTMLElement).closest('.absolute') as HTMLElement;
+                          menu.classList.add('hidden');
+                        }}
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-700 dark:hover:text-green-400 transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Editar
+                      </button>
+                    )}
+                    {onEliminar && (
+                      <>
+                        <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                        <button
+                          onClick={() => {
+                            onEliminar(entidad);
+                            const menu = (event.target as HTMLElement).closest('.absolute') as HTMLElement;
+                            menu.classList.add('hidden');
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          <Trash className="w-4 h-4" />
+                          Eliminar
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
               </div>
 
               {/* Información principal */}
