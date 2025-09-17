@@ -102,6 +102,38 @@ const ListaEntidades = ({
     });
   }, [entidades, filtros]);
 
+  // Función para encontrar el representante principal según prioridad de cargos
+  const encontrarRepresentantePrincipal = (representantes?: any[]): string | null => {
+    if (!representantes || representantes.length === 0) {
+      return null;
+    }
+
+    // Orden de prioridad de cargos
+    const prioridadCargos = [
+      'GERENTE GENERAL',
+      'GERENTE',
+      'PRESIDENTE',
+      'DIRECTOR',
+      'ADMINISTRADOR',
+      'SOCIO',
+      'REPRESENTANTE LEGAL'
+    ];
+
+    // Buscar representante por orden de prioridad
+    for (const cargo of prioridadCargos) {
+      const representante = representantes.find(r =>
+        r.cargo && r.cargo.toUpperCase().includes(cargo)
+      );
+      if (representante && representante.nombre) {
+        return representante.nombre;
+      }
+    }
+
+    // Si no encuentra por cargo, devolver el primer representante con nombre
+    const primerConNombre = representantes.find(r => r.nombre);
+    return primerConNombre ? primerConNombre.nombre : null;
+  };
+
   return (
     <div className="space-y-6">
       {/* Contenido principal */}
@@ -205,7 +237,7 @@ const ListaEntidades = ({
 
               {/* Representante Principal */}
               {(entidad.datos_empresa?.representante_legal ||
-                entidad.datos_empresa?.representantes?.[0]?.nombre ||
+                entidad.datos_empresa?.representantes?.length ||
                 entidad.datos_empresa?.dni_representante) && (
                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                   <div className="flex items-center gap-2 mb-1">
@@ -216,7 +248,7 @@ const ListaEntidades = ({
                   </div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {entidad.datos_empresa.representante_legal ||
-                     entidad.datos_empresa?.representantes?.[0]?.nombre ||
+                     encontrarRepresentantePrincipal(entidad.datos_empresa?.representantes) ||
                      entidad.datos_empresa?.dni_representante}
                   </p>
                 </div>
