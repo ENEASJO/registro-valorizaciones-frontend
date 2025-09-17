@@ -133,15 +133,17 @@ const ListaEntidades = ({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                      console.log('🎯 Click en botón de menú');
                       const menu = e.currentTarget.nextElementSibling as HTMLElement;
                       menu.classList.toggle('hidden');
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-blue-500 text-white"
                     aria-label="Más opciones"
+                    style={{minWidth: '40px', minHeight: '40px'}}
                   >
                     <MoreVertical className="w-4 h-4" />
                   </button>
-                  <div className="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+                  <div className="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50" style={{border: '2px solid red'}}>
                     <button
                       onClick={() => {
                         onVerDetalle(entidad);
