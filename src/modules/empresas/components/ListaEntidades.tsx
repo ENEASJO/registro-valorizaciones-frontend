@@ -18,7 +18,8 @@ import {
   CheckCircle,
   Clock,
   Globe,
-  Briefcase
+  Briefcase,
+  User
 } from 'lucide-react';
 import type {
   EntidadContratistaDetalle,
@@ -337,7 +338,7 @@ const ListaEntidades = ({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="group bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-200 transition-all duration-300 overflow-hidden"
+              className="group relative bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-200 transition-all duration-300 overflow-hidden"
             >
               {/* Header con gradiente */}
               <div className={`bg-gradient-to-r p-4 ${
@@ -421,6 +422,19 @@ const ListaEntidades = ({
                           {entidad.datos_empresa.ruc}
                         </span>
                       </div>
+
+                      {/* Representante Principal */}
+                      {(entidad.datos_empresa?.representante_legal || entidad.datos_empresa?.representantes?.[0]) && (
+                        <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-md">
+                          <User className="w-3 h-3 text-amber-600" />
+                          <div className="flex-1 min-w-0">
+                            <div className="text-xs text-amber-700 font-medium">Representante</div>
+                            <div className="text-xs text-gray-700 truncate">
+                              {entidad.datos_empresa?.representantes?.[0]?.nombre || entidad.datos_empresa?.representante_legal}
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       {/* Contacto rápido */}
                       <div className="grid grid-cols-1 gap-2">
@@ -551,7 +565,7 @@ const ListaEntidades = ({
                     </button>
 
                     {menuAbierto === entidad.id && (
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20 overflow-hidden">
+                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
                         <div className="py-1">
                           <button
                             onClick={() => {
