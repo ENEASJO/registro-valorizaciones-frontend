@@ -75,45 +75,38 @@ const ListaEntidades = ({
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState<string | null>(null);
 
-  // Refs para los menús contextuales
-  const menuRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   const [menuPositions, setMenuPositions] = useState<{ [key: string]: { top: number; left: number } }>({});
 
-  // Actualizar posiciones de los menús
+  // Cerrar menú al hacer clic fuera o presionar Escape
   useEffect(() => {
-    if (menuAbierto) {
-      const button = menuRefs.current[menuAbierto];
-      if (button) {
-        const rect = button.getBoundingClientRect();
-        const scrollY = window.scrollY || window.pageYOffset;
-        const menuWidth = 192; // w-48 = 192px
-        const windowWidth = window.innerWidth;
+    const handleInteraction = (event: MouseEvent | KeyboardEvent) => {
+      if (menuAbierto) {
+        // Cerrar con Escape
+        if (event instanceof KeyboardEvent && event.key === 'Escape') {
+          setMenuAbierto(null);
+          return;
+        }
 
-        // Calcular posición izquierda, asegurando que no se salga de la pantalla
-        let left = rect.right - menuWidth;
-        if (left < 10) left = 10; // Mínimo margen izquierdo
-        if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10; // Máximo margen derecho
-
-        setMenuPositions({
-          [menuAbierto]: {
-            top: rect.bottom + scrollY + 8,
-            left: left
+        // Cerrar al hacer clic fuera del menú
+        if (event instanceof MouseEvent) {
+          const menu = document.querySelector(`[data-menu-id="${menuAbierto}"]`);
+          if (menu && !menu.contains(event.target as Node)) {
+            // Verificar si el clic no fue en un botón de menú
+            const menuButton = event.target as HTMLElement;
+            if (!menuButton.closest('button')?.innerHTML.includes('MoreVertical')) {
+              setMenuAbierto(null);
+            }
           }
-        });
-      }
-    }
-  }, [menuAbierto]);
-
-  // Cerrar menú al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuAbierto && !menuRefs.current[menuAbierto]?.contains(event.target as Node)) {
-        setMenuAbierto(null);
+        }
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+    return () => {
+      document.removeEventListener('mousedown', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+    };
   }, [menuAbierto]);
 
   // Filtrar entidades localmente
@@ -599,19 +592,44 @@ const ListaEntidades = ({
                   {/* Menú de acciones mejorado */}
                   <div className="relative">
                     <button
-                      ref={(el) => menuRefs.current[entidad.id] = el}
-                      onClick={() => setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id);
+
+                        // Calcular posición inmediatamente
+                        setTimeout(() => {
+                          const button = e.currentTarget;
+                          const rect = button.getBoundingClientRect();
+                          const scrollY = window.scrollY || window.pageYOffset;
+                          const menuWidth = 192; // w-48 = 192px
+                          const windowWidth = window.innerWidth;
+
+                          // Calcular posición izquierda, asegurando que no se salga de la pantalla
+                          let left = rect.right - menuWidth;
+                          if (left < 10) left = 10;
+                          if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+
+                          setMenuPositions({
+                            [entidad.id]: {
+                              top: rect.bottom + scrollY + 8,
+                              left: left
+                            }
+                          });
+                        }, 0);
+                      }}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
 
-                    {menuAbierto === entidad.id && menuPositions[entidad.id] && (
+                    {menuAbierto === entidad.id && (
                       <div
+                        data-menu-id={entidad.id}
                         className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
                         style={{
-                          top: `${menuPositions[entidad.id].top}px`,
-                          left: `${menuPositions[entidad.id].left}px`
+                          top: menuPositions[entidad.id] ? `${menuPositions[entidad.id].top}px` : '0px',
+                          left: menuPositions[entidad.id] ? `${menuPositions[entidad.id].left}px` : '0px',
+                          visibility: menuPositions[entidad.id] ? 'visible' : 'hidden'
                         }}
                       >
                         <div className="py-1">
