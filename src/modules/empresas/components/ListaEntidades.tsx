@@ -597,31 +597,35 @@ const ListaEntidades = ({
                   {/* Menú de acciones mejorado */}
                   <div className="relative">
                     <button
-                      onClick={() => {
-                        console.log('Click en menú contextual para entidad:', entidad.id);
-                        alert(`Menú para ${entidad.nombre_completo}`);
+                      onClick={(e) => {
+                        e.stopPropagation();
 
-                        // Versión simple: abrir menú con posicionamiento básico
+                        // Toggle menú
                         if (menuAbierto === entidad.id) {
                           setMenuAbierto(null);
                         } else {
-                          // Posición simple respecto al viewport
-                          const event = window.event;
-                          const target = event?.target as HTMLElement;
-                          if (target) {
-                            const rect = target.getBoundingClientRect();
-                            setMenuPositions({
-                              [entidad.id]: {
-                                top: rect.bottom + 5,
-                                left: rect.left - 150
-                              }
-                            });
-                          }
+                          // Calcular posición del menú
+                          const button = e.currentTarget;
+                          const rect = button.getBoundingClientRect();
+                          const scrollY = window.scrollY || window.pageYOffset;
+                          const menuWidth = 192; // w-48 = 192px
+                          const windowWidth = window.innerWidth;
+
+                          // Calcular posición izquierda, asegurando que no se salga de la pantalla
+                          let left = rect.right - menuWidth;
+                          if (left < 10) left = 10;
+                          if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+
+                          setMenuPositions({
+                            [entidad.id]: {
+                              top: rect.bottom + scrollY + 8,
+                              left: left
+                            }
+                          });
                           setMenuAbierto(entidad.id);
                         }
                       }}
-                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors bg-white border border-gray-200 shadow-sm"
-                      style={{ cursor: 'pointer' }}
+                      className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50"
                       type="button"
                     >
                       <MoreVertical className="w-4 h-4" />
