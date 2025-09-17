@@ -64,20 +64,23 @@ const ListaEntidades = ({
   onEditar,
   onEliminar
 }: ListaEntidadesProps) => {
+  // Estado para controlar qué menú está abierto
+  const [menuAbierto, setMenuAbierto] = useState<string | null>(null);
+
   // Cerrar menús al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Cerrar todos los menús abiertos
-      document.querySelectorAll('.absolute:not(.hidden)').forEach(menu => {
-        if (!menu.contains(event.target as Node)) {
-          menu.classList.add('hidden');
-        }
-      });
+      const target = event.target as HTMLElement;
+      // Buscar si el clic fue en un botón de menú
+      const botonMenu = target.closest('button[aria-label="Más opciones"]');
+      if (!botonMenu && menuAbierto) {
+        setMenuAbierto(null);
+      }
     };
 
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
+  }, [menuAbierto]);
 
   // Filtrar entidades
   const entidadesFiltradas = useMemo(() => {
@@ -133,25 +136,22 @@ const ListaEntidades = ({
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      console.log('🎯 Click en botón de menú');
-                      const menu = e.currentTarget.nextElementSibling as HTMLElement;
-                      menu.classList.toggle('hidden');
+                      setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id);
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-blue-500 text-white"
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                     aria-label="Más opciones"
-                    style={{minWidth: '40px', minHeight: '40px'}}
                   >
                     <MoreVertical className="w-4 h-4" />
                   </button>
-                  <div className="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50" style={{border: '2px solid red'}}>
+                  <div className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 transition-opacity duration-200 ${
+                    menuAbierto === entidad.id ? 'opacity-100 visible' : 'opacity-0 invisible'
+                  }`}>
                     <button
                       onClick={() => {
                         onVerDetalle(entidad);
-                        // Cerrar menú
-                        const menu = (event.target as HTMLElement).closest('.absolute') as HTMLElement;
-                        menu.classList.add('hidden');
+                        setMenuAbierto(null);
                       }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400 transition-colors rounded-t-lg"
                     >
                       <Eye className="w-4 h-4" />
                       Ver detalles
@@ -160,8 +160,7 @@ const ListaEntidades = ({
                       <button
                         onClick={() => {
                           onEditar(entidad);
-                          const menu = (event.target as HTMLElement).closest('.absolute') as HTMLElement;
-                          menu.classList.add('hidden');
+                          setMenuAbierto(null);
                         }}
                         className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-700 dark:hover:text-green-400 transition-colors"
                       >
@@ -175,10 +174,9 @@ const ListaEntidades = ({
                         <button
                           onClick={() => {
                             onEliminar(entidad);
-                            const menu = (event.target as HTMLElement).closest('.absolute') as HTMLElement;
-                            menu.classList.add('hidden');
+                            setMenuAbierto(null);
                           }}
-                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors rounded-b-lg"
                         >
                           <Trash className="w-4 h-4" />
                           Eliminar
@@ -236,13 +234,6 @@ const ListaEntidades = ({
                   {entidad.estado === 'SUSPENDIDO' && <Star className="w-3 h-3 mr-1" />}
                   {entidad.estado}
                 </span>
-
-                <button
-                  onClick={() => onVerDetalle(entidad)}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                >
-                  Ver más
-                </button>
               </div>
             </div>
           </motion.div>
