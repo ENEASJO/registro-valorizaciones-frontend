@@ -607,23 +607,24 @@ const ListaEntidades = ({
                           setMenuAbierto(null);
                         } else {
                           console.log('Abriendo menú');
+
+                          // Guardar referencia al botón y calcular posición ANTES de cualquier operación asíncrona
+                          const button = e.currentTarget;
+                          const rect = button.getBoundingClientRect();
+                          const scrollY = window.scrollY || window.pageYOffset;
+                          const menuWidth = 192; // w-48 = 192px
+                          const windowWidth = window.innerWidth;
+
+                          // Calcular posición izquierda, asegurando que no se salga de la pantalla
+                          let left = rect.right - menuWidth;
+                          if (left < 10) left = 10;
+                          if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+
                           // Cerrar cualquier otro menú abierto primero
                           setMenuAbierto(null);
 
                           // Pequeño delay para asegurar que se cierre primero
                           setTimeout(() => {
-                            // Calcular posición del menú
-                            const button = e.currentTarget;
-                            const rect = button.getBoundingClientRect();
-                            const scrollY = window.scrollY || window.pageYOffset;
-                            const menuWidth = 192; // w-48 = 192px
-                            const windowWidth = window.innerWidth;
-
-                            // Calcular posición izquierda, asegurando que no se salga de la pantalla
-                            let left = rect.right - menuWidth;
-                            if (left < 10) left = 10;
-                            if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
-
                             console.log('Posición:', { top: rect.bottom + scrollY + 8, left });
                             setMenuPositions({
                               [entidad.id]: {
