@@ -607,26 +607,36 @@ const ListaEntidades = ({
                           setMenuAbierto(null);
                         } else {
                           console.log('Abriendo menú');
-                          // Calcular posición del menú
-                          const button = e.currentTarget;
-                          const rect = button.getBoundingClientRect();
-                          const scrollY = window.scrollY || window.pageYOffset;
-                          const menuWidth = 192; // w-48 = 192px
-                          const windowWidth = window.innerWidth;
+                          // Cerrar cualquier otro menú abierto primero
+                          setMenuAbierto(null);
 
-                          // Calcular posición izquierda, asegurando que no se salga de la pantalla
-                          let left = rect.right - menuWidth;
-                          if (left < 10) left = 10;
-                          if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+                          // Pequeño delay para asegurar que se cierre primero
+                          setTimeout(() => {
+                            // Calcular posición del menú
+                            const button = e.currentTarget;
+                            const rect = button.getBoundingClientRect();
+                            const scrollY = window.scrollY || window.pageYOffset;
+                            const menuWidth = 192; // w-48 = 192px
+                            const windowWidth = window.innerWidth;
 
-                          console.log('Posición:', { top: rect.bottom + scrollY + 8, left });
-                          setMenuPositions({
-                            [entidad.id]: {
-                              top: rect.bottom + scrollY + 8,
-                              left: left
-                            }
-                          });
-                          setMenuAbierto(entidad.id);
+                            // Calcular posición izquierda, asegurando que no se salga de la pantalla
+                            let left = rect.right - menuWidth;
+                            if (left < 10) left = 10;
+                            if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+
+                            console.log('Posición:', { top: rect.bottom + scrollY + 8, left });
+                            setMenuPositions({
+                              [entidad.id]: {
+                                top: rect.bottom + scrollY + 8,
+                                left: left
+                              }
+                            });
+
+                            // Abrir el menú después de establecer la posición
+                            setTimeout(() => {
+                              setMenuAbierto(entidad.id);
+                            }, 10);
+                          }, 10);
                         }
                       }}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50 bg-blue-50"
@@ -642,12 +652,10 @@ const ListaEntidades = ({
                         return (
                           <div
                             data-menu-id={entidad.id}
-                            className="fixed w-48 bg-red-500 border-4 border-yellow-400 rounded-lg shadow-2xl z-[99999] overflow-hidden"
+                            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
                             style={{
                               top: `${menuPositions[entidad.id]?.top || 100}px`,
                               left: `${menuPositions[entidad.id]?.left || 100}px`,
-                              minWidth: '200px',
-                              minHeight: '150px'
                             }}
                           >
                             <div className="py-1">
