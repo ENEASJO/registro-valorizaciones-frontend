@@ -597,33 +597,32 @@ const ListaEntidades = ({
                   {/* Menú de acciones mejorado */}
                   <div className="relative">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const button = e.currentTarget;
-                        const rect = button.getBoundingClientRect();
-                        const scrollY = window.scrollY || window.pageYOffset;
-                        const menuWidth = 192; // w-48 = 192px
-                        const windowWidth = window.innerWidth;
+                      onClick={() => {
+                        console.log('Click en menú contextual para entidad:', entidad.id);
+                        alert(`Menú para ${entidad.nombre_completo}`);
 
-                        // Calcular posición izquierda, asegurando que no se salga de la pantalla
-                        let left = rect.right - menuWidth;
-                        if (left < 10) left = 10;
-                        if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
-
-                        // Toggle menú
+                        // Versión simple: abrir menú con posicionamiento básico
                         if (menuAbierto === entidad.id) {
                           setMenuAbierto(null);
                         } else {
-                          setMenuPositions({
-                            [entidad.id]: {
-                              top: rect.bottom + scrollY + 8,
-                              left: left
-                            }
-                          });
+                          // Posición simple respecto al viewport
+                          const event = window.event;
+                          const target = event?.target as HTMLElement;
+                          if (target) {
+                            const rect = target.getBoundingClientRect();
+                            setMenuPositions({
+                              [entidad.id]: {
+                                top: rect.bottom + 5,
+                                left: rect.left - 150
+                              }
+                            });
+                          }
                           setMenuAbierto(entidad.id);
                         }
                       }}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50"
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors bg-white border border-gray-200 shadow-sm"
+                      style={{ cursor: 'pointer' }}
+                      type="button"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
@@ -633,8 +632,8 @@ const ListaEntidades = ({
                         data-menu-id={entidad.id}
                         className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
                         style={{
-                          top: menuPositions[entidad.id]?.top || '0px',
-                          left: menuPositions[entidad.id]?.left || '0px'
+                          top: `${menuPositions[entidad.id]?.top || 100}px`,
+                          left: `${menuPositions[entidad.id]?.left || 100}px`,
                         }}
                       >
                         <div className="py-1">
