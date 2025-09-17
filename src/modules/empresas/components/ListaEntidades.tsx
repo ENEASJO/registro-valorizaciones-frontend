@@ -112,6 +112,17 @@ const ListaEntidades = ({
     };
   }, [menuAbierto]);
 
+  // Forzar que el componente siempre se re-renderice con el último código
+  const [forceRender, setForceRender] = useState(0);
+  useEffect(() => {
+    // Forzar re-render periódicamente para asegurar código actualizado
+    const interval = setInterval(() => {
+      setForceRender(prev => prev + 1);
+    }, 30000); // Cada 30 segundos
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Filtrar entidades localmente
   const entidadesFiltradas = useMemo(() => {
     return entidades.filter(entidad => {
@@ -217,7 +228,7 @@ const ListaEntidades = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" key={`lista-entidades-${forceRender}`}>
       {/* Barra de búsqueda y filtros */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="space-y-4">
@@ -659,6 +670,7 @@ const ListaEntidades = ({
               top: `${menuPositions[menuAbierto]?.top || 100}px`,
               left: `${menuPositions[menuAbierto]?.left || 100}px`,
             }}
+            key={`menu-${menuAbierto}-${Date.now()}`}
           >
             <div className="py-1">
               <button
