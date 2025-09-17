@@ -161,7 +161,7 @@ const ListaEntidades = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-200"
+            className="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-200"
           >
             {/* Header de la tarjeta */}
             <div className="p-6 pb-4">
@@ -170,11 +170,11 @@ const ListaEntidades = ({
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
                     <Building2 className="w-6 h-6 text-white" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" title={entidad.nombre_completo || entidad.datos_empresa?.razon_social || 'Sin nombre'}>
                       {entidad.nombre_completo || entidad.datos_empresa?.razon_social || 'Sin nombre'}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {entidad.ruc_principal || entidad.datos_empresa?.ruc || 'Sin RUC'}
                     </p>
                   </div>
@@ -273,7 +273,9 @@ const ListaEntidades = ({
                 {entidad.datos_empresa?.direccion && (
                   <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span className="line-clamp-2">{entidad.datos_empresa.direccion}</span>
+                    <span className="line-clamp-2 leading-relaxed" title={entidad.datos_empresa.direccion}>
+                      {entidad.datos_empresa.direccion}
+                    </span>
                   </div>
                 )}
               </div>
