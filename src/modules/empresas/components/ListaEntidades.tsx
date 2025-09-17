@@ -642,10 +642,12 @@ const ListaEntidades = ({
                         return (
                           <div
                             data-menu-id={entidad.id}
-                            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
+                            className="fixed w-48 bg-red-500 border-4 border-yellow-400 rounded-lg shadow-2xl z-[99999] overflow-hidden"
                             style={{
                               top: `${menuPositions[entidad.id]?.top || 100}px`,
                               left: `${menuPositions[entidad.id]?.left || 100}px`,
+                              minWidth: '200px',
+                              minHeight: '150px'
                             }}
                           >
                             <div className="py-1">
