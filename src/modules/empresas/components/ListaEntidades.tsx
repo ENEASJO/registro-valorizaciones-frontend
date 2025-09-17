@@ -111,8 +111,15 @@ const ListaEntidades = ({
           console.log('📋 Datos de entidad:', {
             id: entidad.id,
             nombre_completo: entidad.nombre_completo,
-            representante: entidad.datos_empresa?.representante_legal,
-            datos_empresa_completo: entidad.datos_empresa
+            representante_legal: entidad.datos_empresa?.representante_legal,
+            representantes: entidad.datos_empresa?.representantes,
+            dni_representante: entidad.datos_empresa?.dni_representante,
+            datos_empresa: {
+              ruc: entidad.datos_empresa?.ruc,
+              razon_social: entidad.datos_empresa?.razon_social,
+              email: entidad.datos_empresa?.email,
+              telefono: entidad.datos_empresa?.telefono
+            }
           });
 
           return (
@@ -197,7 +204,9 @@ const ListaEntidades = ({
               </div>
 
               {/* Representante Principal */}
-              {entidad.datos_empresa?.representante_legal && (
+              {(entidad.datos_empresa?.representante_legal ||
+                entidad.datos_empresa?.representantes?.[0]?.nombre ||
+                entidad.datos_empresa?.dni_representante) && (
                 <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
                   <div className="flex items-center gap-2 mb-1">
                     <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -206,7 +215,9 @@ const ListaEntidades = ({
                     </span>
                   </div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {entidad.datos_empresa.representante_legal}
+                    {entidad.datos_empresa.representante_legal ||
+                     entidad.datos_empresa?.representantes?.[0]?.nombre ||
+                     entidad.datos_empresa?.dni_representante}
                   </p>
                 </div>
               )}
