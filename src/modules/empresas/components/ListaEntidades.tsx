@@ -106,7 +106,16 @@ const ListaEntidades = ({
     <div className="space-y-6">
       {/* Contenido principal */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {entidadesFiltradas.map((entidad) => (
+        {entidadesFiltradas.map((entidad) => {
+          // Debug: Verificar estructura de datos
+          console.log('📋 Datos de entidad:', {
+            id: entidad.id,
+            nombre_completo: entidad.nombre_completo,
+            representante: entidad.datos_empresa?.representante_legal,
+            datos_empresa_completo: entidad.datos_empresa
+          });
+
+          return (
           <motion.div
             key={entidad.id}
             layout
@@ -245,7 +254,8 @@ const ListaEntidades = ({
               </div>
             </div>
           </motion.div>
-        ))}
+        );
+      })}
       </div>
 
       {/* Estado vacío */}
