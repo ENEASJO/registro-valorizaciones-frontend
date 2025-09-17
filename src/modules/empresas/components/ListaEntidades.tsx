@@ -598,12 +598,15 @@ const ListaEntidades = ({
                   <div className="relative">
                     <button
                       onClick={(e) => {
+                        console.log('Click en menú contextual', entidad.id);
                         e.stopPropagation();
 
                         // Toggle menú
                         if (menuAbierto === entidad.id) {
+                          console.log('Cerrando menú');
                           setMenuAbierto(null);
                         } else {
+                          console.log('Abriendo menú');
                           // Calcular posición del menú
                           const button = e.currentTarget;
                           const rect = button.getBoundingClientRect();
@@ -616,6 +619,7 @@ const ListaEntidades = ({
                           if (left < 10) left = 10;
                           if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
 
+                          console.log('Posición:', { top: rect.bottom + scrollY + 8, left });
                           setMenuPositions({
                             [entidad.id]: {
                               top: rect.bottom + scrollY + 8,
@@ -625,7 +629,8 @@ const ListaEntidades = ({
                           setMenuAbierto(entidad.id);
                         }
                       }}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50"
+                      className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50 bg-blue-50"
+                      style={{ cursor: 'pointer' }}
                       type="button"
                     >
                       <MoreVertical className="w-4 h-4" />
