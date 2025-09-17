@@ -596,16 +596,13 @@ const ListaEntidades = ({
                         e.stopPropagation();
                         const isCurrentlyOpen = menuAbierto === entidad.id;
 
-                        // Si está abierto, cerrarlo sin calcular posición
+                        // Si está abierto, cerrarlo
                         if (isCurrentlyOpen) {
                           setMenuAbierto(null);
                           return;
                         }
 
-                        // Cerrar cualquier otro menú abierto
-                        setMenuAbierto(entidad.id);
-
-                        // Guardar referencia al botón y calcular posición
+                        // Abrir menú y calcular posición
                         const button = e.currentTarget;
                         const rect = button.getBoundingClientRect();
                         const scrollY = window.scrollY || window.pageYOffset;
@@ -617,26 +614,31 @@ const ListaEntidades = ({
                         if (left < 10) left = 10;
                         if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
 
+                        // Establecer posición y abrir menú
                         setMenuPositions({
                           [entidad.id]: {
                             top: rect.bottom + scrollY + 8,
                             left: left
                           }
                         });
+
+                        // Pequeño delay para asegurar que la posición se actualice antes de renderizar
+                        setTimeout(() => {
+                          setMenuAbierto(entidad.id);
+                        }, 10);
                       }}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
 
-                    {menuAbierto === entidad.id && (
+                    {menuAbierto === entidad.id && menuPositions[entidad.id] && (
                       <div
                         data-menu-id={entidad.id}
                         className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
                         style={{
-                          top: menuPositions[entidad.id] ? `${menuPositions[entidad.id].top}px` : '0px',
-                          left: menuPositions[entidad.id] ? `${menuPositions[entidad.id].left}px` : '0px',
-                          visibility: menuPositions[entidad.id] ? 'visible' : 'hidden'
+                          top: `${menuPositions[entidad.id].top}px`,
+                          left: `${menuPositions[entidad.id].left}px`
                         }}
                       >
                         <div className="py-1">
