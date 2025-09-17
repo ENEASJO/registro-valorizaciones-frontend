@@ -73,55 +73,104 @@ const ListaEntidades = ({
   onEliminar
 }: ListaEntidadesProps) => {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
-  const [menuAbierto, setMenuAbierto] = useState<string | null>(null);
 
-  const [menuPositions, setMenuPositions] = useState<{ [key: string]: { top: number; left: number } }>({});
+  // Variable global para rastrear el menú abierto
+  let menuAbiertoGlobal: string | null = null;
 
-  // Función para cerrar todos los menús
-  const cerrarTodosLosMenus = () => {
-    setMenuAbierto(null);
-  };
+  // Función para crear menú con DOM directo
+  const crearMenuDirecto = (entidadId: string, x: number, y: number) => {
+    // Eliminar menú existente si hay
+    const menuExistente = document.getElementById('menu-contextual-global');
+    if (menuExistente) {
+      menuExistente.remove();
+    }
 
-  // Cerrar menú al hacer clic fuera o presionar Escape
-  useEffect(() => {
-    const handleInteraction = (event: MouseEvent | KeyboardEvent) => {
-      if (menuAbierto) {
-        // Cerrar con Escape
-        if (event instanceof KeyboardEvent && event.key === 'Escape') {
-          setMenuAbierto(null);
-          return;
-        }
+    // Crear menú nuevo
+    const menu = document.createElement('div');
+    menu.id = 'menu-contextual-global';
+    menu.className = 'fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999999] overflow-hidden';
+    menu.style.left = `${x}px`;
+    menu.style.top = `${y}px`;
 
-        // Cerrar al hacer clic fuera del menú
-        if (event instanceof MouseEvent) {
-          const menu = document.querySelector(`[data-menu-id="${menuAbierto}"]`);
-          const clickedOnMenuButton = (event.target as HTMLElement).closest('button')?.querySelector('.menu-contextual-button');
+    const entidad = entidadesFiltradas.find(e => e.id === entidadId);
+    if (!entidad) return;
 
-          if (menu && !menu.contains(event.target as Node) && !clickedOnMenuButton) {
-            setMenuAbierto(null);
-          }
-        }
+    menu.innerHTML = `
+      <div class="py-1">
+        <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors" onclick="verDetalleEntidad('${entidadId}')">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+          Ver detalles
+        </button>
+        ${onEditar ? `
+        <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors" onclick="editarEntidad('${entidadId}')">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Editar
+        </button>
+        ` : ''}
+        ${onEliminar ? `
+        <div class="border-t border-gray-100 my-1"></div>
+        <button class="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors" onclick="eliminarEntidad('${entidadId}')">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          Eliminar
+        </button>
+        ` : ''}
+      </div>
+    `;
+
+    document.body.appendChild(menu);
+    menuAbiertoGlobal = entidadId;
+
+    // Cerrar al hacer clic fuera
+    const cerrarMenu = (e: MouseEvent) => {
+      if (!menu.contains(e.target as Node)) {
+        menu.remove();
+        menuAbiertoGlobal = null;
+        document.removeEventListener('click', cerrarMenu);
       }
     };
 
-    document.addEventListener('mousedown', handleInteraction);
-    document.addEventListener('keydown', handleInteraction);
-    return () => {
-      document.removeEventListener('mousedown', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
-    };
-  }, [menuAbierto]);
+    setTimeout(() => {
+      document.addEventListener('click', cerrarMenu);
+    }, 100);
+  };
 
-  // Forzar que el componente siempre se re-renderice con el último código
-  const [forceRender, setForceRender] = useState(0);
-  useEffect(() => {
-    // Forzar re-render periódicamente para asegurar código actualizado
-    const interval = setInterval(() => {
-      setForceRender(prev => prev + 1);
-    }, 30000); // Cada 30 segundos
+  // Hacer funciones globales
+  (window as any).verDetalleEntidad = (entidadId: string) => {
+    const entidad = entidadesFiltradas.find(e => e.id === entidadId);
+    if (entidad) {
+      onVerDetalle(entidad);
+    }
+    const menu = document.getElementById('menu-contextual-global');
+    if (menu) menu.remove();
+    menuAbiertoGlobal = null;
+  };
 
-    return () => clearInterval(interval);
-  }, []);
+  (window as any).editarEntidad = (entidadId: string) => {
+    const entidad = entidadesFiltradas.find(e => e.id === entidadId);
+    if (entidad && onEditar) {
+      onEditar(entidad);
+    }
+    const menu = document.getElementById('menu-contextual-global');
+    if (menu) menu.remove();
+    menuAbiertoGlobal = null;
+  };
+
+  (window as any).eliminarEntidad = (entidadId: string) => {
+    const entidad = entidadesFiltradas.find(e => e.id === entidadId);
+    if (entidad && onEliminar) {
+      onEliminar(entidad);
+    }
+    const menu = document.getElementById('menu-contextual-global');
+    if (menu) menu.remove();
+    menuAbiertoGlobal = null;
+  };
 
   // Filtrar entidades localmente
   const entidadesFiltradas = useMemo(() => {
@@ -228,7 +277,7 @@ const ListaEntidades = ({
   }
 
   return (
-    <div className="space-y-6" key={`lista-entidades-${forceRender}`}>
+    <div className="space-y-6">
       {/* Barra de búsqueda y filtros */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="space-y-4">
@@ -609,43 +658,23 @@ const ListaEntidades = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
+                        e.preventDefault();
 
-                        // Toggle menú
-                        if (menuAbierto === entidad.id) {
-                          setMenuAbierto(null);
-                        } else {
-                          // Guardar referencia al botón y calcular posición ANTES de cualquier operación asíncrona
-                          const button = e.currentTarget;
-                          const rect = button.getBoundingClientRect();
-                          const scrollY = window.scrollY || window.pageYOffset;
-                          const menuWidth = 192; // w-48 = 192px
-                          const windowWidth = window.innerWidth;
+                        const button = e.currentTarget;
+                        const rect = button.getBoundingClientRect();
+                        const scrollY = window.scrollY || window.pageYOffset;
+                        const menuWidth = 192;
+                        const windowWidth = window.innerWidth;
 
-                          // Calcular posición izquierda, asegurando que no se salga de la pantalla
-                          let left = rect.right - menuWidth;
-                          if (left < 10) left = 10;
-                          if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+                        let left = rect.right - menuWidth;
+                        if (left < 10) left = 10;
+                        if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
 
-                          const finalPosition = {
-                            top: rect.bottom + scrollY + 8,
-                            left: left
-                          };
+                        const finalX = left;
+                        const finalY = rect.bottom + scrollY + 8;
 
-                          // Cerrar cualquier otro menú abierto primero
-                          setMenuAbierto(null);
-
-                          // Pequeño delay para asegurar que se cierre primero
-                          setTimeout(() => {
-                            setMenuPositions({
-                              [entidad.id]: finalPosition
-                            });
-
-                            // Abrir el menú después de establecer la posición
-                            setTimeout(() => {
-                              setMenuAbierto(entidad.id);
-                            }, 10);
-                          }, 10);
-                        }
+                        // Usar DOM directo en lugar de estado React
+                        crearMenuDirecto(entidad.id, finalX, finalY);
                       }}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50 bg-blue-50"
                       style={{ cursor: 'pointer' }}
@@ -661,67 +690,7 @@ const ListaEntidades = ({
           ))}
         </div>
 
-        {/* Menú contextual único */}
-        {menuAbierto && (
-          <div
-            data-menu-id={menuAbierto}
-            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[99999] overflow-hidden"
-            style={{
-              top: `${menuPositions[menuAbierto]?.top || 100}px`,
-              left: `${menuPositions[menuAbierto]?.left || 100}px`,
-            }}
-            key={`menu-${menuAbierto}-${Date.now()}`}
-          >
-            <div className="py-1">
-              <button
-                onClick={() => {
-                  const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
-                  if (entidad) {
-                    onVerDetalle(entidad);
-                    setMenuAbierto(null);
-                  }
-                }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors"
-              >
-                <Eye className="w-4 h-4" />
-                Ver detalles
-              </button>
-              {onEditar && (
-                <button
-                  onClick={() => {
-                    const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
-                    if (entidad) {
-                      onEditar(entidad);
-                      setMenuAbierto(null);
-                    }
-                  }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
-                >
-                  <Edit className="w-4 h-4" />
-                  Editar
-                </button>
-              )}
-              {onEliminar && (
-                <>
-                  <div className="border-t border-gray-100 my-1"></div>
-                  <button
-                    onClick={() => {
-                      const entidad = entidadesFiltradas.find(e => e.id === menuAbierto);
-                      if (entidad) {
-                        onEliminar(entidad);
-                        setMenuAbierto(null);
-                      }
-                    }}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <Trash className="w-4 h-4" />
-                    Eliminar
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        {/* El menú se maneja con DOM directo */}
       </>
       )}
     </div>
