@@ -636,16 +636,19 @@ const ListaEntidades = ({
                       <MoreVertical className="w-4 h-4" />
                     </button>
 
-                    {menuAbierto === entidad.id && (
-                      <div
-                        data-menu-id={entidad.id}
-                        className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
-                        style={{
-                          top: `${menuPositions[entidad.id]?.top || 100}px`,
-                          left: `${menuPositions[entidad.id]?.left || 100}px`,
-                        }}
-                      >
-                        <div className="py-1">
+                    {(() => {
+                      console.log('Renderizando menú:', entidad.id, 'menuAbierto:', menuAbierto, 'posición:', menuPositions[entidad.id]);
+                      if (menuAbierto === entidad.id) {
+                        return (
+                          <div
+                            data-menu-id={entidad.id}
+                            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
+                            style={{
+                              top: `${menuPositions[entidad.id]?.top || 100}px`,
+                              left: `${menuPositions[entidad.id]?.left || 100}px`,
+                            }}
+                          >
+                            <div className="py-1">
                           <button
                             onClick={() => {
                               onVerDetalle(entidad);
@@ -683,9 +686,12 @@ const ListaEntidades = ({
                               </button>
                             </>
                           )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    }
+                    return null;
+                  })()}
                   </div>
                 </div>
               </div>
