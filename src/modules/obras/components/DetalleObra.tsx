@@ -166,7 +166,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
               )}
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -333,7 +333,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Detalles de la Obra</h3>
                         <div className="space-y-4">
                           <div className="flex items-start gap-3">
-                            <Target className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <Target className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                             <div>
                               <p className="font-medium text-gray-900">Tipo de Obra</p>
                               <p className="text-gray-600">
@@ -343,7 +343,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                           </div>
                           
                           <div className="flex items-start gap-3">
-                            <Briefcase className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <Briefcase className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                             <div>
                               <p className="font-medium text-gray-900">Modalidad de Ejecución</p>
                               <p className="text-gray-600">{obra.modalidad_ejecucion || 'No especificado'}</p>
@@ -351,7 +351,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                           </div>
                           
                           <div className="flex items-start gap-3">
-                            <Calculator className="w-5 h-5 text-gray-400 mt-0.5" />
+                            <Calculator className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                             <div>
                               <p className="font-medium text-gray-900">Sistema de Contratación</p>
                               <p className="text-gray-600">{obra.sistema_contratacion || 'No especificado'}</p>
@@ -365,7 +365,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                         <div className="space-y-3">
                           {obra.ubicacion && (
                             <div className="flex items-start gap-3">
-                              <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                              <MapPin className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                               <div>
                                 <p className="font-medium text-gray-900">Ubicación Específica</p>
                                 <p className="text-gray-600">{obra.ubicacion}</p>
@@ -659,35 +659,35 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                               <span className="text-lg font-bold text-primary-600">
                                 {profesional.porcentaje_participacion}%
                               </span>
-                              <p className="text-xs text-gray-500">Participación</p>
+                              <p className="text-xs text-gray-500 dark:text-gray-300">Participación</p>
                             </div>
                           </div>
 
                           <div className="space-y-3 text-sm">
                             {profesional.numero_colegiatura && (
                               <div className="flex items-center gap-2">
-                                <Award className="w-4 h-4 text-gray-400" />
+                                <Award className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                                 <span className="text-gray-600">Colegiatura: {profesional.numero_colegiatura}</span>
                               </div>
                             )}
                             
                             {profesional.dni && (
                               <div className="flex items-center gap-2">
-                                <User className="w-4 h-4 text-gray-400" />
+                                <User className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                                 <span className="text-gray-600">DNI: {profesional.dni}</span>
                               </div>
                             )}
 
                             {profesional.telefono && (
                               <div className="flex items-center gap-2">
-                                <Phone className="w-4 h-4 text-gray-400" />
+                                <Phone className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                                 <span className="text-gray-600">{profesional.telefono}</span>
                               </div>
                             )}
 
                             {profesional.email && (
                               <div className="flex items-center gap-2">
-                                <Mail className="w-4 h-4 text-gray-400" />
+                                <Mail className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                                 <span className="text-gray-600">{profesional.email}</span>
                               </div>
                             )}
@@ -705,7 +705,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                           </div>
 
                           <div className="mt-4 pt-3 border-t border-gray-200">
-                            <div className="flex justify-between text-xs text-gray-500">
+                            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-300">
                               <span>Desde: {new Date(profesional.fecha_inicio_participacion).toLocaleDateString('es-PE')}</span>
                               <span className={`px-2 py-1 rounded-full ${
                                 profesional.estado === 'ACTIVO' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'

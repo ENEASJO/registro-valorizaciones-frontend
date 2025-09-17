@@ -74,7 +74,7 @@ const AlertPanel: React.FC<AlertPanelProps> = ({
         return {
           bg: 'bg-gray-50',
           border: 'border-gray-200',
-          icon: 'text-gray-500',
+          icon: 'text-gray-500 dark:text-gray-300',
           title: 'text-gray-800',
           message: 'text-gray-700',
           pulse: 'bg-gray-400'
@@ -229,7 +229,7 @@ const AlertPanel: React.FC<AlertPanelProps> = ({
                     </motion.p>
 
                     {/* Timestamp */}
-                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-300">
                       <Clock className="w-3 h-3" />
                       <span>{formatTimeAgo(alert.timestamp)}</span>
                     </div>
@@ -246,7 +246,7 @@ const AlertPanel: React.FC<AlertPanelProps> = ({
                         e.stopPropagation();
                         onDismiss(alert.id);
                       }}
-                      className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-white/50 transition-colors"
+                      className="flex-shrink-0 p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 rounded-full hover:bg-white/50 dark:hover:bg-gray-800/50 transition-colors"
                     >
                       <X className="w-4 h-4" />
                     </motion.button>
@@ -284,8 +284,8 @@ const AlertPanel: React.FC<AlertPanelProps> = ({
           >
             <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           </motion.div>
-          <p className="text-gray-500">No hay alertas pendientes</p>
-          <p className="text-sm text-gray-400 mt-1">¡Todo está funcionando correctamente!</p>
+          <p className="text-gray-500 dark:text-gray-300">No hay alertas pendientes</p>
+          <p className="text-sm text-gray-400 dark:text-gray-300 mt-1">¡Todo está funcionando correctamente!</p>
         </motion.div>
       )}
 
@@ -312,7 +312,7 @@ const AlertPanel: React.FC<AlertPanelProps> = ({
             </span>
           </div>
           
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-gray-500 dark:text-gray-300">
             {unreadCount} sin leer
           </div>
         </motion.div>

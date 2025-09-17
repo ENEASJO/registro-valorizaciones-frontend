@@ -84,7 +84,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
       case 'PRESENTADA':
         return <Clock className="w-5 h-5 text-yellow-500" />;
       case 'BORRADOR':
-        return <Edit className="w-5 h-5 text-gray-500" />;
+        return <Edit className="w-5 h-5 text-gray-500 dark:text-gray-300" />;
       case 'OBSERVADA':
         return <AlertTriangle className="w-5 h-5 text-orange-500" />;
       case 'PAGADA':
@@ -92,7 +92,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
       case 'RECHAZADA':
         return <Archive className="w-5 h-5 text-red-500" />;
       default:
-        return <Clock className="w-5 h-5 text-gray-500" />;
+        return <Clock className="w-5 h-5 text-gray-500 dark:text-gray-300" />;
     }
   };
   // Función para obtener color de estado
@@ -247,7 +247,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'general'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             Información General
@@ -258,7 +258,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'partidas'
                   ? 'border-primary-500 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
               }`}
             >
               Partidas Valorizadas
@@ -269,7 +269,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'historial'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             Historial
@@ -279,7 +279,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'documentos'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             Documentos
@@ -294,7 +294,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             {/* Datos de la obra */}
             <div className="card">
               <div className="flex items-center gap-2 mb-4">
-                <Building className="w-5 h-5 text-gray-500" />
+                <Building className="w-5 h-5 text-gray-500 dark:text-gray-300" />
                 <h2 className="text-xl font-semibold text-gray-900">Información de la Obra</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -336,7 +336,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             {/* Datos del periodo */}
             <div className="card">
               <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-5 h-5 text-gray-500" />
+                <Calendar className="w-5 h-5 text-gray-500 dark:text-gray-300" />
                 <h2 className="text-xl font-semibold text-gray-900">Periodo de Valorización</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -376,7 +376,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             {/* Personal responsable */}
             <div className="card">
               <div className="flex items-center gap-2 mb-4">
-                <User className="w-5 h-5 text-gray-500" />
+                <User className="w-5 h-5 text-gray-500 dark:text-gray-300" />
                 <h2 className="text-xl font-semibold text-gray-900">Personal Responsable</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -415,7 +415,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             {/* Observaciones */}
             <div className="card">
               <div className="flex items-center gap-2 mb-4">
-                <MessageSquare className="w-5 h-5 text-gray-500" />
+                <MessageSquare className="w-5 h-5 text-gray-500 dark:text-gray-300" />
                 <h2 className="text-xl font-semibold text-gray-900">Observaciones</h2>
               </div>
               <div className="space-y-4">
@@ -485,7 +485,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                 )}
                 {!('observaciones_residente' in valorizacion) && 
                  !('observaciones_periodo' in valorizacion) && (
-                  <p className="text-sm text-gray-500 italic">No hay observaciones registradas</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-300 italic">No hay observaciones registradas</p>
                 )}
               </div>
             </div>
@@ -495,7 +495,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             {/* Montos principales */}
             <div className="card">
               <div className="flex items-center gap-2 mb-4">
-                <Calculator className="w-5 h-5 text-gray-500" />
+                <Calculator className="w-5 h-5 text-gray-500 dark:text-gray-300" />
                 <h3 className="text-lg font-semibold text-gray-900">Resumen Económico</h3>
               </div>
               <div className="space-y-3">
@@ -590,7 +590,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             {/* Fechas importantes */}
             <div className="card">
               <div className="flex items-center gap-2 mb-4">
-                <GitBranch className="w-5 h-5 text-gray-500" />
+                <GitBranch className="w-5 h-5 text-gray-500 dark:text-gray-300" />
                 <h3 className="text-lg font-semibold text-gray-900">GitBranch del Proceso</h3>
               </div>
               <div className="space-y-3">
@@ -644,7 +644,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             {tipo === 'ejecucion' && 'porcentaje_avance_fisico_total' in valorizacion && (
               <div className="card">
                 <div className="flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-5 h-5 text-gray-500" />
+                  <TrendingUp className="w-5 h-5 text-gray-500 dark:text-gray-300" />
                   <h3 className="text-lg font-semibold text-gray-900">Avance de Obra</h3>
                 </div>
                 <div className="space-y-4">
@@ -669,7 +669,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
                         {formatearMoneda(Number(valorizacion.monto_avance_economico_total || 0))}
                       </span>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-300">
                       de {formatearMoneda(obra.monto_ejecucion)} contractuales
                     </div>
                   </div>
@@ -683,7 +683,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
       {activeTab === 'partidas' && tipo === 'ejecucion' && (
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
-            <FileText className="w-5 h-5 text-gray-500" />
+            <FileText className="w-5 h-5 text-gray-500 dark:text-gray-300" />
             <h2 className="text-xl font-semibold text-gray-900">Partidas Valorizadas</h2>
           </div>
           <TablaPartidas
@@ -703,7 +703,7 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
             <GitBranch className="w-5 h-5 text-gray-500" />
             <h2 className="text-xl font-semibold text-gray-900">Historial de Cambios</h2>
           </div>
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-300">
             <GitBranch className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p>Historial de cambios no implementado aún</p>
           </div>
@@ -713,10 +713,10 @@ const DetalleValorizacion = ({ valorizacionId, tipo, onBack }: Props) => {
       {activeTab === 'documentos' && (
         <div className="card">
           <div className="flex items-center gap-2 mb-4">
-            <Paperclip className="w-5 h-5 text-gray-500" />
+            <Paperclip className="w-5 h-5 text-gray-500 dark:text-gray-300" />
             <h2 className="text-xl font-semibold text-gray-900">Documentos Adjuntos</h2>
           </div>
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-300">
             <Paperclip className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p>Gestión de documentos no implementada aún</p>
           </div>

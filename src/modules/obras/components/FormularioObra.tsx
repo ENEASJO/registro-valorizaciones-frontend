@@ -339,7 +339,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -432,7 +432,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                     {formData.errors.numero_contrato && (
                       <p className="text-sm text-red-600 mt-1">{formData.errors.numero_contrato}</p>
                     )}
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                       Formato: {CONFIG_NUMERO_CONTRATO.formato}
                     </p>
                   </div>
@@ -515,7 +515,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                     {formData.errors.fecha_contrato && (
                       <p className="text-sm text-red-600 mt-1">{formData.errors.fecha_contrato}</p>
                     )}
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                       Determina automáticamente la ley aplicable
                     </p>
                   </div>
@@ -533,7 +533,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Ley Aplicable
-                        <HelpCircle className="w-4 h-4 inline ml-1 text-gray-400" />
+                        <HelpCircle className="w-4 h-4 inline ml-1 text-gray-400 dark:text-gray-300" />
                       </label>
                       <div className={`input-field bg-gray-50 border-dashed ${
                         formData.ley_aplicable === 'LEY_32069' 
@@ -567,7 +567,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       <select
                         value={formData.procedimiento_seleccion || ''}
                         onChange={(e) => actualizarCampo('procedimiento_seleccion', e.target.value as ProcedimientoSeleccion)}
-                        className={`input-field ${!formData.ley_aplicable ? 'bg-gray-50 text-gray-400' : ''}`}
+                        className={`input-field ${!formData.ley_aplicable ? 'bg-gray-50 text-gray-400 dark:bg-gray-800 dark:text-gray-300' : ''}`}
                         disabled={!formData.ley_aplicable}
                       >
                         <option value="">
@@ -581,7 +581,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                         ))}
                       </select>
                       {formData.ley_aplicable && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                           Procedimientos disponibles según {LEYES_CONTRATACION[formData.ley_aplicable]}
                         </p>
                       )}
@@ -787,7 +787,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                         Monto de Ejecución (S/) *
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">
                           S/
                         </span>
                         <input
@@ -812,7 +812,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       </label>
                       <div className="flex gap-2">
                         <div className="relative flex-1">
-                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">
                             S/
                           </span>
                           <input
@@ -903,7 +903,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                         <p className="text-sm text-red-600 mt-1">{formData.errors.fecha_inicio}</p>
                       )}
                       {formData.fecha_contrato && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                           No puede ser anterior a la fecha del contrato
                         </p>
                       )}
@@ -923,7 +923,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                           className={`input-field pr-12 ${formData.errors.plazo_ejecucion_dias ? 'border-red-300' : ''}`}
                           placeholder="180"
                         />
-                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-300">
                           días
                         </span>
                       </div>
@@ -947,7 +947,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       {formData.errors.fecha_termino && (
                         <p className="text-sm text-red-600 mt-1">{formData.errors.fecha_termino}</p>
                       )}
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                         Fecha planificada de término de la obra (opcional)
                       </p>
                     </div>

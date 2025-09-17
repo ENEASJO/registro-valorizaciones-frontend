@@ -94,7 +94,7 @@ const Valorizaciones = () => {
       case 'PRESENTADA':
         return <Clock className="w-5 h-5 text-yellow-500" />;
       case 'BORRADOR':
-        return <Edit3 className="w-5 h-5 text-gray-500" />;
+        return <Edit3 className="w-5 h-5 text-gray-500 dark:text-gray-300" />;
       case 'OBSERVADA':
         return <AlertCircle className="w-5 h-5 text-orange-500" />;
       case 'PAGADA':
@@ -102,7 +102,7 @@ const Valorizaciones = () => {
       case 'RECHAZADA':
         return <Archive className="w-5 h-5 text-red-500" />;
       default:
-        return <Clock className="w-5 h-5 text-gray-500" />;
+        return <Clock className="w-5 h-5 text-gray-500 dark:text-gray-300" />;
     }
   };
   // Función para obtener color de estado
@@ -200,7 +200,7 @@ const Valorizaciones = () => {
             className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               tabActivo === 'ejecucion'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -213,7 +213,7 @@ const Valorizaciones = () => {
             className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
               tabActivo === 'supervision'
                 ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-600'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -277,7 +277,7 @@ const Valorizaciones = () => {
           {/* Filtros principales */}
           <div className="flex gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Buscar por número, obra o empresa..."
@@ -388,7 +388,7 @@ const Valorizaciones = () => {
           </div>
         ) : valorizacionesActuales.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <FileText className="w-12 h-12 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
             <p className="text-gray-600">No hay valorizaciones para mostrar</p>
           </div>
         ) : (
@@ -396,25 +396,25 @@ const Valorizaciones = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Número / Código
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Obra / Empresa
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Periodo
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Monto
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Avance
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Estado
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
@@ -436,7 +436,7 @@ const Valorizaciones = () => {
                           <div className="text-sm font-medium text-gray-900">
                             N° {val.numero_valorizacion}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-300">
                             {'codigo_valorización' in val ? String(val.codigo_valorización) : `SUP-${val.numero_valorizacion}`}
                           </div>
                         </div>
@@ -446,7 +446,7 @@ const Valorizaciones = () => {
                       <div className="text-sm font-medium text-gray-900 max-w-xs truncate">
                         {getNombreObra(String(val.obra_id))}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-300">
                         {getNombreEjecutora(String(val.obra_id))}
                       </div>
                     </td>
@@ -455,7 +455,7 @@ const Valorizaciones = () => {
                         {new Date(val.periodo_inicio).toLocaleDateString('es-PE')} - {' '}
                         {new Date(val.periodo_fin).toLocaleDateString('es-PE')}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-300">
                         {('dias_periodo' in val ? String(val.dias_periodo) : 'dias_calendario_periodo' in val ? String(val.dias_calendario_periodo) : '0')} días
                       </div>
                     </td>
@@ -463,7 +463,7 @@ const Valorizaciones = () => {
                       <div className="text-sm font-semibold text-gray-900">
                         {formatearMoneda(val.monto_bruto)}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-300">
                         Neto: {formatearMoneda(val.monto_neto)}
                       </div>
                     </td>

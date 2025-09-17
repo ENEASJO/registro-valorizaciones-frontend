@@ -174,7 +174,7 @@ const ListaEntidades = ({
                     <h3 className="font-semibold text-gray-900 dark:text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" title={entidad.nombre_completo || entidad.datos_empresa?.razon_social || 'Sin nombre'}>
                       {entidad.nombre_completo || entidad.datos_empresa?.razon_social || 'Sin nombre'}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-sm text-gray-500 dark:text-gray-300 truncate">
                       {entidad.ruc_principal || entidad.datos_empresa?.ruc || 'Sin RUC'}
                     </p>
                   </div>
@@ -186,7 +186,7 @@ const ListaEntidades = ({
                       e.stopPropagation();
                       setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id);
                     }}
-                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-200"
                     aria-label="Más opciones"
                   >
                     <MoreVertical className="w-4 h-4" />
@@ -199,7 +199,7 @@ const ListaEntidades = ({
                         onVerDetalle(entidad);
                         setMenuAbierto(null);
                       }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400 transition-colors rounded-t-lg"
+                      className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-400 transition-colors rounded-t-lg"
                     >
                       <Eye className="w-4 h-4" />
                       Ver detalles
@@ -210,7 +210,7 @@ const ListaEntidades = ({
                           onEditar(entidad);
                           setMenuAbierto(null);
                         }}
-                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-700 dark:hover:text-green-400 transition-colors"
+                        className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-700 dark:hover:text-green-400 transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                         Editar
@@ -257,21 +257,21 @@ const ListaEntidades = ({
               {/* Información de contacto */}
               <div className="space-y-3">
                 {entidad.datos_empresa?.telefono && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-200">
                     <Phone className="w-4 h-4" />
                     <span>{entidad.datos_empresa.telefono}</span>
                   </div>
                 )}
 
                 {entidad.datos_empresa?.email && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-200">
                     <Mail className="w-4 h-4" />
                     <span className="truncate">{entidad.datos_empresa.email}</span>
                   </div>
                 )}
 
                 {entidad.datos_empresa?.direccion && (
-                  <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-200">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
                     <span className="line-clamp-2 leading-relaxed" title={entidad.datos_empresa.direccion}>
                       {entidad.datos_empresa.direccion}
@@ -288,7 +288,7 @@ const ListaEntidades = ({
                   entidad.estado === 'ACTIVO'
                     ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                     : entidad.estado === 'INACTIVO'
-                    ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                    ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                     : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                 }`}>
                   {entidad.estado === 'ACTIVO' && <CheckCircle className="w-3 h-3 mr-1" />}
@@ -307,7 +307,7 @@ const ListaEntidades = ({
       {entidadesFiltradas.length === 0 && !loading && (
         <div className="text-center py-12">
           <Building2 className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400">No se encontraron entidades</p>
+          <p className="text-gray-500 dark:text-gray-300">No se encontraron entidades</p>
         </div>
       )}
     </div>

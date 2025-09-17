@@ -76,7 +76,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ metric, index, onClick }) => {
   const getChangeColor = () => {
     if (metric.changeType === 'increase') return 'text-green-600';
     if (metric.changeType === 'decrease') return 'text-red-600';
-    return 'text-gray-500';
+    return 'text-gray-500 dark:text-gray-300';
   };
 
   const ChangeIcon = getChangeIcon();
@@ -185,7 +185,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ metric, index, onClick }) => {
 
         {/* Información de cambio */}
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500">vs. período anterior</span>
+          <span className="text-gray-500 dark:text-gray-300">vs. período anterior</span>
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

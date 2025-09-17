@@ -93,7 +93,7 @@ const Layout = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white">Valorizaciones</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Sistema de Gestión</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300">Sistema de Gestión</p>
               </div>
             </div>
             <button
@@ -123,7 +123,7 @@ const Layout = () => {
                         w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200
                         ${isSubmenuActive(item)
                           ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium shadow-sm'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
                         }
                       `}
                     >
@@ -166,7 +166,7 @@ const Layout = () => {
                                       : subitem.href.includes('/supervision')
                                       ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-medium'
                                       : 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                                    : 'text-gray-600 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                                   }
                                 `}
                               >
@@ -199,7 +199,7 @@ const Layout = () => {
                       flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200
                       ${isActive(item.href)
                         ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 font-medium shadow-sm'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
                       }
                     `}
                   >
@@ -225,7 +225,7 @@ const Layout = () => {
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">Admin Usuario</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">admin@empresa.com</p>
+                <p className="text-xs text-gray-500 dark:text-gray-300">admin@empresa.com</p>
               </div>
             </div>
           </div>
@@ -263,8 +263,8 @@ const Layout = () => {
                   <div className="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Admin</span>
-                  <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Admin</span>
+                  <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                 </button>
 
                 {userMenuOpen && (
@@ -273,11 +273,11 @@ const Layout = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1"
                   >
-                    <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                       <User className="w-4 h-4" />
                       Mi Perfil
                     </button>
-                    <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <button className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                       <Settings className="w-4 h-4" />
                       Configuración
                     </button>

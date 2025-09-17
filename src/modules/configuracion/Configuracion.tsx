@@ -161,11 +161,11 @@ const Configuracion = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Último Acceso</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Usuario</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Rol</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Estado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Último Acceso</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -178,7 +178,7 @@ const Configuracion = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-gray-900">{usuario.nombre}</div>
-                            <div className="text-sm text-gray-500">{usuario.email}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-300">{usuario.email}</div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -195,7 +195,7 @@ const Configuracion = () => {
                             {usuario.estado}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                           {usuario.ultimo}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -385,7 +385,7 @@ const Configuracion = () => {
                       <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                           <p className="text-sm font-medium text-gray-900">{respaldo.fecha}</p>
-                          <p className="text-xs text-gray-500">{respaldo.tamaño}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-300">{respaldo.tamaño}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">

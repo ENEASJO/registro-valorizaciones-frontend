@@ -179,7 +179,7 @@ const TablaPartidas = ({
       {/* Filtros */}
       <div className="flex gap-4 items-center">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
           <input
             type="text"
             placeholder="Buscar por código o descripción..."
@@ -240,10 +240,10 @@ const TablaPartidas = ({
         <table className="min-w-full divide-y divide-gray-200 text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Código / Descripción
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Unidad
               </th>
               <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -418,7 +418,7 @@ const TablaPartidas = ({
         </table>
       </div>
       {partidasFiltradas.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-500 dark:text-gray-300">
           <Search className="w-12 h-12 mx-auto mb-2 opacity-50" />
           <p>No se encontraron partidas con los filtros aplicados</p>
         </div>

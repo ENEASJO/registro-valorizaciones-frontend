@@ -289,7 +289,7 @@ const Obras = () => {
         <div className="flex flex-col lg:flex-row gap-4 mb-6">
           {/* Búsqueda */}
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
             <input
               type="text"
               placeholder="Buscar por número de contrato, nombre o ubicación..."
@@ -430,7 +430,7 @@ const Obras = () => {
                           {obra.nombre}
                         </h3>
                         {obra.codigo_interno && (
-                          <p className="text-sm text-gray-500 mt-1">{obra.codigo_interno}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">{obra.codigo_interno}</p>
                         )}
                       </div>
                       <span className={`px-3 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${estadoConfig.color}`}>
@@ -441,19 +441,19 @@ const Obras = () => {
 
                     <div className="space-y-3 mb-4">
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Building2 className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <Building2 className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                         <span className="truncate">Ejecutora: {getNombreEntidad(obra.entidad_ejecutora_id)}</span>
                       </div>
                       
                       {obra.ubicacion && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                           <span className="truncate">{obra.ubicacion}</span>
                         </div>
                       )}
 
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                         <span>
                           {new Date(obra.fecha_inicio).toLocaleDateString('es-PE')} - {' '}
                           {new Date(obra.fecha_fin_prevista).toLocaleDateString('es-PE')}
@@ -461,7 +461,7 @@ const Obras = () => {
                       </div>
 
                       <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <DollarSign className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <DollarSign className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                         <span className="font-medium">
                           S/ {obra.monto_total.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                         </span>
@@ -469,11 +469,11 @@ const Obras = () => {
 
                       <div className="flex items-center justify-between text-sm text-gray-600">
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-gray-400" />
+                          <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                           <span>{obra.plazo_ejecucion_dias} días</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <BarChart className="w-4 h-4 text-gray-400" />
+                          <BarChart className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                           <span>{obra.numero_valorizaciones} valorizaciones</span>
                         </div>
                       </div>
