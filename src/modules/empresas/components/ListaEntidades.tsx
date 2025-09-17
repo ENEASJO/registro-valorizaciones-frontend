@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Building2,
@@ -74,6 +74,47 @@ const ListaEntidades = ({
 }: ListaEntidadesProps) => {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState<string | null>(null);
+
+  // Refs para los menús contextuales
+  const menuRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+  const [menuPositions, setMenuPositions] = useState<{ [key: string]: { top: number; left: number } }>({});
+
+  // Actualizar posiciones de los menús
+  useEffect(() => {
+    if (menuAbierto) {
+      const button = menuRefs.current[menuAbierto];
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        const scrollY = window.scrollY || window.pageYOffset;
+        const menuWidth = 192; // w-48 = 192px
+        const windowWidth = window.innerWidth;
+
+        // Calcular posición izquierda, asegurando que no se salga de la pantalla
+        let left = rect.right - menuWidth;
+        if (left < 10) left = 10; // Mínimo margen izquierdo
+        if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10; // Máximo margen derecho
+
+        setMenuPositions({
+          [menuAbierto]: {
+            top: rect.bottom + scrollY + 8,
+            left: left
+          }
+        });
+      }
+    }
+  }, [menuAbierto]);
+
+  // Cerrar menú al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuAbierto && !menuRefs.current[menuAbierto]?.contains(event.target as Node)) {
+        setMenuAbierto(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuAbierto]);
 
   // Filtrar entidades localmente
   const entidadesFiltradas = useMemo(() => {
@@ -558,14 +599,21 @@ const ListaEntidades = ({
                   {/* Menú de acciones mejorado */}
                   <div className="relative">
                     <button
+                      ref={(el) => menuRefs.current[entidad.id] = el}
                       onClick={() => setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id)}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </button>
 
-                    {menuAbierto === entidad.id && (
-                      <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 overflow-hidden">
+                    {menuAbierto === entidad.id && menuPositions[entidad.id] && (
+                      <div
+                        className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-[9999] overflow-hidden"
+                        style={{
+                          top: `${menuPositions[entidad.id].top}px`,
+                          left: `${menuPositions[entidad.id].left}px`
+                        }}
+                      >
                         <div className="py-1">
                           <button
                             onClick={() => {
