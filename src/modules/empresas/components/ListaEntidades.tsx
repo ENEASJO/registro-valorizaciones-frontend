@@ -594,28 +594,35 @@ const ListaEntidades = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setMenuAbierto(menuAbierto === entidad.id ? null : entidad.id);
+                        const isCurrentlyOpen = menuAbierto === entidad.id;
 
-                        // Calcular posición inmediatamente
-                        setTimeout(() => {
-                          const button = e.currentTarget;
-                          const rect = button.getBoundingClientRect();
-                          const scrollY = window.scrollY || window.pageYOffset;
-                          const menuWidth = 192; // w-48 = 192px
-                          const windowWidth = window.innerWidth;
+                        // Si está abierto, cerrarlo sin calcular posición
+                        if (isCurrentlyOpen) {
+                          setMenuAbierto(null);
+                          return;
+                        }
 
-                          // Calcular posición izquierda, asegurando que no se salga de la pantalla
-                          let left = rect.right - menuWidth;
-                          if (left < 10) left = 10;
-                          if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+                        // Cerrar cualquier otro menú abierto
+                        setMenuAbierto(entidad.id);
 
-                          setMenuPositions({
-                            [entidad.id]: {
-                              top: rect.bottom + scrollY + 8,
-                              left: left
-                            }
-                          });
-                        }, 0);
+                        // Guardar referencia al botón y calcular posición
+                        const button = e.currentTarget;
+                        const rect = button.getBoundingClientRect();
+                        const scrollY = window.scrollY || window.pageYOffset;
+                        const menuWidth = 192; // w-48 = 192px
+                        const windowWidth = window.innerWidth;
+
+                        // Calcular posición izquierda, asegurando que no se salga de la pantalla
+                        let left = rect.right - menuWidth;
+                        if (left < 10) left = 10;
+                        if (left + menuWidth > windowWidth - 10) left = windowWidth - menuWidth - 10;
+
+                        setMenuPositions({
+                          [entidad.id]: {
+                            top: rect.bottom + scrollY + 8,
+                            left: left
+                          }
+                        });
                       }}
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors group-hover:bg-gray-50"
                     >
