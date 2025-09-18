@@ -189,7 +189,12 @@ const realizarPeticionHTTP = async (
 };
 
 // Hook principal para gestión de obras
-export const useObras = () => {
+interface UseObrasOptions {
+  autoLoad?: boolean;
+}
+
+export const useObras = (options: UseObrasOptions = {}) => {
+  const { autoLoad = true } = options;
   const [obras, setObras] = useState<Obra[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -470,8 +475,11 @@ export const useObras = () => {
   }, []);
 
   useEffect(() => {
+    if (!autoLoad) {
+      return;
+    }
     cargarObras();
-  }, [cargarObras]);
+  }, [autoLoad, cargarObras]);
 
   return {
     obras,

@@ -138,7 +138,12 @@ const mapearEmpresaFromAPI = (apiEmpresa: EmpresaNeonResponse): Empresa => ({
   updated_at: apiEmpresa.updated_at
 });
 
-export const useEmpresas = () => {
+interface UseEmpresasOptions {
+  autoLoad?: boolean;
+}
+
+export const useEmpresas = (options: UseEmpresasOptions = {}) => {
+  const { autoLoad = true } = options;
   const [empresas, setEmpresas] = useState<EntidadContratistaDetalle[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -535,9 +540,12 @@ export const useEmpresas = () => {
   }, []);
 
   useEffect(() => {
-    // Cargar empresas al montar el componente
+    if (!autoLoad) {
+      return;
+    }
+    // Cargar empresas al montar el componente cuando está habilitado
     cargarEmpresas();
-  }, []);
+  }, [autoLoad, cargarEmpresas]);
 
   return {
     empresas,

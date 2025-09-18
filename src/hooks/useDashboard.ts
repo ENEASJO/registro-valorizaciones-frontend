@@ -63,8 +63,8 @@ const useDashboard = () => {
   const [currentPeriod, setCurrentPeriod] = useState<'today' | 'week' | 'month' | 'year'>('month');
   
   // Usar hooks de datos reales
-  const { obtenerEstadisticas } = useEmpresas();
-  const { obras, obtenerObras, estadisticasObras } = useObras();
+  const { obtenerEstadisticas } = useEmpresas({ autoLoad: false });
+  const { obras, obtenerObras, estadisticasObras } = useObras({ autoLoad: false });
   const { valorizaciones, obtenerValorizaciones, obtenerEstadisticasValorizaciones } = useValorizaciones();
   
   // Estado para métricas calculadas
@@ -154,15 +154,15 @@ const useDashboard = () => {
       try {
         setLoading(true);
         
-        // Cargar datos en paralelo
-        await Promise.all([
+        // Cargar datos en paralelo y obtener estadísticas en la misma pasada
+        const [, , statsEmpresas] = await Promise.all([
           obtenerObras(),
           obtenerValorizaciones(),
+          obtenerEstadisticas(),
         ]);
         
-        // Obtener estadísticas
-        const statsEmpresas = await obtenerEstadisticas();
         setEstadisticas(statsEmpresas);
+        setLastUpdate(new Date());
         
       } catch (error) {
         console.error('Error cargando datos del dashboard:', error);
@@ -785,3 +785,4 @@ const useDashboard = () => {
 };
 
 export default useDashboard;
+
