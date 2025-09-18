@@ -438,16 +438,17 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                   </div>
 
                   {/* Nombre de la obra */}
-                  <div>
+                  <div className="lg:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Nombre de la Obra *
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={formData.nombre}
                       onChange={(e) => actualizarCampo('nombre', e.target.value)}
                       className={`input-field ${formData.errors.nombre ? 'border-red-300' : ''}`}
                       placeholder="Nombre completo y descriptivo de la obra"
+                      rows={2}
+                      style={{ resize: 'vertical' }}
                     />
                     {formData.errors.nombre && (
                       <p className="text-sm text-red-600 mt-1">{formData.errors.nombre}</p>
