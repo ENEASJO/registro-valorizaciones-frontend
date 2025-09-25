@@ -8,9 +8,7 @@
     "build": "tsc -b tsconfig.build.json && vite build",
     "build:check": "node check-env.js",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "backend": "cd server && node sunat-api.js",
-    "test-sunat": "node test-sunat-api.js"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
