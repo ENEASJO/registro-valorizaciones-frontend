@@ -786,7 +786,7 @@ setFormData({
                       onChange={(e) => actualizarCampo('ubicacion', e.target.value)}
                       className={`input-field ${formData.errors.ubicacion ? 'border-red-300' : ''}`}
                     >
-                      <option value="">Selecciona un centro poblado o caserío</option>
+                      <option value="">Seleccione un centro poblado o caserío dentro de San Marcos</option>
                       <optgroup label="Centros Poblados">
                         {CENTROS_POBLADOS.map((cp) => (
                           <option key={cp} value={cp}>{cp}</option>
@@ -800,6 +800,11 @@ setFormData({
                     </select>
                     {formData.errors.ubicacion && (
                       <p className="text-sm text-red-600 mt-1">{formData.errors.ubicacion}</p>
+                    )}
+                    {!formData.errors.ubicacion && (
+                      <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
+                        Seleccione un centro poblado o caserío dentro de San Marcos (Áncash, Huari).
+                      </p>
                     )}
                   </div>
                 </div>
