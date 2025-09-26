@@ -175,6 +175,9 @@ export const API_ENDPOINTS = {
   // Valorizaciones - Neon integrado
   valorizaciones: `${API_BASE_URL}/valorizaciones`,
 
+  // Ubicaciones (San Marcos)
+  ubicaciones: `${API_BASE_URL}/ubicaciones`,
+
   // Health check
   health: `${API_BASE_URL}/health`,
 

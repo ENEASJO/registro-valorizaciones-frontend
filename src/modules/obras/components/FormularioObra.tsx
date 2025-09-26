@@ -41,6 +41,7 @@ import {
 import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
 import { useValidacionesObra } from '../../../hooks/useObras';
 import PlantelProfesional from './PlantelProfesional';
+import { API_ENDPOINTS } from '../../../config/api';
 
 // Listas fijas para ubicación en San Marcos (Áncash > Huari > San Marcos)
 const CENTROS_POBLADOS = [
@@ -127,6 +128,10 @@ const [formData, setFormData] = useState<FormData>({
   const [plantelProfesional, setPlantelProfesional] = useState<ProfesionalForm[]>([]);
   const [mensaje, setMensaje] = useState<{ tipo: 'success' | 'error' | 'warning'; texto: string } | null>(null);
 
+  // Estado para opciones dinámicas de ubicación (con fallback a constantes)
+  const [centrosPoblados, setCentrosPoblados] = useState<string[]>([...CENTROS_POBLADOS]);
+  const [caserios, setCaserios] = useState<string[]>([...CASERIOS_INDEPENDIENTES]);
+
   // Inicializar formulario con datos de obra existente
   useEffect(() => {
     if (obra && isOpen) {
@@ -180,6 +185,32 @@ setFormData({
       }, 100);
     }
   }, [obra, isOpen]);
+
+  // Cargar ubicaciones desde el backend (Neon) al abrir el modal
+  useEffect(() => {
+    const cargarUbicaciones = async () => {
+      try {
+        const [cpRes, casRes] = await Promise.all([
+          fetch(`${API_ENDPOINTS.ubicaciones}?tipo=CENTRO_POBLADO`),
+          fetch(`${API_ENDPOINTS.ubicaciones}?tipo=CASERIO`),
+        ]);
+        const cpData = await cpRes.json();
+        const casData = await casRes.json();
+        if (cpData?.success && Array.isArray(cpData.data)) {
+          setCentrosPoblados(cpData.data.map((x: any) => x.nombre));
+        }
+        if (casData?.success && Array.isArray(casData.data)) {
+          setCaserios(casData.data.map((x: any) => x.nombre));
+        }
+      } catch (e) {
+        // Silencioso: usar fallback a constantes
+        console.warn('No se pudieron cargar ubicaciones desde backend, usando valores por defecto');
+      }
+    };
+    if (isOpen) {
+      cargarUbicaciones();
+    }
+  }, [isOpen]);
 
   // Manejar tecla ESC para cerrar modal
   useEffect(() => {
@@ -788,12 +819,12 @@ setFormData({
                     >
                       <option value="">Seleccione un centro poblado o caserío dentro de San Marcos</option>
                       <optgroup label="Centros Poblados">
-                        {CENTROS_POBLADOS.map((cp) => (
+                        {centrosPoblados.map((cp) => (
                           <option key={cp} value={cp}>{cp}</option>
                         ))}
                       </optgroup>
                       <optgroup label="Caseríos Independientes">
-                        {CASERIOS_INDEPENDIENTES.map((c) => (
+                        {caserios.map((c) => (
                           <option key={c} value={c}>{c}</option>
                         ))}
                       </optgroup>
