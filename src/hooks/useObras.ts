@@ -756,6 +756,11 @@ export const useValidacionesObra = () => {
     // Validar fechas
     const erroresFechas = validarFechas(form.fecha_inicio, form.plazo_ejecucion_dias, form.fecha_termino);
     errores.push(...erroresFechas);
+
+    // Validar ubicación (lugar de ejecución obligatorio)
+    if (!form.ubicacion || !String(form.ubicacion).trim()) {
+      errores.push({ campo: 'ubicacion', mensaje: 'Debe seleccionar el lugar de ejecución' });
+    }
     
     // Validar entidades
     const erroresEntidades = validarEntidadesContratistas(
