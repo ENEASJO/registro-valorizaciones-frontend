@@ -42,6 +42,39 @@ import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
 import { useValidacionesObra } from '../../../hooks/useObras';
 import PlantelProfesional from './PlantelProfesional';
 
+// Listas fijas para ubicación en San Marcos (Áncash > Huari > San Marcos)
+const CENTROS_POBLADOS = [
+  'PICHIU SAN PEDRO',
+  'PICHIU QUINHUARAGRA',
+  'SANTA CRUZ DE MOSNA',
+  'QUINHUARAGRA',
+  'CHALLHUAYACO',
+  'LA MERCED DE GAUCHO',
+  'RANCAS',
+  'SAN ANDRES DE RUNTU',
+  'SAN LUIS DE PUJUN',
+  'SAN PEDRO DE CARASH',
+  'CARHUAYOC',
+  'SAN MIGUEL DE OPAYACO',
+  'HUARIPAMPA',
+  'HUARIPAMPA ALTO',
+  'AYASH HUARIPAMPA',
+] as const;
+
+const CASERIOS_INDEPENDIENTES = [
+  'MULLIPAMPA',
+  'MULLIPATAC',
+  'HUARCON - TINYAYOC (QUISHU)',
+  'QUISHU',
+  'CASERIO DE VISTA ALEGRE',
+  'CASERIO DE CHUYO',
+  'CASHAPATAC',
+  'OPAYACO',
+  'AYASH HUAMANIN',
+  'HUANCHA',
+  'BADO',
+] as const;
+
 interface FormularioObraProps {
   isOpen: boolean;
   onClose: () => void;
@@ -68,7 +101,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
 
 
   const [tabActivo, setTabActivo] = useState('general');
-  const [formData, setFormData] = useState<FormData>({
+const [formData, setFormData] = useState<FormData>({
     numero_contrato: '',
     nombre: '',
     codigo_interno: '',
@@ -80,9 +113,9 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
     fecha_inicio: '',
     fecha_termino: '',
     ubicacion: '',
-    distrito: '',
-    provincia: 'Lima',
-    departamento: 'Lima',
+    distrito: 'San Marcos',
+    provincia: 'Huari',
+    departamento: 'Áncash',
     tipo_obra: undefined,
     modalidad_ejecucion: 'CONTRATA',
     sistema_contratacion: 'SUMA_ALZADA',
@@ -112,7 +145,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
       }
     } else if (isOpen) {
       // Resetear formulario para obra nueva
-      setFormData({
+setFormData({
         numero_contrato: '',
         nombre: '',
         codigo_interno: '',
@@ -124,9 +157,9 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
         fecha_inicio: '',
         fecha_termino: '',
         ubicacion: '',
-        distrito: '',
-        provincia: 'Lima',
-        departamento: 'Lima',
+        distrito: 'San Marcos',
+        provincia: 'Huari',
+        departamento: 'Áncash',
         tipo_obra: undefined,
         modalidad_ejecucion: 'CONTRATA',
         sistema_contratacion: 'SUMA_ALZADA',
@@ -696,11 +729,11 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                   </div>
                 </div>
 
-                {/* Ubicación */}
+{/* Ubicación */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium text-gray-900 border-b border-gray-200 pb-2">
                     <MapPin className="w-5 h-5 inline mr-2" />
-                    Ubicación
+                    Ubicación (fija en San Marcos)
                   </h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -711,9 +744,9 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       <input
                         type="text"
                         value={formData.departamento}
-                        onChange={(e) => actualizarCampo('departamento', e.target.value)}
-                        className="input-field"
-                        placeholder="Lima"
+                        disabled
+                        className="input-field bg-gray-50 text-gray-700"
+                        placeholder="Áncash"
                       />
                     </div>
 
@@ -724,9 +757,9 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       <input
                         type="text"
                         value={formData.provincia}
-                        onChange={(e) => actualizarCampo('provincia', e.target.value)}
-                        className="input-field"
-                        placeholder="Lima"
+                        disabled
+                        className="input-field bg-gray-50 text-gray-700"
+                        placeholder="Huari"
                       />
                     </div>
 
@@ -737,24 +770,37 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       <input
                         type="text"
                         value={formData.distrito}
-                        onChange={(e) => actualizarCampo('distrito', e.target.value)}
-                        className="input-field"
-                        placeholder="San Martín de Porres"
+                        disabled
+                        className="input-field bg-gray-50 text-gray-700"
+                        placeholder="San Marcos"
                       />
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ubicación Específica
+                      Lugar de ejecución (selección obligatoria)
                     </label>
-                    <textarea
+                    <select
                       value={formData.ubicacion || ''}
                       onChange={(e) => actualizarCampo('ubicacion', e.target.value)}
-                      className="input-field"
-                      rows={2}
-                      placeholder="Descripción detallada de la ubicación de la obra"
-                    />
+                      className={`input-field ${formData.errors.ubicacion ? 'border-red-300' : ''}`}
+                    >
+                      <option value="">Selecciona un centro poblado o caserío</option>
+                      <optgroup label="Centros Poblados">
+                        {CENTROS_POBLADOS.map((cp) => (
+                          <option key={cp} value={cp}>{cp}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Caseríos Independientes">
+                        {CASERIOS_INDEPENDIENTES.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                    {formData.errors.ubicacion && (
+                      <p className="text-sm text-red-600 mt-1">{formData.errors.ubicacion}</p>
+                    )}
                   </div>
                 </div>
 
