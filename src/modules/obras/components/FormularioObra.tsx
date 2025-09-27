@@ -186,21 +186,17 @@ setFormData({
     }
   }, [obra, isOpen]);
 
-  // Cargar ubicaciones desde el backend (Neon) al abrir el modal
+  // Cargar ubicaciones desde el backend (Neon) al abrir el modal (una sola llamada)
   useEffect(() => {
     const cargarUbicaciones = async () => {
       try {
-        const [cpRes, casRes] = await Promise.all([
-          fetch(`${API_ENDPOINTS.ubicaciones}?tipo=CENTRO_POBLADO`),
-          fetch(`${API_ENDPOINTS.ubicaciones}?tipo=CASERIO`),
-        ]);
-        const cpData = await cpRes.json();
-        const casData = await casRes.json();
-        if (cpData?.success && Array.isArray(cpData.data)) {
-          setCentrosPoblados(cpData.data.map((x: any) => x.nombre));
-        }
-        if (casData?.success && Array.isArray(casData.data)) {
-          setCaserios(casData.data.map((x: any) => x.nombre));
+        const res = await fetch(`${API_ENDPOINTS.ubicaciones}`);
+        const data = await res.json();
+        if (data?.success && Array.isArray(data.data)) {
+          const cps = data.data.filter((x: any) => (x.tipo || '').toUpperCase() === 'CENTRO_POBLADO').map((x: any) => x.nombre);
+          const cas = data.data.filter((x: any) => (x.tipo || '').toUpperCase() === 'CASERIO').map((x: any) => x.nombre);
+          if (cps.length > 0) setCentrosPoblados(cps);
+          if (cas.length > 0) setCaserios(cas);
         }
       } catch (e) {
         // Silencioso: usar fallback a constantes
@@ -810,9 +806,11 @@ setFormData({
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Lugar de ejecución (selección obligatoria)
+                      Lugar de ejecución <span className="text-red-600">*</span>
                     </label>
                     <select
+                      aria-required="true"
+                      required
                       value={formData.ubicacion || ''}
                       onChange={(e) => actualizarCampo('ubicacion', e.target.value)}
                       className={`input-field ${formData.errors.ubicacion ? 'border-red-300' : ''}`}
