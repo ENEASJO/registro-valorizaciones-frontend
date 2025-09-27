@@ -190,11 +190,11 @@ setFormData({
   useEffect(() => {
     const cargarUbicaciones = async () => {
       try {
-        const res = await fetch(`${API_ENDPOINTS.ubicaciones}`);
+        const res = await fetch(`${API_ENDPOINTS.ubicacionesAgrupadas}`);
         const data = await res.json();
-        if (data?.success && Array.isArray(data.data)) {
-          const cps = data.data.filter((x: any) => (x.tipo || '').toUpperCase() === 'CENTRO_POBLADO').map((x: any) => x.nombre);
-          const cas = data.data.filter((x: any) => (x.tipo || '').toUpperCase() === 'CASERIO').map((x: any) => x.nombre);
+        if (data?.success && data.data) {
+          const cps = Array.isArray(data.data.centros_poblados) ? data.data.centros_poblados : [];
+          const cas = Array.isArray(data.data.caserios) ? data.data.caserios : [];
           if (cps.length > 0) setCentrosPoblados(cps);
           if (cas.length > 0) setCaserios(cas);
         }

@@ -177,6 +177,7 @@ export const API_ENDPOINTS = {
 
   // Ubicaciones (San Marcos)
   ubicaciones: `${API_BASE_URL}/ubicaciones`,
+  ubicacionesAgrupadas: `${API_BASE_URL}/ubicaciones/agrupadas`,
 
   // Health check
   health: `${API_BASE_URL}/health`,
