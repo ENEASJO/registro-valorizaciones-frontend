@@ -389,13 +389,15 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                         <div className="bg-white rounded-lg p-4 space-y-3">
                           <h4 className="font-semibold text-green-800 text-sm uppercase">Modificaciones durante Ejecución</h4>
                           <div className="space-y-2">
-                            {datosMEF.modificaciones_ejecucion.documentos.map((doc, idx) => (
+                            {datosMEF.modificaciones_ejecucion.documentos.map((doc: any, idx) => (
                               <div key={idx} className="text-sm border-l-2 border-orange-400 pl-3 py-1">
                                 <p className="font-medium text-gray-900">
-                                  {doc.tipo_documento} N° {doc.numero_documento}
+                                  {doc.tipo || doc.tipo_documento} N° {doc.numero || doc.numero_documento}
                                 </p>
                                 <p className="text-gray-600 text-xs">
-                                  Fecha: {doc.fecha_documento}
+                                  {doc.fecha && `Fecha: ${doc.fecha}`}
+                                  {doc.fecha_documento && !doc.fecha && `Fecha: ${doc.fecha_documento}`}
+                                  {doc.descripcion && ` | ${doc.descripcion}`}
                                   {doc.monto_modificacion && ` | Monto: S/ ${doc.monto_modificacion.toLocaleString('es-PE')}`}
                                 </p>
                               </div>
