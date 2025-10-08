@@ -27,6 +27,12 @@ export interface CostosFinales {
   costo_control_concurrente: number;
   costo_controversias: number;
   monto_carta_fianza: number;
+  costo_obra?: number;
+  costo_supervision?: number;
+  fuentes_financiamiento?: Array<{
+    fuente: string;
+    monto: number;
+  }>;
 }
 
 export interface ArticulacionPMI {
