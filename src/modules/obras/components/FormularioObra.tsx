@@ -221,46 +221,186 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-green-50 border border-green-200 rounded-lg p-6 space-y-4"
+                      className="bg-green-50 border border-green-200 rounded-lg p-6 space-y-6"
                     >
                       <div className="flex items-center gap-2 text-green-800">
                         <CheckCircle className="w-6 h-6" />
                         <h3 className="font-semibold text-lg">Datos MEF Cargados</h3>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium text-gray-700">Nombre:</span>
-                          <p className="text-gray-900 mt-1">{datosMEF.nombre}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">Estado:</span>
-                          <p className="text-gray-900 mt-1">{datosMEF.estado}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">Etapa:</span>
-                          <p className="text-gray-900 mt-1">{datosMEF.etapa}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">Inversión Total:</span>
-                          <p className="text-gray-900 mt-1 font-bold">
-                            S/ {datosMEF.costos_finales.costo_total_actualizado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                          </p>
+                      {/* Datos Básicos */}
+                      <div className="bg-white rounded-lg p-4 space-y-3">
+                        <h4 className="font-semibold text-green-800 text-sm uppercase">Información General</h4>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-700">Nombre:</span>
+                            <p className="text-gray-900 mt-1">{datosMEF.nombre}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">CUI:</span>
+                            <p className="text-gray-900 mt-1 font-mono">{datosMEF.cui}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Estado:</span>
+                            <p className="text-gray-900 mt-1">{datosMEF.estado}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Etapa:</span>
+                            <p className="text-gray-900 mt-1">{datosMEF.etapa}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Fecha Registro:</span>
+                            <p className="text-gray-900 mt-1">{datosMEF.fecha_registro}</p>
+                          </div>
+                          <div>
+                            <span className="font-medium text-gray-700">Fuente:</span>
+                            <p className="text-gray-900 mt-1">{datosMEF.fuente}</p>
+                          </div>
                         </div>
                       </div>
 
-                      {datosMEF.expediente_tecnico?.metas && (
-                        <div>
-                          <span className="font-medium text-gray-700 block mb-2">
-                            Metas Físicas:
-                          </span>
-                          <ul className="space-y-1">
+                      {/* Costos Finales */}
+                      <div className="bg-white rounded-lg p-4 space-y-3">
+                        <h4 className="font-semibold text-green-800 text-sm uppercase">Costos Finales</h4>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <span className="font-medium text-gray-700">Costo Total Actualizado:</span>
+                            <p className="text-gray-900 mt-1 font-bold text-lg">
+                              S/ {datosMEF.costos_finales.costo_total_actualizado?.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                          {datosMEF.costos_finales.costo_obra && (
+                            <div>
+                              <span className="font-medium text-gray-700">Costo Obra:</span>
+                              <p className="text-gray-900 mt-1">
+                                S/ {datosMEF.costos_finales.costo_obra.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                          )}
+                          {datosMEF.costos_finales.costo_supervision && (
+                            <div>
+                              <span className="font-medium text-gray-700">Costo Supervisión:</span>
+                              <p className="text-gray-900 mt-1">
+                                S/ {datosMEF.costos_finales.costo_supervision.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                          )}
+                          {datosMEF.costos_finales.costo_control_concurrente > 0 && (
+                            <div>
+                              <span className="font-medium text-gray-700">Control Concurrente:</span>
+                              <p className="text-gray-900 mt-1">
+                                S/ {datosMEF.costos_finales.costo_control_concurrente.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                          )}
+                          {datosMEF.costos_finales.monto_carta_fianza > 0 && (
+                            <div>
+                              <span className="font-medium text-gray-700">Carta Fianza:</span>
+                              <p className="text-gray-900 mt-1">
+                                S/ {datosMEF.costos_finales.monto_carta_fianza.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Institucionalidad */}
+                      {datosMEF.institucionalidad && (
+                        <div className="bg-white rounded-lg p-4 space-y-3">
+                          <h4 className="font-semibold text-green-800 text-sm uppercase">Institucionalidad</h4>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            {datosMEF.institucionalidad.uep && (
+                              <div>
+                                <span className="font-medium text-gray-700">Unidad Ejecutora (UEP):</span>
+                                <p className="text-gray-900 mt-1">
+                                  {datosMEF.institucionalidad.uep.codigo} - {datosMEF.institucionalidad.uep.nombre}
+                                </p>
+                              </div>
+                            )}
+                            {datosMEF.institucionalidad.sector && (
+                              <div>
+                                <span className="font-medium text-gray-700">Sector:</span>
+                                <p className="text-gray-900 mt-1">{datosMEF.institucionalidad.sector}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Metas Físicas */}
+                      {datosMEF.expediente_tecnico?.metas && datosMEF.expediente_tecnico.metas.length > 0 && (
+                        <div className="bg-white rounded-lg p-4 space-y-3">
+                          <h4 className="font-semibold text-green-800 text-sm uppercase">Metas Físicas</h4>
+                          <div className="space-y-2">
                             {datosMEF.expediente_tecnico.metas.map((meta, idx) => (
-                              <li key={idx} className="text-sm text-gray-900">
-                                • {meta.tipo} - {meta.activo}: {meta.cantidad} {meta.unidad}
-                              </li>
+                              <div key={idx} className="flex items-start gap-2 text-sm">
+                                <span className="text-green-600">•</span>
+                                <div>
+                                  <p className="font-medium text-gray-900">
+                                    {meta.tipo} - {meta.activo}
+                                  </p>
+                                  <p className="text-gray-600 text-xs">
+                                    {meta.cantidad} {meta.unidad} | {meta.naturaleza} | {meta.factor_productivo}
+                                  </p>
+                                </div>
+                              </div>
                             ))}
-                          </ul>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Expediente Técnico - Fechas */}
+                      {datosMEF.expediente_tecnico && (
+                        <div className="bg-white rounded-lg p-4 space-y-3">
+                          <h4 className="font-semibold text-green-800 text-sm uppercase">Expediente Técnico</h4>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            {datosMEF.expediente_tecnico.modalidad_ejecucion && (
+                              <div className="col-span-2">
+                                <span className="font-medium text-gray-700">Modalidad de Ejecución:</span>
+                                <p className="text-gray-900 mt-1">{datosMEF.expediente_tecnico.modalidad_ejecucion}</p>
+                              </div>
+                            )}
+                            {datosMEF.expediente_tecnico.fechas_muro && (
+                              <div>
+                                <span className="font-medium text-gray-700">Fechas Muro:</span>
+                                <p className="text-gray-600 text-xs mt-1">
+                                  Inicio: {datosMEF.expediente_tecnico.fechas_muro.inicio}<br/>
+                                  Término: {datosMEF.expediente_tecnico.fechas_muro.termino}<br/>
+                                  Entrega: {datosMEF.expediente_tecnico.fechas_muro.entrega}
+                                </p>
+                              </div>
+                            )}
+                            {datosMEF.expediente_tecnico.fechas_ptar && (
+                              <div>
+                                <span className="font-medium text-gray-700">Fechas PTAR:</span>
+                                <p className="text-gray-600 text-xs mt-1">
+                                  Inicio: {datosMEF.expediente_tecnico.fechas_ptar.inicio}<br/>
+                                  Término: {datosMEF.expediente_tecnico.fechas_ptar.termino}<br/>
+                                  Entrega: {datosMEF.expediente_tecnico.fechas_ptar.entrega}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Modificaciones durante Ejecución */}
+                      {datosMEF.modificaciones_ejecucion?.documentos && datosMEF.modificaciones_ejecucion.documentos.length > 0 && (
+                        <div className="bg-white rounded-lg p-4 space-y-3">
+                          <h4 className="font-semibold text-green-800 text-sm uppercase">Modificaciones durante Ejecución</h4>
+                          <div className="space-y-2">
+                            {datosMEF.modificaciones_ejecucion.documentos.map((doc, idx) => (
+                              <div key={idx} className="text-sm border-l-2 border-orange-400 pl-3 py-1">
+                                <p className="font-medium text-gray-900">
+                                  {doc.tipo_documento} N° {doc.numero_documento}
+                                </p>
+                                <p className="text-gray-600 text-xs">
+                                  Fecha: {doc.fecha_documento}
+                                  {doc.monto_modificacion && ` | Monto: S/ ${doc.monto_modificacion.toLocaleString('es-PE')}`}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </motion.div>
