@@ -90,6 +90,9 @@ export interface MetaFisica {
   cantidad: number;
   naturaleza?: string;
   factor_productivo?: string;
+  componente?: string; // Alias de tipo para compatibilidad
+  meta?: string; // Alias de activo para compatibilidad
+  unidad_medida?: string; // Alias de unidad para compatibilidad
 }
 
 export interface FechasComponente {
@@ -154,6 +157,10 @@ export interface DatosContrato {
   procedimiento_seleccion?: string;
   entidad_ejecutora_id?: string;
   entidad_supervisora_id?: string;
+  plazo_ejecucion_dias?: number;
+  monto_contratado?: number;
+  contratista_ruc?: string;
+  contratista_nombre?: string;
 }
 
 export type SistemaContratacion =
@@ -183,6 +190,13 @@ export interface Ubicacion {
   distrito: 'San Marcos';
   lugar_ejecucion: string; // Zona Urbana, Centro Poblado o Caserío
   zona_tipo: ZonaTipo;
+  tipo?: string; // Alias de zona_tipo para compatibilidad
+  nombre_ubicacion?: string; // Alias de lugar_ejecucion para compatibilidad
+  direccion_especifica?: string;
+  coordenadas?: {
+    latitud: number;
+    longitud: number;
+  };
 }
 
 export type ZonaTipo = 'urbana' | 'centro_poblado' | 'caserio';
