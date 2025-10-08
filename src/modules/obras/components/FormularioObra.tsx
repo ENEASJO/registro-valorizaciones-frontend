@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X,
@@ -24,6 +24,7 @@ import type {
   ZonaTipo,
 } from '../types';
 import { obrasService } from '../services/obrasService';
+import { obtenerUbicacionesAgrupadas, type Ubicacion } from '../../../services/ubicacionesService';
 
 interface FormularioObraProps {
   isOpen: boolean;
@@ -48,6 +49,18 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
   const [datosMEF, setDatosMEF] = useState<DatosMEF | null>(null);
   const [errorMEF, setErrorMEF] = useState<string | null>(null);
 
+  // Estados para ubicaciones
+  const [ubicaciones, setUbicaciones] = useState<{
+    urbana: Ubicacion[];
+    centro_poblado: Ubicacion[];
+    caserio: Ubicacion[];
+  }>({
+    urbana: [],
+    centro_poblado: [],
+    caserio: [],
+  });
+  const [cargandoUbicaciones, setCargandoUbicaciones] = useState(false);
+
   const [formulario, setFormulario] = useState<ObraFormulario>({
     cui: obra?.cui || '',
     importar_mef: false,
@@ -60,6 +73,27 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
     zona_tipo: obra?.ubicacion?.zona_tipo || 'urbana',
     estado_obra: obra?.estado_obra || 'registrada',
   });
+
+  // Cargar ubicaciones al montar el componente
+  useEffect(() => {
+    const cargarUbicaciones = async () => {
+      setCargandoUbicaciones(true);
+      try {
+        const response = await obtenerUbicacionesAgrupadas();
+        if (response.status === 'success' && response.data) {
+          setUbicaciones(response.data);
+        }
+      } catch (error) {
+        console.error('Error al cargar ubicaciones:', error);
+      } finally {
+        setCargandoUbicaciones(false);
+      }
+    };
+
+    if (isOpen) {
+      cargarUbicaciones();
+    }
+  }, [isOpen]);
 
   // Consultar datos MEF
   const consultarMEF = useCallback(async () => {
@@ -663,10 +697,16 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
               {/* TAB 2: Ubicación */}
               {tabActual === 2 && (
                 <div className="space-y-6">
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm text-gray-600">
-                      Todas las obras se ubican en San Marcos, Huari, Áncash
-                    </p>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-blue-900">
+                        Ubicación en San Marcos, Huari, Áncash
+                      </p>
+                      <p className="text-xs text-blue-700 mt-1">
+                        Selecciona el tipo de zona y luego elige la ubicación específica de la lista
+                      </p>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -676,7 +716,12 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       </label>
                       <select
                         value={formulario.zona_tipo}
-                        onChange={(e) => handleChange('zona_tipo', e.target.value as ZonaTipo)}
+                        onChange={(e) => {
+                          const nuevoTipo = e.target.value as ZonaTipo;
+                          handleChange('zona_tipo', nuevoTipo);
+                          // Limpiar lugar de ejecución al cambiar tipo
+                          handleChange('lugar_ejecucion', '');
+                        }}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                         required
                       >
@@ -690,14 +735,31 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Lugar de Ejecución *
                       </label>
-                      <input
-                        type="text"
-                        value={formulario.lugar_ejecucion}
-                        onChange={(e) => handleChange('lugar_ejecucion', e.target.value)}
-                        placeholder="Ej: Rancas, Huaripampa, etc."
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        required
-                      />
+                      {cargandoUbicaciones ? (
+                        <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                          <span className="text-sm text-gray-500">Cargando ubicaciones...</span>
+                        </div>
+                      ) : (
+                        <select
+                          value={formulario.lugar_ejecucion}
+                          onChange={(e) => handleChange('lugar_ejecucion', e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          required
+                        >
+                          <option value="">Seleccione una ubicación</option>
+                          {ubicaciones[formulario.zona_tipo]?.map((ubicacion) => (
+                            <option key={ubicacion.id} value={ubicacion.nombre}>
+                              {ubicacion.nombre}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {!cargandoUbicaciones && ubicaciones[formulario.zona_tipo]?.length === 0 && (
+                        <p className="text-xs text-amber-600 mt-1">
+                          No hay ubicaciones registradas para este tipo de zona
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
