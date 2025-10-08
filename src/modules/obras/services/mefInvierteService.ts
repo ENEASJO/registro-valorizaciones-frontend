@@ -204,7 +204,16 @@ export const mapearDatosMEFAFormulario = (datosMEF: DatosMEF): Partial<ObraForm>
                          datosMEF.expediente_tecnico?.fechas_ptar;
 
   const fechaInicio = convertirFechaMEF(fechasVigentes?.inicio || '');
-  const fechaTermino = convertirFechaMEF(fechasVigentes?.termino_vigente || fechasVigentes?.termino || '');
+
+  // Manejar fechas de término con type narrowing
+  let fechaTermino = '';
+  if (fechasVigentes) {
+    if ('termino_vigente' in fechasVigentes) {
+      fechaTermino = convertirFechaMEF(fechasVigentes.termino_vigente);
+    } else if ('termino' in fechasVigentes) {
+      fechaTermino = convertirFechaMEF(fechasVigentes.termino);
+    }
+  }
 
   // Calcular plazo
   const plazoDias = calcularPlazoDias(fechaInicio, fechaTermino);
