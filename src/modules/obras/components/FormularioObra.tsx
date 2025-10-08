@@ -228,120 +228,188 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                         <h3 className="font-semibold text-lg">Datos MEF Cargados</h3>
                       </div>
 
-                      {/* Datos Básicos */}
-                      <div className="bg-white rounded-lg p-4 space-y-3">
-                        <h4 className="font-semibold text-green-800 text-sm uppercase">Información General</h4>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium text-gray-700">Nombre:</span>
-                            <p className="text-gray-900 mt-1">{datosMEF.nombre}</p>
+                      {/* 1. INFORMACIÓN GENERAL */}
+                      <div className="bg-white rounded-lg p-5 shadow-sm space-y-4">
+                        <h4 className="font-bold text-green-800 text-base uppercase border-b-2 border-green-200 pb-2">📋 Información General</h4>
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                          <div className="col-span-2">
+                            <span className="font-semibold text-gray-700 block mb-1">Nombre del Proyecto:</span>
+                            <p className="text-gray-900 leading-relaxed">{datosMEF.nombre}</p>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">CUI:</span>
-                            <p className="text-gray-900 mt-1 font-mono">{datosMEF.cui}</p>
+                            <span className="font-semibold text-gray-700 block mb-1">CUI:</span>
+                            <p className="text-gray-900 font-mono text-base">{datosMEF.cui}</p>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">Estado:</span>
-                            <p className="text-gray-900 mt-1">{datosMEF.estado}</p>
+                            <span className="font-semibold text-gray-700 block mb-1">Estado:</span>
+                            <p className="text-gray-900"><span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">{datosMEF.estado}</span></p>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">Etapa:</span>
-                            <p className="text-gray-900 mt-1">{datosMEF.etapa}</p>
+                            <span className="font-semibold text-gray-700 block mb-1">Etapa:</span>
+                            <p className="text-gray-900">{datosMEF.etapa}</p>
                           </div>
                           <div>
-                            <span className="font-medium text-gray-700">Fecha Registro:</span>
-                            <p className="text-gray-900 mt-1">{datosMEF.fecha_registro}</p>
+                            <span className="font-semibold text-gray-700 block mb-1">Fecha Registro:</span>
+                            <p className="text-gray-900">{datosMEF.fecha_registro}</p>
                           </div>
-                          <div>
-                            <span className="font-medium text-gray-700">Fuente:</span>
-                            <p className="text-gray-900 mt-1">{datosMEF.fuente}</p>
+                          <div className="col-span-2">
+                            <span className="font-semibold text-gray-700 block mb-1">Fuente:</span>
+                            <p className="text-gray-600 text-xs italic">{datosMEF.fuente}</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Costos Finales */}
-                      <div className="bg-white rounded-lg p-4 space-y-3">
-                        <h4 className="font-semibold text-green-800 text-sm uppercase">Costos Finales</h4>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium text-gray-700">Costo Total Actualizado:</span>
-                            <p className="text-gray-900 mt-1 font-bold text-lg">
-                              S/ {datosMEF.costos_finales.costo_total_actualizado?.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                            </p>
-                          </div>
-                          {datosMEF.costos_finales.costo_obra && (
-                            <div>
-                              <span className="font-medium text-gray-700">Costo Obra:</span>
-                              <p className="text-gray-900 mt-1">
-                                S/ {datosMEF.costos_finales.costo_obra.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          )}
-                          {datosMEF.costos_finales.costo_supervision && (
-                            <div>
-                              <span className="font-medium text-gray-700">Costo Supervisión:</span>
-                              <p className="text-gray-900 mt-1">
-                                S/ {datosMEF.costos_finales.costo_supervision.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          )}
-                          {datosMEF.costos_finales.costo_control_concurrente > 0 && (
-                            <div>
-                              <span className="font-medium text-gray-700">Control Concurrente:</span>
-                              <p className="text-gray-900 mt-1">
-                                S/ {datosMEF.costos_finales.costo_control_concurrente.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          )}
-                          {datosMEF.costos_finales.monto_carta_fianza > 0 && (
-                            <div>
-                              <span className="font-medium text-gray-700">Carta Fianza:</span>
-                              <p className="text-gray-900 mt-1">
-                                S/ {datosMEF.costos_finales.monto_carta_fianza.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                      {/* 2. COSTOS Y PRESUPUESTO */}
+                      <div className="bg-white rounded-lg p-5 shadow-sm space-y-4">
+                        <h4 className="font-bold text-green-800 text-base uppercase border-b-2 border-green-200 pb-2">💰 Costos y Presupuesto</h4>
 
-                      {/* Institucionalidad */}
-                      {datosMEF.institucionalidad && (
-                        <div className="bg-white rounded-lg p-4 space-y-3">
-                          <h4 className="font-semibold text-green-800 text-sm uppercase">Institucionalidad</h4>
+                        {/* Costos del Expediente Técnico Original */}
+                        {datosMEF.expediente_tecnico && (
+                          <>
+                            <div className="bg-blue-50 border border-blue-200 rounded p-3">
+                              <p className="font-semibold text-blue-900 text-xs uppercase mb-2">Expediente Técnico Original</p>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                {datosMEF.expediente_tecnico.subtotal_metas && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 block text-xs">Subtotal Metas:</span>
+                                    <p className="text-gray-900 font-bold">S/ {datosMEF.expediente_tecnico.subtotal_metas.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                  </div>
+                                )}
+                                {datosMEF.expediente_tecnico.costo_expediente_tecnico && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 block text-xs">Expediente Técnico:</span>
+                                    <p className="text-gray-900">S/ {datosMEF.expediente_tecnico.costo_expediente_tecnico.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                  </div>
+                                )}
+                                {datosMEF.expediente_tecnico.costo_supervision && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 block text-xs">Supervisión:</span>
+                                    <p className="text-gray-900">S/ {datosMEF.expediente_tecnico.costo_supervision.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                  </div>
+                                )}
+                                {datosMEF.expediente_tecnico.costo_liquidacion && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 block text-xs">Liquidación:</span>
+                                    <p className="text-gray-900">S/ {datosMEF.expediente_tecnico.costo_liquidacion.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                  </div>
+                                )}
+                                {datosMEF.expediente_tecnico.costo_inversion_actualizado && (
+                                  <div className="col-span-2 mt-2 pt-2 border-t border-blue-300">
+                                    <span className="font-semibold text-blue-900 block text-xs">Costo Inversión Actualizado:</span>
+                                    <p className="text-blue-900 font-bold text-lg">S/ {datosMEF.expediente_tecnico.costo_inversion_actualizado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {/* Costos Modificados (si existen) */}
+                        {datosMEF.modificaciones_ejecucion && (
+                          <div className="bg-orange-50 border border-orange-200 rounded p-3">
+                            <p className="font-semibold text-orange-900 text-xs uppercase mb-2">⚠️ Costos Modificados durante Ejecución</p>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              {datosMEF.modificaciones_ejecucion.subtotal_modificado && (
+                                <div>
+                                  <span className="font-medium text-gray-700 block text-xs">Subtotal Modificado:</span>
+                                  <p className="text-gray-900 font-bold">S/ {datosMEF.modificaciones_ejecucion.subtotal_modificado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                </div>
+                              )}
+                              {datosMEF.modificaciones_ejecucion.costo_supervision_modificado && (
+                                <div>
+                                  <span className="font-medium text-gray-700 block text-xs">Supervisión Modificada:</span>
+                                  <p className="text-gray-900">S/ {datosMEF.modificaciones_ejecucion.costo_supervision_modificado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                </div>
+                              )}
+                              {datosMEF.modificaciones_ejecucion.costo_liquidacion_modificado && (
+                                <div>
+                                  <span className="font-medium text-gray-700 block text-xs">Liquidación Modificada:</span>
+                                  <p className="text-gray-900">S/ {datosMEF.modificaciones_ejecucion.costo_liquidacion_modificado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                </div>
+                              )}
+                              {datosMEF.modificaciones_ejecucion.costo_inversion_modificado && (
+                                <div className="col-span-2 mt-2 pt-2 border-t border-orange-300">
+                                  <span className="font-semibold text-orange-900 block text-xs">Costo Inversión Modificado:</span>
+                                  <p className="text-orange-900 font-bold text-lg">S/ {datosMEF.modificaciones_ejecucion.costo_inversion_modificado.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Costos Finales */}
+                        <div className="bg-green-50 border-2 border-green-400 rounded p-3">
+                          <p className="font-semibold text-green-900 text-xs uppercase mb-2">✅ Costos Finales</p>
                           <div className="grid grid-cols-2 gap-4 text-sm">
-                            {datosMEF.institucionalidad.uep && (
+                            <div className="col-span-2">
+                              <span className="font-bold text-green-900 block text-sm">COSTO TOTAL ACTUALIZADO:</span>
+                              <p className="text-green-900 font-bold text-2xl">S/ {datosMEF.costos_finales.costo_total_actualizado?.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                            </div>
+                            {datosMEF.costos_finales.costo_control_concurrente > 0 && (
                               <div>
-                                <span className="font-medium text-gray-700">Unidad Ejecutora (UEP):</span>
-                                <p className="text-gray-900 mt-1">
-                                  {datosMEF.institucionalidad.uep.codigo} - {datosMEF.institucionalidad.uep.nombre}
+                                <span className="font-medium text-gray-700 block text-xs">Control Concurrente:</span>
+                                <p className="text-gray-900">S/ {datosMEF.costos_finales.costo_control_concurrente.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                              </div>
+                            )}
+                            {datosMEF.costos_finales.costo_controversias > 0 && (
+                              <div>
+                                <span className="font-medium text-gray-700 block text-xs">Controversias:</span>
+                                <p className="text-gray-900">S/ {datosMEF.costos_finales.costo_controversias.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                              </div>
+                            )}
+                            {datosMEF.costos_finales.monto_carta_fianza > 0 && (
+                              <div>
+                                <span className="font-medium text-gray-700 block text-xs">Carta Fianza:</span>
+                                <p className="text-gray-900">S/ {datosMEF.costos_finales.monto_carta_fianza.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 3. INSTITUCIONALIDAD */}
+                      {datosMEF.institucionalidad && (
+                        <div className="bg-white rounded-lg p-5 shadow-sm space-y-4">
+                          <h4 className="font-bold text-green-800 text-base uppercase border-b-2 border-green-200 pb-2">🏛️ Institucionalidad</h4>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            {datosMEF.institucionalidad.uep && datosMEF.institucionalidad.uep.codigo && (
+                              <div className="col-span-2">
+                                <span className="font-semibold text-gray-700 block mb-1">Unidad Ejecutora de Proyectos (UEP):</span>
+                                <p className="text-gray-900">
+                                  <span className="font-mono bg-gray-100 px-2 py-1 rounded">{datosMEF.institucionalidad.uep.codigo}</span>
+                                  {datosMEF.institucionalidad.uep.nombre && <span className="ml-2">{datosMEF.institucionalidad.uep.nombre.trim()}</span>}
                                 </p>
                               </div>
                             )}
                             {datosMEF.institucionalidad.sector && (
                               <div>
-                                <span className="font-medium text-gray-700">Sector:</span>
-                                <p className="text-gray-900 mt-1">{datosMEF.institucionalidad.sector}</p>
+                                <span className="font-semibold text-gray-700 block mb-1">Sector:</span>
+                                <p className="text-gray-900">{datosMEF.institucionalidad.sector}</p>
                               </div>
                             )}
                           </div>
                         </div>
                       )}
 
-                      {/* Metas Físicas */}
+                      {/* 4. METAS FÍSICAS */}
                       {datosMEF.expediente_tecnico?.metas && datosMEF.expediente_tecnico.metas.length > 0 && (
-                        <div className="bg-white rounded-lg p-4 space-y-3">
-                          <h4 className="font-semibold text-green-800 text-sm uppercase">Metas Físicas</h4>
-                          <div className="space-y-2">
+                        <div className="bg-white rounded-lg p-5 shadow-sm space-y-4">
+                          <h4 className="font-bold text-green-800 text-base uppercase border-b-2 border-green-200 pb-2">🎯 Metas Físicas</h4>
+                          <div className="space-y-3">
                             {datosMEF.expediente_tecnico.metas.map((meta, idx) => (
-                              <div key={idx} className="flex items-start gap-2 text-sm">
-                                <span className="text-green-600">•</span>
-                                <div>
-                                  <p className="font-medium text-gray-900">
-                                    {meta.tipo} - {meta.activo}
-                                  </p>
-                                  <p className="text-gray-600 text-xs">
-                                    {meta.cantidad} {meta.unidad} | {meta.naturaleza} | {meta.factor_productivo}
-                                  </p>
+                              <div key={idx} className="border-l-4 border-green-500 bg-gray-50 pl-4 pr-3 py-3 rounded-r">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <p className="font-bold text-gray-900 text-sm">{meta.tipo} - {meta.activo}</p>
+                                    <div className="flex gap-3 mt-1 text-xs text-gray-600">
+                                      <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded">{meta.naturaleza}</span>
+                                      <span className="bg-purple-100 text-purple-800 px-2 py-0.5 rounded">{meta.factor_productivo}</span>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <p className="font-bold text-green-700 text-lg">{meta.cantidad}</p>
+                                    <p className="text-gray-600 text-xs">{meta.unidad}</p>
+                                  </div>
                                 </div>
                               </div>
                             ))}
@@ -349,57 +417,138 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
                         </div>
                       )}
 
-                      {/* Expediente Técnico - Fechas */}
+                      {/* 5. CRONOGRAMA Y FECHAS */}
                       {datosMEF.expediente_tecnico && (
-                        <div className="bg-white rounded-lg p-4 space-y-3">
-                          <h4 className="font-semibold text-green-800 text-sm uppercase">Expediente Técnico</h4>
+                        <div className="bg-white rounded-lg p-5 shadow-sm space-y-4">
+                          <h4 className="font-bold text-green-800 text-base uppercase border-b-2 border-green-200 pb-2">📅 Cronograma y Fechas</h4>
+
+                          {datosMEF.expediente_tecnico.modalidad_ejecucion && (
+                            <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
+                              <span className="font-semibold text-blue-900 block text-xs uppercase">Modalidad de Ejecución</span>
+                              <p className="text-blue-900 font-medium mt-1">{datosMEF.expediente_tecnico.modalidad_ejecucion}</p>
+                            </div>
+                          )}
+
                           <div className="grid grid-cols-2 gap-4 text-sm">
-                            {datosMEF.expediente_tecnico.modalidad_ejecucion && (
-                              <div className="col-span-2">
-                                <span className="font-medium text-gray-700">Modalidad de Ejecución:</span>
-                                <p className="text-gray-900 mt-1">{datosMEF.expediente_tecnico.modalidad_ejecucion}</p>
-                              </div>
-                            )}
+                            {/* Fechas Originales */}
                             {datosMEF.expediente_tecnico.fechas_muro && (
-                              <div>
-                                <span className="font-medium text-gray-700">Fechas Muro:</span>
-                                <p className="text-gray-600 text-xs mt-1">
-                                  Inicio: {datosMEF.expediente_tecnico.fechas_muro.inicio}<br/>
-                                  Término: {datosMEF.expediente_tecnico.fechas_muro.termino}<br/>
-                                  Entrega: {datosMEF.expediente_tecnico.fechas_muro.entrega}
-                                </p>
+                              <div className="bg-gray-50 rounded p-3">
+                                <span className="font-semibold text-gray-800 block mb-2 text-xs uppercase">🧱 Muro de Contención</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_muro.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_muro.termino}</span></p>
+                                  <p><span className="font-medium text-gray-600">Entrega:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_muro.entrega}</span></p>
+                                </div>
                               </div>
                             )}
+
                             {datosMEF.expediente_tecnico.fechas_ptar && (
-                              <div>
-                                <span className="font-medium text-gray-700">Fechas PTAR:</span>
-                                <p className="text-gray-600 text-xs mt-1">
-                                  Inicio: {datosMEF.expediente_tecnico.fechas_ptar.inicio}<br/>
-                                  Término: {datosMEF.expediente_tecnico.fechas_ptar.termino}<br/>
-                                  Entrega: {datosMEF.expediente_tecnico.fechas_ptar.entrega}
-                                </p>
+                              <div className="bg-gray-50 rounded p-3">
+                                <span className="font-semibold text-gray-800 block mb-2 text-xs uppercase">💧 PTAR</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_ptar.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_ptar.termino}</span></p>
+                                  <p><span className="font-medium text-gray-600">Entrega:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_ptar.entrega}</span></p>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Fechas Modificadas */}
+                            {datosMEF.modificaciones_ejecucion?.fechas_muro_modificado && (
+                              <div className="bg-orange-50 border border-orange-200 rounded p-3">
+                                <span className="font-semibold text-orange-800 block mb-2 text-xs uppercase">🧱 Muro (Modificado)</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-orange-900">{datosMEF.modificaciones_ejecucion.fechas_muro_modificado.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término Vigente:</span> <span className="text-orange-900 font-bold">{datosMEF.modificaciones_ejecucion.fechas_muro_modificado.termino_vigente}</span></p>
+                                  <p><span className="font-medium text-gray-600">Entrega:</span> <span className="text-orange-900">{datosMEF.modificaciones_ejecucion.fechas_muro_modificado.entrega}</span></p>
+                                </div>
+                              </div>
+                            )}
+
+                            {datosMEF.modificaciones_ejecucion?.fechas_ptar_modificado && (
+                              <div className="bg-orange-50 border border-orange-200 rounded p-3">
+                                <span className="font-semibold text-orange-800 block mb-2 text-xs uppercase">💧 PTAR (Modificado)</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-orange-900">{datosMEF.modificaciones_ejecucion.fechas_ptar_modificado.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término Vigente:</span> <span className="text-orange-900 font-bold">{datosMEF.modificaciones_ejecucion.fechas_ptar_modificado.termino_vigente}</span></p>
+                                  <p><span className="font-medium text-gray-600">Entrega:</span> <span className="text-orange-900">{datosMEF.modificaciones_ejecucion.fechas_ptar_modificado.entrega}</span></p>
+                                </div>
+                              </div>
+                            )}
+
+                            {datosMEF.expediente_tecnico.fechas_supervision && (
+                              <div className="bg-gray-50 rounded p-3">
+                                <span className="font-semibold text-gray-800 block mb-2 text-xs uppercase">👁️ Supervisión</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_supervision.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_supervision.termino}</span></p>
+                                </div>
+                              </div>
+                            )}
+
+                            {datosMEF.modificaciones_ejecucion?.fechas_supervision_modificado && (
+                              <div className="bg-orange-50 border border-orange-200 rounded p-3">
+                                <span className="font-semibold text-orange-800 block mb-2 text-xs uppercase">👁️ Supervisión (Modificado)</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-orange-900">{datosMEF.modificaciones_ejecucion.fechas_supervision_modificado.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término Vigente:</span> <span className="text-orange-900 font-bold">{datosMEF.modificaciones_ejecucion.fechas_supervision_modificado.termino_vigente}</span></p>
+                                </div>
+                              </div>
+                            )}
+
+                            {datosMEF.expediente_tecnico.fechas_liquidacion && (
+                              <div className="bg-gray-50 rounded p-3">
+                                <span className="font-semibold text-gray-800 block mb-2 text-xs uppercase">📊 Liquidación</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_liquidacion.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término:</span> <span className="text-gray-900">{datosMEF.expediente_tecnico.fechas_liquidacion.termino}</span></p>
+                                </div>
+                              </div>
+                            )}
+
+                            {datosMEF.modificaciones_ejecucion?.fechas_liquidacion_modificado && (
+                              <div className="bg-orange-50 border border-orange-200 rounded p-3">
+                                <span className="font-semibold text-orange-800 block mb-2 text-xs uppercase">📊 Liquidación (Modificado)</span>
+                                <div className="space-y-1 text-xs">
+                                  <p><span className="font-medium text-gray-600">Inicio:</span> <span className="text-orange-900">{datosMEF.modificaciones_ejecucion.fechas_liquidacion_modificado.inicio}</span></p>
+                                  <p><span className="font-medium text-gray-600">Término Vigente:</span> <span className="text-orange-900 font-bold">{datosMEF.modificaciones_ejecucion.fechas_liquidacion_modificado.termino_vigente}</span></p>
+                                </div>
                               </div>
                             )}
                           </div>
                         </div>
                       )}
 
-                      {/* Modificaciones durante Ejecución */}
+                      {/* 6. MODIFICACIONES DURANTE EJECUCIÓN */}
                       {datosMEF.modificaciones_ejecucion?.documentos && datosMEF.modificaciones_ejecucion.documentos.length > 0 && (
-                        <div className="bg-white rounded-lg p-4 space-y-3">
-                          <h4 className="font-semibold text-green-800 text-sm uppercase">Modificaciones durante Ejecución</h4>
-                          <div className="space-y-2">
+                        <div className="bg-white rounded-lg p-5 shadow-sm space-y-4">
+                          <h4 className="font-bold text-green-800 text-base uppercase border-b-2 border-green-200 pb-2">📝 Documentos de Modificación</h4>
+                          <div className="space-y-3">
                             {datosMEF.modificaciones_ejecucion.documentos.map((doc: any, idx) => (
-                              <div key={idx} className="text-sm border-l-2 border-orange-400 pl-3 py-1">
-                                <p className="font-medium text-gray-900">
-                                  {doc.tipo || doc.tipo_documento} N° {doc.numero || doc.numero_documento}
-                                </p>
-                                <p className="text-gray-600 text-xs">
-                                  {doc.fecha && `Fecha: ${doc.fecha}`}
-                                  {doc.fecha_documento && !doc.fecha && `Fecha: ${doc.fecha_documento}`}
-                                  {doc.descripcion && ` | ${doc.descripcion}`}
-                                  {doc.monto_modificacion && ` | Monto: S/ ${doc.monto_modificacion.toLocaleString('es-PE')}`}
-                                </p>
+                              <div key={idx} className="border-l-4 border-orange-500 bg-orange-50 pl-4 pr-3 py-3 rounded-r">
+                                <div className="flex justify-between items-start">
+                                  <div>
+                                    <p className="font-bold text-orange-900 text-sm">
+                                      {doc.tipo || doc.tipo_documento}
+                                    </p>
+                                    <p className="text-gray-700 text-xs mt-1">
+                                      N° {doc.numero || doc.numero_documento}
+                                    </p>
+                                    {doc.descripcion && (
+                                      <p className="text-gray-600 text-xs mt-1 italic">{doc.descripcion}</p>
+                                    )}
+                                  </div>
+                                  <div className="text-right text-xs text-gray-600">
+                                    {(doc.fecha || doc.fecha_documento) && (
+                                      <p className="font-medium">{doc.fecha || doc.fecha_documento}</p>
+                                    )}
+                                    {doc.monto_modificacion && (
+                                      <p className="font-bold text-orange-700 mt-1">
+                                        S/ {doc.monto_modificacion.toLocaleString('es-PE')}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             ))}
                           </div>
