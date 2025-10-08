@@ -41,6 +41,10 @@ export interface Institucionalidad {
   uei?: UnidadInversion;
   uf?: UnidadFormuladora;
   opmi?: OficinaMultianual;
+  unidad_formuladora?: string;
+  unidad_ejecutora?: string;
+  responsable_ue?: string;
+  sector?: string;
 }
 
 export interface UnidadEjecutora {
@@ -118,10 +122,11 @@ export interface ModificacionesEjecucion {
 }
 
 export interface DocumentoModificacion {
-  tipo: string;
-  numero: string;
-  fecha?: string;
-  descripcion?: string;
+  tipo_documento: string;
+  numero_documento: string;
+  fecha_documento: string;
+  monto_modificacion?: number;
+  observaciones?: string;
 }
 
 export interface FechasExpedienteModificado {
