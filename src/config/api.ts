@@ -184,7 +184,12 @@ export const API_ENDPOINTS = {
 
   // OSCE - Extracción de consorcios con Playwright (usando endpoint consolidado que incluye OSCE)
   consultaOsce: `${API_BASE_URL}/consulta-osce`, // Temporalmente deshabilitado - usar consultaRucConsolidada en su lugar
-  buscar: `${API_BASE_URL}/buscar`
+  buscar: `${API_BASE_URL}/buscar`,
+
+  // MEF Invierte - Consulta de inversiones públicas
+  mefInvierte: `${API_BASE_URL}/api/v1/mef-invierte`,
+  mefConsultar: (cui: string) => `${API_BASE_URL}/api/v1/mef-invierte/consultar/${cui}`,
+  mefActualizar: `${API_BASE_URL}/api/v1/mef-invierte/actualizar`
 } as const;
 
 // Endpoint especial para empresas sin cache busting (para DELETE y PUT)

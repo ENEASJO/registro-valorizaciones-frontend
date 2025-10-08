@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  X, 
-  Construction, 
-  DollarSign, 
-  Calendar, 
-  MapPin, 
-  FileText, 
+import {
+  X,
+  Construction,
+  DollarSign,
+  Calendar,
+  MapPin,
+  FileText,
   Users,
   AlertCircle,
   CheckCircle,
   Calculator,
   Clock,
   Scale,
-  HelpCircle
+  HelpCircle,
+  Download,
+  Loader2
 } from 'lucide-react';
 import * as Tabs from '@radix-ui/react-tabs';
 import type { 
@@ -42,6 +44,8 @@ import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
 import { useValidacionesObra } from '../../../hooks/useObras';
 import PlantelProfesional from './PlantelProfesional';
 import { API_ENDPOINTS } from '../../../config/api';
+import { consultarCUI, mapearDatosMEFAFormulario } from '../services/mefInvierteService';
+import type { DatosMEF } from '../services/mefInvierteService';
 
 // Listas fijas para ubicación en San Marcos (Áncash > Huari > San Marcos)
 const CENTROS_POBLADOS = [
@@ -106,6 +110,7 @@ const [formData, setFormData] = useState<FormData>({
     numero_contrato: '',
     nombre: '',
     codigo_interno: '',
+    cui: '',
     entidad_ejecutora_id: '',
     entidad_supervisora_id: '',
     monto_ejecucion: 0,
@@ -132,6 +137,10 @@ const [formData, setFormData] = useState<FormData>({
   const [centrosPoblados, setCentrosPoblados] = useState<string[]>([...CENTROS_POBLADOS]);
   const [caserios, setCaserios] = useState<string[]>([...CASERIOS_INDEPENDIENTES]);
 
+  // Estados para MEF Invierte
+  const [cargandoMEF, setCargandoMEF] = useState(false);
+  const [datosMEF, setDatosMEF] = useState<DatosMEF | null>(null);
+
   // Inicializar formulario con datos de obra existente
   useEffect(() => {
     if (obra && isOpen) {
@@ -154,6 +163,7 @@ setFormData({
         numero_contrato: '',
         nombre: '',
         codigo_interno: '',
+        cui: '',
         entidad_ejecutora_id: '',
         entidad_supervisora_id: '',
         monto_ejecucion: 0,
@@ -173,6 +183,7 @@ setFormData({
         errors: {}
       });
       setPlantelProfesional([]);
+      setDatosMEF(null); // Limpiar datos MEF al cerrar
     }
 
     // Enfocar el primer campo cuando se abre el modal
@@ -365,6 +376,47 @@ setFormData({
     actualizarCampo('monto_supervision', supervisionSugerida);
   };
 
+  // Consultar y autocompletar desde MEF Invierte
+  const autocompletarDesdeMEF = async () => {
+    if (!formData.cui || formData.cui.trim().length === 0) {
+      mostrarMensaje('warning', 'Ingrese un CUI válido');
+      return;
+    }
+
+    setCargandoMEF(true);
+    setDatosMEF(null);
+
+    try {
+      const respuesta = await consultarCUI(formData.cui.trim());
+
+      if (!respuesta.success || !respuesta.found || !respuesta.data) {
+        mostrarMensaje('error', respuesta.message || 'CUI no encontrado en la base de datos');
+        setCargandoMEF(false);
+        return;
+      }
+
+      // Guardar datos MEF completos
+      setDatosMEF(respuesta.data);
+
+      // Mapear datos a formulario
+      const datosMapeados = mapearDatosMEFAFormulario(respuesta.data);
+
+      // Actualizar formulario con datos mapeados
+      setFormData(prev => ({
+        ...prev,
+        ...datosMapeados,
+        errors: {}
+      }) as FormData);
+
+      mostrarMensaje('success', 'Datos de MEF Invierte cargados correctamente');
+    } catch (error) {
+      console.error('Error consultando MEF:', error);
+      mostrarMensaje('error', 'Error al consultar MEF Invierte. Verifique la conexión.');
+    } finally {
+      setCargandoMEF(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const fechaFinCalculada = calcularFechaFin(formData.fecha_inicio, formData.plazo_ejecucion_dias);
@@ -497,6 +549,45 @@ setFormData({
                     </p>
                   </div>
 
+                  {/* CUI - Código Único de Inversiones */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      CUI - Código Único de Inversiones
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={formData.cui || ''}
+                        onChange={(e) => actualizarCampo('cui', e.target.value)}
+                        className="input-field flex-1"
+                        placeholder="2595080"
+                        maxLength={7}
+                      />
+                      <button
+                        type="button"
+                        onClick={autocompletarDesdeMEF}
+                        disabled={cargandoMEF || !formData.cui}
+                        className="btn-primary px-4 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Consultar y autocompletar desde MEF Invierte"
+                      >
+                        {cargandoMEF ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Consultando...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-4 h-4" />
+                            Autocompletar MEF
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
+                      Ingrese el CUI y haga clic en "Autocompletar MEF" para cargar datos desde MEF Invierte
+                    </p>
+                  </div>
+
                   {/* Nombre de la obra */}
                   <div className="lg:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -514,6 +605,47 @@ setFormData({
                       <p className="text-sm text-red-600 mt-1">{formData.errors.nombre}</p>
                     )}
                   </div>
+
+                  {/* Panel informativo de datos MEF */}
+                  {datosMEF && (
+                    <div className="lg:col-span-2">
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-green-50 border border-green-200 rounded-lg p-4"
+                      >
+                        <h4 className="font-medium text-green-900 mb-3 flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          Datos de MEF Invierte Cargados
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
+                          <div>
+                            <span className="text-green-700 font-medium">Estado:</span>
+                            <span className="ml-2 text-green-900">{datosMEF.estado}</span>
+                          </div>
+                          <div>
+                            <span className="text-green-700 font-medium">Etapa:</span>
+                            <span className="ml-2 text-green-900">{datosMEF.etapa}</span>
+                          </div>
+                          <div>
+                            <span className="text-green-700 font-medium">Costo Total:</span>
+                            <span className="ml-2 text-green-900">
+                              S/ {datosMEF.costos_finales?.costo_total_actualizado?.toLocaleString('es-PE', { minimumFractionDigits: 2 }) || 'N/A'}
+                            </span>
+                          </div>
+                          {datosMEF.institucionalidad?.uep?.nombre && (
+                            <div className="md:col-span-2 lg:col-span-3">
+                              <span className="text-green-700 font-medium">UEP:</span>
+                              <span className="ml-2 text-green-900">{datosMEF.institucionalidad.uep.nombre}</span>
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-xs text-green-600 mt-3">
+                          ✓ Los campos del formulario se han actualizado con los datos de MEF Invierte
+                        </p>
+                      </motion.div>
+                    </div>
+                  )}
 
                   {/* Código interno */}
                   <div>

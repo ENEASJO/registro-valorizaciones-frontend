@@ -169,10 +169,15 @@ export interface Obra extends AuditoriaBase {
   ley_aplicable?: LeyContratacion;
   procedimiento_seleccion?: ProcedimientoSeleccion;
   fecha_contrato?: string; // Para determinar ley aplicable
-  
+
+  // Integración MEF Invierte
+  cui?: string; // Código Único de Inversiones
+  datos_mef?: Record<string, any>; // Datos completos desde MEF Invierte
+  fecha_actualizacion_mef?: string; // Última actualización desde MEF
+
   // Estados
   estado: EstadoObra;
-  
+
   // Metadatos
   descripcion?: string;
   observaciones?: string;
@@ -204,6 +209,8 @@ export interface ObraForm {
   ley_aplicable?: LeyContratacion;
   procedimiento_seleccion?: ProcedimientoSeleccion;
   fecha_contrato?: string;
+  cui?: string;
+  datos_mef?: Record<string, any>;
   descripcion?: string;
   observaciones?: string;
 }
