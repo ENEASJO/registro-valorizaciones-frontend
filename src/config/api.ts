@@ -16,9 +16,9 @@ const getBackendUrl = () => {
     return url;
   }
 
-  // En producción usa Cloud Run - URL unificada
+  // En producción usa Railway - URL unificada
   if (import.meta.env.PROD) {
-    return 'https://registro-valorizaciones-backend-503600768755.southamerica-west1.run.app';
+    return 'https://registro-valorizaciones-backend-production.up.railway.app';
   }
 
   // En desarrollo usa localhost
@@ -52,7 +52,7 @@ if (import.meta.env.PROD && typeof window !== 'undefined') {
     }
 
     const cleanUrl = url.trim();
-    const targetDomain = 'registro-valorizaciones-backend-503600768755.southamerica-west1.run.app';
+    const targetDomain = 'registro-valorizaciones-backend-production.up.railway.app';
 
     if (cleanUrl.includes('http://') && cleanUrl.includes(targetDomain)) {
       const correctedUrl = cleanUrl.replace('http://' + targetDomain, 'https://' + targetDomain);
