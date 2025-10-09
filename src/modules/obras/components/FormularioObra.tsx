@@ -132,7 +132,30 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formulario);
+
+    // Transformar datos para que coincidan con el modelo del backend
+    const payload = {
+      cui: formulario.cui,
+      importar_mef: formulario.importar_mef,
+      datos_mef: formulario.datos_mef,
+      codigo_interno: formulario.codigo_interno,
+      contrato: {
+        numero_contrato: formulario.numero_contrato || '',
+        fecha_contrato: formulario.fecha_contrato,
+        plazo_ejecucion_dias: null, // Opcional
+        monto_contratado: null, // Opcional
+      },
+      ubicacion: {
+        tipo: formulario.zona_tipo,
+        nombre_ubicacion: formulario.lugar_ejecucion,
+        direccion_especifica: null,
+        coordenadas: null,
+      },
+      estado_obra: formulario.estado_obra,
+      observaciones: formulario.observaciones,
+    };
+
+    await onSubmit(payload);
   };
 
   const handleChange = (
