@@ -136,8 +136,9 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
     // Transformar datos para que coincidan con el modelo del backend
     const payload: any = {
       cui: formulario.cui,
-      importar_mef: formulario.importar_mef,
-      datos_mef: formulario.datos_mef,
+      // Si no hay datos_mef, forzar importar_mef=true para que el backend los consulte
+      importar_mef: !formulario.datos_mef || formulario.importar_mef,
+      datos_mef: formulario.datos_mef || undefined,
       codigo_interno: formulario.codigo_interno,
       contrato: {
         numero_contrato: formulario.numero_contrato || '',
