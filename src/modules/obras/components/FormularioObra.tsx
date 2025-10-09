@@ -155,21 +155,21 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
       // Siempre enviar importar_mef=false porque ya consultamos localmente
       importar_mef: false,
       datos_mef: datosMEFParaEnviar,
-      codigo_interno: formulario.codigo_interno,
+      codigo_interno: formulario.codigo_interno || null,
       contrato: {
-        numero_contrato: formulario.numero_contrato || '',
-        fecha_contrato: formulario.fecha_contrato,
+        numero_contrato: formulario.numero_contrato || 'SIN CONTRATO',
+        fecha_contrato: formulario.fecha_contrato || new Date().toISOString().split('T')[0],
         plazo_ejecucion_dias: null, // Opcional
         monto_contratado: null, // Opcional
       },
       ubicacion: {
-        tipo: formulario.zona_tipo,
-        nombre_ubicacion: formulario.lugar_ejecucion,
+        tipo: formulario.zona_tipo || 'urbana',
+        nombre_ubicacion: formulario.lugar_ejecucion || 'SIN ESPECIFICAR',
         direccion_especifica: null,
         coordenadas: null,
       },
-      estado_obra: formulario.estado_obra,
-      observaciones: formulario.observaciones,
+      estado_obra: formulario.estado_obra || 'registrada',
+      observaciones: formulario.observaciones || null,
     };
 
     await onSubmit(payload);
