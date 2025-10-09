@@ -179,6 +179,11 @@ export const API_ENDPOINTS = {
   ubicaciones: `${API_BASE_URL}/ubicaciones`,
   ubicacionesAgrupadas: `${API_BASE_URL}/ubicaciones/agrupadas`,
 
+  // Plantel Profesional
+  plantelCargos: `${API_BASE_URL}/plantel/cargos`,
+  plantelPorObra: (obraId: string) => `${API_BASE_URL}/plantel/obra/${obraId}`,
+  plantel: `${API_BASE_URL}/plantel`,
+
   // Health check
   health: `${API_BASE_URL}/health`,
 

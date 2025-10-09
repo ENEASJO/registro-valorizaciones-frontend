@@ -14,6 +14,7 @@ import {
   CheckCircle,
   AlertTriangle,
   Download,
+  Users,
 } from 'lucide-react';
 import type {
   ObraFormulario,
@@ -25,6 +26,7 @@ import type {
 } from '../types';
 import { obrasService } from '../services/obrasService';
 import { obtenerUbicacionesAgrupadas, type Ubicacion } from '../../../services/ubicacionesService';
+import PlantelProfesional from './PlantelProfesional';
 
 interface FormularioObraProps {
   isOpen: boolean;
@@ -147,7 +149,8 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
     { id: 0, nombre: 'Datos MEF', icono: Download },
     { id: 1, nombre: 'Datos Contractuales', icono: FileText },
     { id: 2, nombre: 'Ubicación', icono: MapPin },
-    { id: 3, nombre: 'Observaciones', icono: Building2 },
+    { id: 3, nombre: 'Plantel Profesional', icono: Users },
+    { id: 4, nombre: 'Observaciones', icono: Building2 },
   ];
 
   if (!isOpen) return null;
@@ -767,6 +770,10 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
 
               {/* TAB 3: Observaciones */}
               {tabActual === 3 && (
+                <PlantelProfesional obraId={obra?.id} />
+              )}
+
+              {tabActual === 4 && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Observaciones
