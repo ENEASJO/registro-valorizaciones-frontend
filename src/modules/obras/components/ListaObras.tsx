@@ -298,29 +298,37 @@ const ListaObras: React.FC<ListaObrasProps> = ({
                     <td className="px-6 py-4">
                       <div>
                         <div className="text-sm font-medium text-gray-900">
-                          CUI: {obra.cui}
+                          {obra.cui ? `CUI: ${obra.cui}` : obra.codigo || 'Sin código'}
                         </div>
                         <div className="text-sm text-gray-500 line-clamp-1">
-                          {obra.datos_mef.nombre}
+                          {obra.datos_mef?.nombre || obra.nombre || 'Sin nombre'}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-900">
-                        {obra.contrato.numero_contrato}
+                        {obra.contrato?.numero_contrato || obra.contrato_numero || '-'}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {new Date(obra.contrato.fecha_contrato).toLocaleDateString('es-PE')}
+                        {obra.contrato?.fecha_contrato
+                          ? new Date(obra.contrato.fecha_contrato).toLocaleDateString('es-PE')
+                          : obra.contrato_fecha
+                            ? new Date(obra.contrato_fecha).toLocaleDateString('es-PE')
+                            : '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm font-semibold text-gray-900">
-                        {formatearMoneda(obra.datos_mef.costos_finales.costo_total_actualizado)}
+                        {obra.datos_mef?.costos_finales?.costo_total_actualizado
+                          ? formatearMoneda(obra.datos_mef.costos_finales.costo_total_actualizado)
+                          : obra.monto_contractual
+                            ? formatearMoneda(Number(obra.monto_contractual))
+                            : '-'}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{obra.datos_mef.estado}</div>
-                      <div className="text-xs text-gray-500">{obra.datos_mef.etapa}</div>
+                      <div className="text-sm text-gray-900">{obra.datos_mef?.estado || '-'}</div>
+                      <div className="text-xs text-gray-500">{obra.datos_mef?.etapa || '-'}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 text-xs font-medium rounded-full ${getEstadoColor(obra.estado_obra)}`}>

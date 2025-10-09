@@ -213,18 +213,18 @@ export type ZonaTipo = 'urbana' | 'centro_poblado' | 'caserio';
 
 export interface Obra {
   id: string;
-  cui: string;
+  cui?: string;
   codigo_interno?: string;
 
-  // Datos MEF (completos del scraping)
-  datos_mef: DatosMEF;
+  // Datos MEF (completos del scraping) - OPCIONAL para compatibilidad con modelo antiguo
+  datos_mef?: DatosMEF;
   fecha_actualizacion_mef?: string;
 
-  // Datos contractuales municipales
-  contrato: DatosContrato;
+  // Datos contractuales municipales - OPCIONAL para compatibilidad con modelo antiguo
+  contrato?: DatosContrato;
 
-  // Ubicación
-  ubicacion: Ubicacion;
+  // Ubicación - OPCIONAL para compatibilidad con modelo antiguo
+  ubicacion?: Ubicacion;
 
   // Estado y seguimiento
   estado_obra: EstadoObra;
@@ -235,6 +235,45 @@ export interface Obra {
   updated_at: string;
   created_by?: string;
   updated_by?: string;
+
+  // Campos del modelo antiguo (para compatibilidad retroactiva)
+  empresa_id?: string;
+  codigo?: string;
+  nombre?: string;
+  descripcion?: string;
+  monto_contractual?: string;
+  fecha_inicio?: string;
+  fecha_fin_programada?: string;
+  fecha_fin_real?: string;
+  estado?: string;
+  tipo_obra?: string;
+  modalidad_contrato?: string;
+  cliente?: string;
+  ubigeo?: string;
+  modalidad_ejecucion?: string;
+  sistema_contratacion?: string;
+  monto_adicionales?: string;
+  monto_total?: string;
+  fecha_fin_contractual?: string;
+  plazo_contractual?: number;
+  plazo_total?: number;
+  porcentaje_avance?: string;
+  activo?: boolean;
+  version?: number;
+  contrato_numero?: string;
+  contrato_fecha?: string;
+  contrato_plazo_dias?: number;
+  contrato_monto?: string;
+  contratista_ruc?: string;
+  contratista_nombre?: string;
+  supervisor_ruc?: string;
+  supervisor_nombre?: string;
+  ubicacion_tipo?: string;
+  ubicacion_nombre?: string;
+  ubicacion_direccion?: string;
+  ubicacion_latitud?: number;
+  ubicacion_longitud?: number;
+  empresa_nombre?: string;
 }
 
 export type EstadoObra =
