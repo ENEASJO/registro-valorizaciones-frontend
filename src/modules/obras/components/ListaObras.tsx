@@ -34,7 +34,13 @@ const ListaObras: React.FC<ListaObrasProps> = ({
   const [busqueda, setBusqueda] = useState('');
   const [estadisticas, setEstadisticas] = useState({
     total: 0,
-    por_estado: {} as Record<string, number>,
+    por_estado: {
+      registrada: 0,
+      en_ejecucion: 0,
+      paralizada: 0,
+      culminada: 0,
+      liquidada: 0,
+    } as Record<string, number>,
     inversion_total: 0,
   });
 
