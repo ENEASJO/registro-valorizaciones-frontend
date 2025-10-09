@@ -133,12 +133,28 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Si no hay datos MEF, consultarlos primero con scraping local
+    let datosMEFParaEnviar = formulario.datos_mef;
+    if (!datosMEFParaEnviar && formulario.cui) {
+      try {
+        setConsultandoMEF(true);
+        const response = await obrasService.consultarMEF(formulario.cui);
+        if (response.status === 'success' && response.data) {
+          datosMEFParaEnviar = response.data;
+        }
+      } catch (error) {
+        console.error('Error consultando MEF antes de guardar:', error);
+      } finally {
+        setConsultandoMEF(false);
+      }
+    }
+
     // Transformar datos para que coincidan con el modelo del backend
     const payload: any = {
       cui: formulario.cui,
-      // Si no hay datos_mef, forzar importar_mef=true para que el backend los consulte
-      importar_mef: !formulario.datos_mef || formulario.importar_mef,
-      datos_mef: formulario.datos_mef || undefined,
+      // Siempre enviar importar_mef=false porque ya consultamos localmente
+      importar_mef: false,
+      datos_mef: datosMEFParaEnviar,
       codigo_interno: formulario.codigo_interno,
       contrato: {
         numero_contrato: formulario.numero_contrato || '',
