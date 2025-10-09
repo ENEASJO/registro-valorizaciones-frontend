@@ -42,9 +42,11 @@ const ObrasPage = () => {
 
       setVista('lista');
       setObraSeleccionada(undefined);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error guardando obra:', error);
-      throw error;
+      // Mostrar el error al usuario
+      alert(`Error al guardar la obra: ${error.message || 'Error desconocido. Por favor, revise los datos ingresados.'}`);
+      // No lanzar el error nuevamente para que el modal permanezca abierto
     } finally {
       setGuardando(false);
     }
