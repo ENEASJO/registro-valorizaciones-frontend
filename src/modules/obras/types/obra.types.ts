@@ -300,18 +300,22 @@ export interface ObraFormulario {
 // ============================================================================
 
 export interface ObrasResponse {
-  status: 'success' | 'error';
-  data?: Obra[];
-  total?: number;
-  page?: number;
-  limit?: number;
+  success: boolean;
+  data?: {
+    obras: Obra[];
+    total: number;
+    limit?: number;
+    offset?: number;
+  };
+  timestamp?: string;
   message?: string;
 }
 
 export interface ObraResponse {
-  status: 'success' | 'error';
+  success: boolean;
   data?: Obra;
   message?: string;
+  timestamp?: string;
 }
 
 export interface ConsultaMEFResponse {
