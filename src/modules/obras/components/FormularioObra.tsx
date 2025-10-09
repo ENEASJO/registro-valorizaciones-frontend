@@ -139,7 +139,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
       try {
         setConsultandoMEF(true);
         const response = await obrasService.consultarMEF(formulario.cui);
-        if (response.status === 'success' && response.data) {
+        if (response.success && response.data) {
           datosMEFParaEnviar = response.data;
         }
       } catch (error) {
