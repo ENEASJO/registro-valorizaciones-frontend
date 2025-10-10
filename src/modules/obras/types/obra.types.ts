@@ -7,7 +7,7 @@
 // DATOS MEF INVIERTE
 // ============================================================================
 
-export interface DatosMEF {
+export interface DatosMEFCore {
   cui: string;
   nombre: string;
   estado: string;
@@ -20,6 +20,13 @@ export interface DatosMEF {
   expediente_tecnico?: ExpedienteTecnico;
   modificaciones_ejecucion?: ModificacionesEjecucion;
   responsabilidad_funcional?: ResponsabilidadFuncional;
+}
+
+// Estructura retornada por el backend (datos anidados bajo 'data')
+export interface DatosMEF {
+  data: DatosMEFCore;
+  success?: boolean;
+  fuente?: string;
 }
 
 export interface CostosFinales {
@@ -315,7 +322,7 @@ export interface ObraFormulario {
   // Tab 1: Datos MEF
   cui: string;
   importar_mef: boolean;
-  datos_mef?: DatosMEF;
+  datos_mef?: DatosMEFCore; // Usar DatosMEFCore para formularios
 
   // Tab 2: Datos Contractuales
   numero_contrato: string;
@@ -363,7 +370,7 @@ export interface ConsultaMEFResponse {
   success: boolean;
   found: boolean;
   cui: string;
-  data?: DatosMEF;
+  data?: DatosMEFCore; // Usar DatosMEFCore para el response directo del API
   obra_info?: {
     nombre: string;
     codigo: string;
