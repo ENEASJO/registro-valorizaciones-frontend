@@ -59,7 +59,7 @@ const ObrasPage = () => {
       setGuardando(true);
       const response = await obrasService.actualizarDatosMEF(obraSeleccionada.id);
 
-      if (response.success && response.data) {
+      if (response.status === "success" && response.data) {
         setObraSeleccionada(response.data);
       }
     } catch (error) {
