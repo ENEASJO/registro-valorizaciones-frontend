@@ -57,11 +57,11 @@ const ListaObras: React.FC<ListaObrasProps> = ({
         busqueda,
       });
 
-      // El backend retorna: {success: true, data: {obras: [...], total: 4}}
-      if (response.success && response.data) {
-        // response.data.obras contiene el array de obras
-        const obrasArray = response.data.obras || response.data;
-        setObras(Array.isArray(obrasArray) ? obrasArray : []);
+      // El backend retorna: {status: "success", data: [...]}
+      if (response.status === "success" && response.data) {
+        // response.data es directamente el array de obras
+        const obrasArray = Array.isArray(response.data) ? response.data : (response.data.obras || []);
+        setObras(obrasArray);
       }
     } catch (error) {
       console.error('Error cargando obras:', error);
