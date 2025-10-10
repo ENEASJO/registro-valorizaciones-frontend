@@ -19,6 +19,7 @@ import {
 import type {
   ObraFormulario,
   DatosMEF,
+  DatosMEFCore,
   SistemaContratacion,
   ModalidadEjecucion,
   EstadoObra,
@@ -48,7 +49,7 @@ const FormularioObra: React.FC<FormularioObraProps> = ({
   // Estados del formulario
   const [tabActual, setTabActual] = useState(0);
   const [consultandoMEF, setConsultandoMEF] = useState(false);
-  const [datosMEF, setDatosMEF] = useState<DatosMEF | null>(null);
+  const [datosMEF, setDatosMEF] = useState<DatosMEFCore | null>(null);
   const [errorMEF, setErrorMEF] = useState<string | null>(null);
 
   // Estados para ubicaciones
