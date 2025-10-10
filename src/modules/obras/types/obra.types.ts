@@ -135,6 +135,7 @@ export interface DocumentoModificacion {
   numero_documento: string;
   fecha?: string; // Campo usado por MEF
   fecha_documento?: string; // Alias para compatibilidad
+  descripcion?: string; // Descripción del documento
   monto_modificacion?: number;
   observaciones?: string;
 }
