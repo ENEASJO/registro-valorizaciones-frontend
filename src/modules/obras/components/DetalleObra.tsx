@@ -166,6 +166,42 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
             </div>
           </section>
 
+          {/* Articulación PMI */}
+          {obra.datos_mef?.articulacion_pmi && (
+            <section className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-teal-600" />
+                Articulación con PMI
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {obra.datos_mef.articulacion_pmi.servicio_publico && (
+                  <div className="md:col-span-2">
+                    <p className="text-sm text-gray-500">Servicio Público</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.articulacion_pmi.servicio_publico}</p>
+                  </div>
+                )}
+                {obra.datos_mef.articulacion_pmi.indicador_brecha && (
+                  <div className="md:col-span-2">
+                    <p className="text-sm text-gray-500">Indicador de Brecha</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.articulacion_pmi.indicador_brecha}</p>
+                  </div>
+                )}
+                {obra.datos_mef.articulacion_pmi.espacio_geografico && (
+                  <div>
+                    <p className="text-sm text-gray-500">Espacio Geográfico</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.articulacion_pmi.espacio_geografico}</p>
+                  </div>
+                )}
+                {obra.datos_mef.articulacion_pmi.contribucion_brecha !== undefined && (
+                  <div>
+                    <p className="text-sm text-gray-500">Contribución a la Brecha</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.articulacion_pmi.contribucion_brecha}</p>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
           {/* Costos y Financiamiento - Solo si hay datos MEF */}
           {obra.datos_mef?.costos_finales && (
             <section className="bg-white border border-gray-200 rounded-lg p-6">
@@ -362,23 +398,195 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                   <p className="text-sm font-medium text-gray-700 mb-3">Metas Físicas</p>
                   <div className="space-y-3">
                     {obra.datos_mef.expediente_tecnico.metas.map((meta, idx) => (
-                      <div key={idx} className="bg-gray-50 p-4 rounded-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div key={idx} className="bg-indigo-50 p-4 rounded-lg border border-indigo-100">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                           <div>
-                            <p className="text-xs text-gray-500">Componente</p>
-                            <p className="font-medium text-gray-900">{meta.componente}</p>
+                            <p className="text-xs text-indigo-600 font-medium">Tipo</p>
+                            <p className="font-medium text-gray-900">{meta.tipo || meta.componente || '-'}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500">Meta</p>
-                            <p className="font-medium text-gray-900">{meta.meta}</p>
+                            <p className="text-xs text-indigo-600 font-medium">Activo</p>
+                            <p className="font-medium text-gray-900">{meta.activo || meta.meta || '-'}</p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500">Unidad de Medida</p>
-                            <p className="font-medium text-gray-900">{meta.unidad_medida}</p>
+                            <p className="text-xs text-indigo-600 font-medium">Cantidad</p>
+                            <p className="font-medium text-gray-900">{meta.cantidad || '-'}</p>
                           </div>
+                          <div>
+                            <p className="text-xs text-indigo-600 font-medium">Unidad</p>
+                            <p className="font-medium text-gray-900">{meta.unidad || meta.unidad_medida || '-'}</p>
+                          </div>
+                          {meta.naturaleza && (
+                            <div className="md:col-span-2">
+                              <p className="text-xs text-indigo-600 font-medium">Naturaleza</p>
+                              <p className="font-medium text-gray-900">{meta.naturaleza}</p>
+                            </div>
+                          )}
+                          {meta.factor_productivo && (
+                            <div className="md:col-span-2">
+                              <p className="text-xs text-indigo-600 font-medium">Factor Productivo</p>
+                              <p className="font-medium text-gray-900">{meta.factor_productivo}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Fechas de Componentes */}
+              {(obra.datos_mef.expediente_tecnico.fechas_muro || obra.datos_mef.expediente_tecnico.fechas_ptar) && (
+                <div className="mt-6">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Cronograma de Componentes</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {obra.datos_mef.expediente_tecnico.fechas_muro && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">Muro de Contención</p>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Inicio:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_muro.inicio}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Término:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_muro.termino}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Entrega:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_muro.entrega}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {obra.datos_mef.expediente_tecnico.fechas_ptar && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">PTAR</p>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Inicio:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_ptar.inicio}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Término:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_ptar.termino}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Entrega:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_ptar.entrega}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Fechas de Expediente, Supervisión y Liquidación */}
+              {(obra.datos_mef.expediente_tecnico.fechas_expediente ||
+                obra.datos_mef.expediente_tecnico.fechas_supervision ||
+                obra.datos_mef.expediente_tecnico.fechas_liquidacion) && (
+                <div className="mt-4">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Cronograma de Actividades</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {obra.datos_mef.expediente_tecnico.fechas_expediente && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">Expediente Técnico</p>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Inicio:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_expediente.inicio}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Término:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_expediente.termino}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {obra.datos_mef.expediente_tecnico.fechas_supervision && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">Supervisión</p>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Inicio:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_supervision.inicio}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Término:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_supervision.termino}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    {obra.datos_mef.expediente_tecnico.fechas_liquidacion && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <p className="text-xs font-medium text-gray-700 mb-2">Liquidación</p>
+                        <div className="space-y-1 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Inicio:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_liquidacion.inicio}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Término:</span>
+                            <span className="font-medium">{obra.datos_mef.expediente_tecnico.fechas_liquidacion.termino}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Costos Detallados del Expediente */}
+              {(obra.datos_mef.expediente_tecnico.subtotal_metas ||
+                obra.datos_mef.expediente_tecnico.costo_expediente_tecnico ||
+                obra.datos_mef.expediente_tecnico.costo_supervision ||
+                obra.datos_mef.expediente_tecnico.costo_liquidacion ||
+                obra.datos_mef.expediente_tecnico.costo_inversion_actualizado) && (
+                <div className="mt-6">
+                  <p className="text-sm font-medium text-gray-700 mb-3">Costos Detallados</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {obra.datos_mef.expediente_tecnico.subtotal_metas && (
+                      <div className="bg-blue-50 p-3 rounded-lg">
+                        <p className="text-xs text-blue-700 font-medium">Subtotal Metas</p>
+                        <p className="text-lg font-bold text-blue-900">
+                          {formatearMoneda(obra.datos_mef.expediente_tecnico.subtotal_metas)}
+                        </p>
+                      </div>
+                    )}
+                    {obra.datos_mef.expediente_tecnico.costo_expediente_tecnico && (
+                      <div className="bg-purple-50 p-3 rounded-lg">
+                        <p className="text-xs text-purple-700 font-medium">Expediente Técnico</p>
+                        <p className="text-lg font-bold text-purple-900">
+                          {formatearMoneda(obra.datos_mef.expediente_tecnico.costo_expediente_tecnico)}
+                        </p>
+                      </div>
+                    )}
+                    {obra.datos_mef.expediente_tecnico.costo_supervision && (
+                      <div className="bg-green-50 p-3 rounded-lg">
+                        <p className="text-xs text-green-700 font-medium">Supervisión</p>
+                        <p className="text-lg font-bold text-green-900">
+                          {formatearMoneda(obra.datos_mef.expediente_tecnico.costo_supervision)}
+                        </p>
+                      </div>
+                    )}
+                    {obra.datos_mef.expediente_tecnico.costo_liquidacion && (
+                      <div className="bg-orange-50 p-3 rounded-lg">
+                        <p className="text-xs text-orange-700 font-medium">Liquidación</p>
+                        <p className="text-lg font-bold text-orange-900">
+                          {formatearMoneda(obra.datos_mef.expediente_tecnico.costo_liquidacion)}
+                        </p>
+                      </div>
+                    )}
+                    {obra.datos_mef.expediente_tecnico.costo_inversion_actualizado && (
+                      <div className="bg-indigo-50 p-3 rounded-lg md:col-span-2">
+                        <p className="text-xs text-indigo-700 font-medium">Inversión Actualizada</p>
+                        <p className="text-lg font-bold text-indigo-900">
+                          {formatearMoneda(obra.datos_mef.expediente_tecnico.costo_inversion_actualizado)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -406,7 +614,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                       </div>
                       <div>
                         <p className="text-xs text-yellow-700">Fecha</p>
-                        <p className="font-medium text-yellow-900">{formatearFecha(doc.fecha_documento)}</p>
+                        <p className="font-medium text-yellow-900">{doc.fecha || doc.fecha_documento || '-'}</p>
                       </div>
                       {doc.monto_modificacion && (
                         <div>
@@ -457,6 +665,42 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                   <div>
                     <p className="text-sm text-gray-500">Sector</p>
                     <p className="font-medium text-gray-900">{obra.datos_mef.institucionalidad.sector}</p>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Responsabilidad Funcional */}
+          {obra.datos_mef?.responsabilidad_funcional && (
+            <section className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-pink-600" />
+                Responsabilidad Funcional
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {obra.datos_mef.responsabilidad_funcional.funcion && (
+                  <div>
+                    <p className="text-sm text-gray-500">Función</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.responsabilidad_funcional.funcion}</p>
+                  </div>
+                )}
+                {obra.datos_mef.responsabilidad_funcional.grupo_funcional && (
+                  <div>
+                    <p className="text-sm text-gray-500">Grupo Funcional</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.responsabilidad_funcional.grupo_funcional}</p>
+                  </div>
+                )}
+                {obra.datos_mef.responsabilidad_funcional.division_funcional && (
+                  <div>
+                    <p className="text-sm text-gray-500">División Funcional</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.responsabilidad_funcional.division_funcional}</p>
+                  </div>
+                )}
+                {obra.datos_mef.responsabilidad_funcional.sector_responsable && (
+                  <div>
+                    <p className="text-sm text-gray-500">Sector Responsable</p>
+                    <p className="font-medium text-gray-900">{obra.datos_mef.responsabilidad_funcional.sector_responsable}</p>
                   </div>
                 )}
               </div>
