@@ -339,8 +339,8 @@ export interface ObraFormulario {
 // ============================================================================
 
 export interface ObrasResponse {
-  success: boolean;
-  data?: {
+  status: string;
+  data?: Obra[] | {
     obras: Obra[];
     total: number;
     limit?: number;
@@ -351,7 +351,7 @@ export interface ObrasResponse {
 }
 
 export interface ObraResponse {
-  success: boolean;
+  status: string;
   data?: Obra;
   message?: string;
   timestamp?: string;
