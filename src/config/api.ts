@@ -169,8 +169,8 @@ export const API_ENDPOINTS = {
   empresasSearch: `${API_BASE_URL}/api/empresas-guardadas/search`, // Buscar
   empresasStats: `${API_BASE_URL}/api/empresas-guardadas/stats`,   // Estadísticas
 
-  // Obras - Neon integrado con MEF (usar endpoint /api/v1 con trailing slash)
-  obras: `${API_BASE_URL}/api/v1/obras/`,
+  // Obras - Neon integrado con MEF (usar endpoint /api/v1/obras-mef con trailing slash)
+  obras: `${API_BASE_URL}/api/v1/obras-mef/`,
 
   // Valorizaciones - Neon integrado
   valorizaciones: `${API_BASE_URL}/valorizaciones`,
