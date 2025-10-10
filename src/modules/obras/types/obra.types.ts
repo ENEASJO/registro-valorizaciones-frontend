@@ -133,7 +133,8 @@ export interface ModificacionesEjecucion {
 export interface DocumentoModificacion {
   tipo_documento: string;
   numero_documento: string;
-  fecha_documento: string;
+  fecha?: string; // Campo usado por MEF
+  fecha_documento?: string; // Alias para compatibilidad
   monto_modificacion?: number;
   observaciones?: string;
 }
