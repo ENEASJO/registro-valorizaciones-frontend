@@ -75,7 +75,9 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
             <Building2 className="w-8 h-8 text-white" />
             <div>
               <h2 className="text-xl font-bold text-white">Detalle de Obra</h2>
-              <p className="text-blue-100 text-sm">CUI: {obra.cui}</p>
+              <p className="text-blue-100 text-sm">
+                {obra.cui ? `CUI: ${obra.cui}` : obra.codigo || 'Sin código'}
+              </p>
             </div>
           </div>
           <div className="flex gap-2">
@@ -113,11 +115,15 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Nombre de la Obra</p>
-                <p className="font-medium text-gray-900">{obra.datos_mef.nombre}</p>
+                <p className="font-medium text-gray-900">
+                  {obra.datos_mef?.nombre || obra.nombre || 'Sin nombre'}
+                </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">CUI</p>
-                <p className="font-medium text-gray-900">{obra.cui}</p>
+                <p className="text-sm text-gray-500">CUI / Código</p>
+                <p className="font-medium text-gray-900">
+                  {obra.cui || obra.codigo || 'Sin código'}
+                </p>
               </div>
               {obra.codigo_interno && (
                 <div>
@@ -125,26 +131,32 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
                   <p className="font-medium text-gray-900">{obra.codigo_interno}</p>
                 </div>
               )}
-              <div>
-                <p className="text-sm text-gray-500">Estado MEF</p>
-                <span className="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
-                  {obra.datos_mef.estado}
-                </span>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Etapa</p>
-                <p className="font-medium text-gray-900">{obra.datos_mef.etapa}</p>
-              </div>
+              {obra.datos_mef?.estado && (
+                <div>
+                  <p className="text-sm text-gray-500">Estado MEF</p>
+                  <span className="inline-flex px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">
+                    {obra.datos_mef.estado}
+                  </span>
+                </div>
+              )}
+              {obra.datos_mef?.etapa && (
+                <div>
+                  <p className="text-sm text-gray-500">Etapa</p>
+                  <p className="font-medium text-gray-900">{obra.datos_mef.etapa}</p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-gray-500">Estado de la Obra</p>
                 <span className={`inline-flex px-3 py-1 text-sm font-medium rounded-full ${getEstadoColor(obra.estado_obra)}`}>
                   {obra.estado_obra}
                 </span>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Fecha de Registro MEF</p>
-                <p className="font-medium text-gray-900">{formatearFecha(obra.datos_mef.fecha_registro)}</p>
-              </div>
+              {obra.datos_mef?.fecha_registro && (
+                <div>
+                  <p className="text-sm text-gray-500">Fecha de Registro MEF</p>
+                  <p className="font-medium text-gray-900">{formatearFecha(obra.datos_mef.fecha_registro)}</p>
+                </div>
+              )}
               {obra.fecha_actualizacion_mef && (
                 <div>
                   <p className="text-sm text-gray-500">Última Actualización MEF</p>
@@ -154,124 +166,184 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
             </div>
           </section>
 
-          {/* Costos y Financiamiento */}
-          <section className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
-              Costos y Financiamiento
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-sm text-green-600 font-medium">Costo Total</p>
-                <p className="text-2xl font-bold text-green-800">
-                  {formatearMoneda(obra.datos_mef.costos_finales.costo_total_actualizado)}
-                </p>
+          {/* Costos y Financiamiento - Solo si hay datos MEF */}
+          {obra.datos_mef?.costos_finales && (
+            <section className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-600" />
+                Costos y Financiamiento
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-sm text-green-600 font-medium">Costo Total</p>
+                  <p className="text-2xl font-bold text-green-800">
+                    {formatearMoneda(obra.datos_mef.costos_finales.costo_total_actualizado)}
+                  </p>
+                </div>
+                {obra.datos_mef.costos_finales.costo_obra && (
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <p className="text-sm text-blue-600 font-medium">Costo de Obra</p>
+                    <p className="text-2xl font-bold text-blue-800">
+                      {formatearMoneda(obra.datos_mef.costos_finales.costo_obra)}
+                    </p>
+                  </div>
+                )}
+                {obra.datos_mef.costos_finales.costo_supervision && (
+                  <div className="bg-purple-50 p-4 rounded-lg">
+                    <p className="text-sm text-purple-600 font-medium">Supervisión</p>
+                    <p className="text-2xl font-bold text-purple-800">
+                      {formatearMoneda(obra.datos_mef.costos_finales.costo_supervision)}
+                    </p>
+                  </div>
+                )}
               </div>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-600 font-medium">Costo de Obra</p>
-                <p className="text-2xl font-bold text-blue-800">
-                  {formatearMoneda(obra.datos_mef.costos_finales.costo_obra)}
-                </p>
-              </div>
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <p className="text-sm text-purple-600 font-medium">Supervisión</p>
-                <p className="text-2xl font-bold text-purple-800">
-                  {formatearMoneda(obra.datos_mef.costos_finales.costo_supervision)}
-                </p>
-              </div>
-            </div>
 
-            {obra.datos_mef.costos_finales.fuentes_financiamiento && (
-              <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Fuentes de Financiamiento</p>
-                <div className="space-y-2">
-                  {obra.datos_mef.costos_finales.fuentes_financiamiento.map((fuente, idx) => (
-                    <div key={idx} className="flex justify-between items-center bg-gray-50 p-3 rounded">
-                      <span className="text-sm text-gray-700">{fuente.fuente}</span>
-                      <span className="font-medium text-gray-900">{formatearMoneda(fuente.monto)}</span>
+              {obra.datos_mef.costos_finales.fuentes_financiamiento && (
+                <div className="mt-4">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Fuentes de Financiamiento</p>
+                  <div className="space-y-2">
+                    {obra.datos_mef.costos_finales.fuentes_financiamiento.map((fuente, idx) => (
+                      <div key={idx} className="flex justify-between items-center bg-gray-50 p-3 rounded">
+                        <span className="text-sm text-gray-700">{fuente.fuente}</span>
+                        <span className="font-medium text-gray-900">{formatearMoneda(fuente.monto)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+
+          {/* Costos Modelo Antiguo - Si no hay datos MEF pero hay monto contractual */}
+          {!obra.datos_mef && obra.monto_contractual && (
+            <section className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-600" />
+                Información Financiera
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-green-50 p-4 rounded-lg">
+                  <p className="text-sm text-green-600 font-medium">Monto Contractual</p>
+                  <p className="text-2xl font-bold text-green-800">
+                    {formatearMoneda(Number(obra.monto_contractual))}
+                  </p>
+                </div>
+                {obra.monto_total && Number(obra.monto_total) > 0 && (
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <p className="text-sm text-blue-600 font-medium">Monto Total</p>
+                    <p className="text-2xl font-bold text-blue-800">
+                      {formatearMoneda(Number(obra.monto_total))}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {/* Datos Contractuales - Solo si existen */}
+          {(obra.contrato || obra.contrato_numero) && (
+            <section className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-orange-600" />
+                Datos Contractuales
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(obra.contrato?.numero_contrato || obra.contrato_numero) && (
+                  <div>
+                    <p className="text-sm text-gray-500">Número de Contrato</p>
+                    <p className="font-medium text-gray-900">
+                      {obra.contrato?.numero_contrato || obra.contrato_numero}
+                    </p>
+                  </div>
+                )}
+                {(obra.contrato?.fecha_contrato || obra.contrato_fecha) && (
+                  <div>
+                    <p className="text-sm text-gray-500">Fecha de Contrato</p>
+                    <p className="font-medium text-gray-900">
+                      {formatearFecha(obra.contrato?.fecha_contrato || obra.contrato_fecha!)}
+                    </p>
+                  </div>
+                )}
+                {(obra.contrato?.plazo_ejecucion_dias || obra.contrato_plazo_dias) && (
+                  <div>
+                    <p className="text-sm text-gray-500">Plazo de Ejecución</p>
+                    <p className="font-medium text-gray-900">
+                      {obra.contrato?.plazo_ejecucion_dias || obra.contrato_plazo_dias} días
+                    </p>
+                  </div>
+                )}
+                {(obra.contrato?.monto_contratado || obra.contrato_monto) && (
+                  <div>
+                    <p className="text-sm text-gray-500">Monto Contratado</p>
+                    <p className="font-medium text-gray-900">
+                      {formatearMoneda(Number(obra.contrato?.monto_contratado || obra.contrato_monto))}
+                    </p>
+                  </div>
+                )}
+                {(obra.contrato?.contratista_ruc || obra.contratista_ruc) && (
+                  <>
+                    <div>
+                      <p className="text-sm text-gray-500">Contratista RUC</p>
+                      <p className="font-medium text-gray-900">
+                        {obra.contrato?.contratista_ruc || obra.contratista_ruc}
+                      </p>
                     </div>
-                  ))}
-                </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Razón Social</p>
+                      <p className="font-medium text-gray-900">
+                        {obra.contrato?.contratista_nombre || obra.contratista_nombre}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
-            )}
-          </section>
+            </section>
+          )}
 
-          {/* Datos Contractuales */}
-          <section className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-orange-600" />
-              Datos Contractuales
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-500">Número de Contrato</p>
-                <p className="font-medium text-gray-900">{obra.contrato.numero_contrato}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Fecha de Contrato</p>
-                <p className="font-medium text-gray-900">{formatearFecha(obra.contrato.fecha_contrato)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Plazo de Ejecución</p>
-                <p className="font-medium text-gray-900">{obra.contrato.plazo_ejecucion_dias} días</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Monto Contratado</p>
-                <p className="font-medium text-gray-900">{formatearMoneda(obra.contrato.monto_contratado)}</p>
-              </div>
-              {obra.contrato.contratista_ruc && (
-                <>
+          {/* Ubicación - Solo si existe */}
+          {obra.ubicacion && (
+            <section className="bg-white border border-gray-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-red-600" />
+                Ubicación
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {obra.ubicacion.tipo && (
                   <div>
-                    <p className="text-sm text-gray-500">Contratista RUC</p>
-                    <p className="font-medium text-gray-900">{obra.contrato.contratista_ruc}</p>
+                    <p className="text-sm text-gray-500">Tipo de Ubicación</p>
+                    <p className="font-medium text-gray-900">{obra.ubicacion.tipo}</p>
                   </div>
+                )}
+                {obra.ubicacion.nombre_ubicacion && (
                   <div>
-                    <p className="text-sm text-gray-500">Razón Social</p>
-                    <p className="font-medium text-gray-900">{obra.contrato.contratista_nombre}</p>
+                    <p className="text-sm text-gray-500">Ubicación Específica</p>
+                    <p className="font-medium text-gray-900">{obra.ubicacion.nombre_ubicacion}</p>
                   </div>
-                </>
-              )}
-            </div>
-          </section>
-
-          {/* Ubicación */}
-          <section className="bg-white border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-red-600" />
-              Ubicación
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-500">Tipo de Ubicación</p>
-                <p className="font-medium text-gray-900">{obra.ubicacion.tipo}</p>
+                )}
+                {obra.ubicacion.direccion_especifica && (
+                  <div className="md:col-span-2">
+                    <p className="text-sm text-gray-500">Dirección Específica</p>
+                    <p className="font-medium text-gray-900">{obra.ubicacion.direccion_especifica}</p>
+                  </div>
+                )}
+                {obra.ubicacion.coordenadas && (
+                  <>
+                    <div>
+                      <p className="text-sm text-gray-500">Latitud</p>
+                      <p className="font-medium text-gray-900">{obra.ubicacion.coordenadas.latitud}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Longitud</p>
+                      <p className="font-medium text-gray-900">{obra.ubicacion.coordenadas.longitud}</p>
+                    </div>
+                  </>
+                )}
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Ubicación Específica</p>
-                <p className="font-medium text-gray-900">{obra.ubicacion.nombre_ubicacion}</p>
-              </div>
-              {obra.ubicacion.direccion_especifica && (
-                <div className="md:col-span-2">
-                  <p className="text-sm text-gray-500">Dirección Específica</p>
-                  <p className="font-medium text-gray-900">{obra.ubicacion.direccion_especifica}</p>
-                </div>
-              )}
-              {obra.ubicacion.coordenadas && (
-                <>
-                  <div>
-                    <p className="text-sm text-gray-500">Latitud</p>
-                    <p className="font-medium text-gray-900">{obra.ubicacion.coordenadas.latitud}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Longitud</p>
-                    <p className="font-medium text-gray-900">{obra.ubicacion.coordenadas.longitud}</p>
-                  </div>
-                </>
-              )}
-            </div>
-          </section>
+            </section>
+          )}
 
           {/* Expediente Técnico */}
-          {obra.datos_mef.expediente_tecnico && (
+          {obra.datos_mef?.expediente_tecnico && (
             <section className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-indigo-600" />
@@ -314,7 +386,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
           )}
 
           {/* Modificaciones de Ejecución */}
-          {obra.datos_mef.modificaciones_ejecucion && obra.datos_mef.modificaciones_ejecucion.documentos && obra.datos_mef.modificaciones_ejecucion.documentos.length > 0 && (
+          {obra.datos_mef?.modificaciones_ejecucion && obra.datos_mef.modificaciones_ejecucion.documentos && obra.datos_mef.modificaciones_ejecucion.documentos.length > 0 && (
             <section className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-yellow-600" />
@@ -356,7 +428,7 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
           )}
 
           {/* Institucionalidad */}
-          {obra.datos_mef.institucionalidad && (
+          {obra.datos_mef?.institucionalidad && (
             <section className="bg-white border border-gray-200 rounded-lg p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Users className="w-5 h-5 text-purple-600" />
@@ -405,10 +477,12 @@ const DetalleObra: React.FC<DetalleObraProps> = ({
           {/* Metadatos */}
           <section className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500">Fuente MEF</p>
-                <p className="font-medium text-gray-700">{obra.datos_mef.fuente}</p>
-              </div>
+              {obra.datos_mef?.fuente && (
+                <div>
+                  <p className="text-gray-500">Fuente MEF</p>
+                  <p className="font-medium text-gray-700">{obra.datos_mef.fuente}</p>
+                </div>
+              )}
               <div>
                 <p className="text-gray-500">Creado</p>
                 <p className="font-medium text-gray-700">{formatearFecha(obra.created_at)}</p>
