@@ -102,6 +102,17 @@ const ListaObras: React.FC<ListaObrasProps> = ({
     }).format(monto);
   };
 
+  const formatearFecha = (fecha: string | null | undefined): string => {
+    if (!fecha) return '-';
+    try {
+      const date = new Date(fecha);
+      if (isNaN(date.getTime())) return '-';
+      return date.toLocaleDateString('es-PE');
+    } catch {
+      return '-';
+    }
+  };
+
   const getEstadoColor = (estado: EstadoObra) => {
     const colores = {
       registrada: 'bg-blue-100 text-blue-800',
@@ -323,9 +334,7 @@ const ListaObras: React.FC<ListaObrasProps> = ({
                     </div>
                     {(obra.contrato?.fecha_contrato || obra.contrato_fecha) && (
                       <div className="text-xs text-gray-500 ml-6">
-                        {obra.contrato?.fecha_contrato
-                          ? new Date(obra.contrato.fecha_contrato).toLocaleDateString('es-PE')
-                          : new Date(obra.contrato_fecha!).toLocaleDateString('es-PE')}
+                        {formatearFecha(obra.contrato?.fecha_contrato || obra.contrato_fecha)}
                       </div>
                     )}
                   </div>
@@ -364,9 +373,9 @@ const ListaObras: React.FC<ListaObrasProps> = ({
                         <div className="text-xs">
                           <span className="text-gray-500 font-medium">Plazo Ejecución:</span>
                           <div className="text-gray-700 mt-0.5">
-                            {new Date(obra.datos_mef.data.expediente_tecnico.fechas_muro.inicio).toLocaleDateString('es-PE')}
+                            {formatearFecha(obra.datos_mef.data.expediente_tecnico.fechas_muro.inicio)}
                             {' → '}
-                            {new Date(obra.datos_mef.data.expediente_tecnico.fechas_muro.termino).toLocaleDateString('es-PE')}
+                            {formatearFecha(obra.datos_mef.data.expediente_tecnico.fechas_muro.termino)}
                           </div>
                         </div>
                       )}
