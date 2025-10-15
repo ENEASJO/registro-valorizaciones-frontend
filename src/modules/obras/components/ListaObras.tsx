@@ -330,6 +330,59 @@ const ListaObras: React.FC<ListaObrasProps> = ({
                     )}
                   </div>
 
+                  {/* MEF Additional Info */}
+                  {obra.datos_mef?.data && (
+                    <div className="mb-4 pb-4 border-b border-gray-100 space-y-2">
+                      {/* Unidad Ejecutora */}
+                      {(obra.datos_mef.data.institucionalidad?.unidad_ejecutora ||
+                        obra.datos_mef.data.institucionalidad?.uep?.nombre) && (
+                        <div className="text-xs">
+                          <span className="text-gray-500 font-medium">Unidad Ejecutora:</span>
+                          <div className="text-gray-700 mt-0.5 line-clamp-2">
+                            {obra.datos_mef.data.institucionalidad.unidad_ejecutora ||
+                             obra.datos_mef.data.institucionalidad.uep?.nombre}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Función / Servicio Público */}
+                      {(obra.datos_mef.data.responsabilidad_funcional?.funcion ||
+                        obra.datos_mef.data.articulacion_pmi?.servicio_publico) && (
+                        <div className="text-xs">
+                          <span className="text-gray-500 font-medium">
+                            {obra.datos_mef.data.responsabilidad_funcional?.funcion ? 'Función:' : 'Servicio:'}
+                          </span>
+                          <div className="text-gray-700 mt-0.5">
+                            {obra.datos_mef.data.responsabilidad_funcional?.funcion ||
+                             obra.datos_mef.data.articulacion_pmi?.servicio_publico}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Fechas de Ejecución del Expediente Técnico */}
+                      {obra.datos_mef.data.expediente_tecnico?.fechas_muro && (
+                        <div className="text-xs">
+                          <span className="text-gray-500 font-medium">Plazo Ejecución:</span>
+                          <div className="text-gray-700 mt-0.5">
+                            {new Date(obra.datos_mef.data.expediente_tecnico.fechas_muro.inicio).toLocaleDateString('es-PE')}
+                            {' → '}
+                            {new Date(obra.datos_mef.data.expediente_tecnico.fechas_muro.termino).toLocaleDateString('es-PE')}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Modificaciones */}
+                      {obra.datos_mef.data.modificaciones_ejecucion?.documentos &&
+                       obra.datos_mef.data.modificaciones_ejecucion.documentos.length > 0 && (
+                        <div className="text-xs">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
+                            {obra.datos_mef.data.modificaciones_ejecucion.documentos.length} modificación(es)
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Investment Amount */}
                   <div className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
