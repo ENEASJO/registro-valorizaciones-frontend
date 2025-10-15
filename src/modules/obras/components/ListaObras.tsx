@@ -398,7 +398,7 @@ const ListaObras: React.FC<ListaObrasProps> = ({
                       <div className="p-2 bg-green-50 rounded-lg">
                         <DollarSign className="w-5 h-5 text-green-600" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="text-xs text-gray-500 font-medium">Inversión Total</p>
                         <p className="text-xl font-bold text-green-700">
                           {obra.datos_mef?.data?.costos_finales?.costo_total_actualizado
@@ -407,6 +407,15 @@ const ListaObras: React.FC<ListaObrasProps> = ({
                               ? formatearMoneda(Number(obra.monto_contractual))
                               : 'S/ 0.00'}
                         </p>
+                        {/* Subtotal Metas */}
+                        {obra.datos_mef?.data?.expediente_tecnico?.subtotal_metas && (
+                          <div className="mt-1 pt-1 border-t border-green-100">
+                            <p className="text-xs text-gray-500">Subtotal Metas:</p>
+                            <p className="text-sm font-semibold text-green-600">
+                              {formatearMoneda(obra.datos_mef.data.expediente_tecnico.subtotal_metas)}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
