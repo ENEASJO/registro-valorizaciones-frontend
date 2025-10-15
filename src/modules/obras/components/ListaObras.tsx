@@ -240,13 +240,13 @@ const ListaObras: React.FC<ListaObrasProps> = ({
       </div>
 
       {/* Lista de obras */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div>
         {cargando ? (
-          <div className="flex items-center justify-center p-12">
+          <div className="flex items-center justify-center p-12 bg-white rounded-xl shadow-lg">
             <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
         ) : obras.length === 0 ? (
-          <div className="text-center p-12">
+          <div className="text-center p-12 bg-white rounded-xl shadow-lg">
             <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
               No hay obras registradas
@@ -263,107 +263,123 @@ const ListaObras: React.FC<ListaObrasProps> = ({
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    CUI / Nombre
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contrato
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Inversión
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado MEF
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Estado Obra
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {obras.map((obra) => (
-                  <motion.tr
-                    key={obra.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="hover:bg-gray-50 transition-colors"
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {obras.map((obra) => (
+              <motion.div
+                key={obra.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2 }}
+                className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all relative"
+              >
+                {/* Action buttons in top right corner */}
+                <div className="absolute top-4 right-4 flex gap-2 z-10">
+                  <button
+                    onClick={() => onVerObra(obra)}
+                    className="p-2 bg-white/90 backdrop-blur-sm text-blue-600 hover:bg-blue-50 rounded-lg shadow-md transition-colors"
+                    title="Ver detalles"
                   >
-                    <td className="px-6 py-4">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {obra.cui ? `CUI: ${obra.cui}` : obra.codigo || 'Sin código'}
-                        </div>
-                        <div className="text-sm text-gray-500 line-clamp-1">
-                          {obra.datos_mef?.data?.nombre || obra.nombre || 'Sin nombre'}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        {obra.contrato?.numero_contrato || obra.contrato_numero || '-'}
-                      </div>
-                      <div className="text-sm text-gray-500">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onEditarObra(obra)}
+                    className="p-2 bg-white/90 backdrop-blur-sm text-green-600 hover:bg-green-50 rounded-lg shadow-md transition-colors"
+                    title="Editar"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleEliminar(obra.id)}
+                    className="p-2 bg-white/90 backdrop-blur-sm text-red-600 hover:bg-red-50 rounded-lg shadow-md transition-colors"
+                    title="Eliminar"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Card content */}
+                <div className="p-6">
+                  {/* CUI Badge */}
+                  <div className="mb-3">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm">
+                      <Building2 className="w-3 h-3 mr-1" />
+                      {obra.cui ? `CUI: ${obra.cui}` : obra.codigo || 'Sin código'}
+                    </span>
+                  </div>
+
+                  {/* Project Name */}
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 line-clamp-2 pr-20">
+                    {obra.datos_mef?.data?.nombre || obra.nombre || 'Sin nombre'}
+                  </h3>
+
+                  {/* Contract Info */}
+                  <div className="mb-4 pb-4 border-b border-gray-100">
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="font-medium">
+                        {obra.contrato?.numero_contrato || obra.contrato_numero || 'Sin contrato'}
+                      </span>
+                    </div>
+                    {(obra.contrato?.fecha_contrato || obra.contrato_fecha) && (
+                      <div className="text-xs text-gray-500 ml-6">
                         {obra.contrato?.fecha_contrato
                           ? new Date(obra.contrato.fecha_contrato).toLocaleDateString('es-PE')
-                          : obra.contrato_fecha
-                            ? new Date(obra.contrato_fecha).toLocaleDateString('es-PE')
-                            : '-'}
+                          : new Date(obra.contrato_fecha!).toLocaleDateString('es-PE')}
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-semibold text-gray-900">
-                        {obra.datos_mef?.data?.costos_finales?.costo_total_actualizado
-                          ? formatearMoneda(obra.datos_mef.data.costos_finales.costo_total_actualizado)
-                          : obra.monto_contractual
-                            ? formatearMoneda(Number(obra.monto_contractual))
-                            : '-'}
+                    )}
+                  </div>
+
+                  {/* Investment Amount */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-2 bg-green-50 rounded-lg">
+                        <DollarSign className="w-5 h-5 text-green-600" />
                       </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">{obra.datos_mef?.data?.estado || '-'}</div>
-                      <div className="text-xs text-gray-500">{obra.datos_mef?.data?.etapa || '-'}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-xs font-medium rounded-full ${getEstadoColor(obra.estado_obra)}`}>
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium">Inversión Total</p>
+                        <p className="text-xl font-bold text-green-700">
+                          {obra.datos_mef?.data?.costos_finales?.costo_total_actualizado
+                            ? formatearMoneda(obra.datos_mef.data.costos_finales.costo_total_actualizado)
+                            : obra.monto_contractual
+                              ? formatearMoneda(Number(obra.monto_contractual))
+                              : 'S/ 0.00'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status Badges */}
+                  <div className="space-y-3">
+                    {/* MEF Status */}
+                    {obra.datos_mef?.data?.estado && (
+                      <div>
+                        <p className="text-xs text-gray-500 font-medium mb-1">Estado MEF</p>
+                        <div className="flex flex-col gap-1">
+                          <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {obra.datos_mef.data.estado}
+                          </span>
+                          {obra.datos_mef.data.etapa && (
+                            <span className="text-xs text-gray-600 ml-1">
+                              {obra.datos_mef.data.etapa}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Obra Status */}
+                    <div>
+                      <p className="text-xs text-gray-500 font-medium mb-1">Estado Obra</p>
+                      <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-lg ${getEstadoColor(obra.estado_obra)}`}>
                         {getEstadoTexto(obra.estado_obra)}
                       </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => onVerObra(obra)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="Ver detalles"
-                        >
-                          <Eye className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => onEditarObra(obra)}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                          title="Editar"
-                        >
-                          <Edit2 className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleEliminar(obra.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         )}
       </div>
