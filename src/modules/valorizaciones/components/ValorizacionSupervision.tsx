@@ -282,7 +282,7 @@ const ValorizacionSupervision = () => {
               <option value="">Todas las obras</option>
               {obras.filter(obra => obra.entidad_supervisora_id).map(obra => (
                 <option key={obra.id} value={obra.id}>
-                  {obra.numero_contrato} - {obra.nombre.substring(0, 50)}...
+                  {obra.numero_contrato} - {obra.nombre?.substring(0, 50) || 'Sin nombre'}...
                 </option>
               ))}
             </select>
