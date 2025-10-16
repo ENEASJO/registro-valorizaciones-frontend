@@ -61,8 +61,8 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
     loading 
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
-  // Obras valorizables (REGISTRADA = primera valorización, EN_EJECUCION = valorizaciones subsecuentes)
-  const obrasValorizables = obras.filter(o => o.estado === 'EN_EJECUCION' || o.estado === 'REGISTRADA');
+  // Obras valorizables (registrada = primera valorización, en_ejecucion = valorizaciones subsecuentes)
+  const obrasValorizables = obras.filter(o => o.estado_obra === 'en_ejecucion' || o.estado_obra === 'registrada');
   // Obra actual
   const [obraActual, setObraActual] = useState<any>(null);
   
