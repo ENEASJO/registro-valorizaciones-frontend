@@ -406,7 +406,6 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                   onChange={(e: any) => setObraSeleccionada(e.target.value || null)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
-                  size={Math.min(obrasFiltradas.length + 1, 5)}
                 >
                   <option value="">Seleccionar obra con supervisor...</option>
                   {obrasFiltradas.map(obra => (
@@ -449,7 +448,6 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                   onChange={(e: any) => setEmpresaSupervisoraId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
-                  size={Math.min(supervisorasFiltradas.length + 1, 5)}
                 >
                   <option value="">Seleccionar empresa supervisora...</option>
                   {supervisorasFiltradas.map(empresa => (

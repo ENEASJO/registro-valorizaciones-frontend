@@ -364,7 +364,6 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
                   onChange={(e: any) => setObraSeleccionada(e.target.value || null)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
-                  size={Math.min(obrasFiltradas.length + 1, 5)}
                 >
                   <option value="">Seleccionar obra...</option>
                   {obrasFiltradas.map(obra => (
@@ -407,7 +406,6 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
                   onChange={(e: any) => setEmpresaEjecutoraId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
-                  size={Math.min(ejecutorasFiltradas.length + 1, 5)}
                 >
                   <option value="">Seleccionar empresa ejecutora...</option>
                   {ejecutorasFiltradas.map(empresa => (
