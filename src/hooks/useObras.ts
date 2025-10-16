@@ -46,6 +46,15 @@ interface ObraResponse {
   created_at: string;
   updated_at: string;
   version: number;
+  cui?: string;
+  codigo_interno?: string;
+  datos_mef?: {
+    data?: {
+      nombre?: string;
+      [key: string]: any;
+    };
+    [key: string]: any;
+  };
 }
 
 interface EstadisticasObrasResponse {
@@ -63,7 +72,7 @@ interface EstadisticasObrasResponse {
 const mapearObraResponse = (response: ObraResponse): any => ({ // Usando any temporalmente para evitar errores de tipos
   id: response.id,
   numero_contrato: response.codigo || `OBR-${response.id}`, // Mapear codigo a numero_contrato
-  nombre: response.nombre,
+  nombre: response.datos_mef?.data?.nombre || response.nombre || (response.cui ? `Obra CUI: ${response.cui}` : `Obra ${response.id}`),
   codigo_interno: response.codigo,
   entidad_ejecutora_id: String(response.empresa_id), // Mapear empresa_id a entidad_ejecutora_id
   entidad_supervisora_id: '', // Default, se puede ajustar según necesidades
