@@ -17,7 +17,8 @@ import {
   Cloud,
   X,
   Pause,
-  MoreHorizontal
+  MoreHorizontal,
+  Search
 } from 'lucide-react';
 import { useValorizaciones } from '../../../hooks/useValorizaciones';
 
@@ -30,6 +31,7 @@ interface Props {
 const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
   // Estados del formulario
   const [obraSeleccionada, setObraSeleccionada] = useState<string | null>(null);
+  const [busquedaObra, setBusquedaObra] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   // Expediente
@@ -65,6 +67,17 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
     ((o as any).estado_obra === 'en_ejecucion' || (o as any).estado_obra === 'registrada') &&
     o.entidad_supervisora_id
   );
+
+  // Filtrar obras por búsqueda
+  const obrasFiltradas = obrasConSupervisor.filter(obra => {
+    if (!busquedaObra.trim()) return true;
+    const termino = busquedaObra.toLowerCase();
+    const nombre = (obra.nombre || '').toLowerCase();
+    const cui = ((obra as any).cui || '').toLowerCase();
+    const numeroContrato = (obra.numero_contrato || '').toLowerCase();
+    return nombre.includes(termino) || cui.includes(termino) || numeroContrato.includes(termino);
+  });
+
   // Obra actual
   const [obraActual, setObraActual] = useState<any>(null);
   
@@ -334,23 +347,46 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
               <h2 className="text-xl font-semibold text-gray-900">Información General</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Obra *
                 </label>
+                {/* Input de búsqueda */}
+                <div className="relative mb-2">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={busquedaObra}
+                    onChange={(e: any) => setBusquedaObra(e.target.value)}
+                    placeholder="Buscar por CUI, nombre o código..."
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                {/* Select con obras filtradas */}
                 <select
                   value={obraSeleccionada || ''}
                   onChange={(e: any) => setObraSeleccionada(e.target.value || null)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
+                  size={Math.min(obrasFiltradas.length + 1, 5)}
                 >
                   <option value="">Seleccionar obra con supervisor...</option>
-                  {obrasConSupervisor.map(obra => (
+                  {obrasFiltradas.map(obra => (
                     <option key={obra.id} value={obra.id}>
-                      {obra.numero_contrato} - {obra.nombre}
+                      {obra.numero_contrato} - {obra.nombre?.substring(0, 80) || 'Sin nombre'}{obra.nombre && obra.nombre.length > 80 ? '...' : ''}
                     </option>
                   ))}
                 </select>
+                {busquedaObra && obrasFiltradas.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No se encontraron obras que coincidan con "{busquedaObra}"
+                  </p>
+                )}
+                {!busquedaObra && obrasConSupervisor.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No hay obras con supervisor disponibles para valorizar
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
