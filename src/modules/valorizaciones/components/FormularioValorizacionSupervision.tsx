@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import type { ValorizacionSupervisionForm } from '../../../types/valorizacion.types';
 import type { ValorizacionForm } from '../../../hooks/useValorizaciones';
 import { useObras } from '../../../hooks/useObras';
-import { useEmpresas } from '../../../hooks/useEmpresas';
+import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
 import {
   ArrowLeft,
   Save,
@@ -66,20 +66,23 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
     loading 
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
-  const { empresas: todasEmpresas, loading: loadingEmpresas } = useEmpresas({ autoLoad: true });
+  const { entidades: todasEntidades, loading: loadingEntidades } = useEntidadesContratistas();
 
-  // Filtrar empresas supervisoras
-  const empresasSupervisoras = todasEmpresas.filter(e =>
+  // Filtrar entidades supervisoras (empresas y consorcios)
+  const entidadesSupervisoras = todasEntidades.filter(e =>
+    // Incluir consorcios (tipo_entidad === 'CONSORCIO')
+    // O empresas con categoria_contratista === 'SUPERVISORA'
+    e.tipo_entidad === 'CONSORCIO' ||
     e.datos_empresa?.categoria_contratista === 'SUPERVISORA'
   );
 
   // Filtrar por búsqueda
-  const supervisorasFiltradas = empresasSupervisoras.filter(empresa => {
+  const supervisorasFiltradas = entidadesSupervisoras.filter(entidad => {
     if (!busquedaSupervisora.trim()) return true;
     const termino = busquedaSupervisora.toLowerCase();
-    const razonSocial = (empresa.nombre_completo || '').toLowerCase();
-    const ruc = (empresa.ruc_principal || '').toLowerCase();
-    return razonSocial.includes(termino) || ruc.includes(termino);
+    const nombre = (entidad.nombre_completo || '').toLowerCase();
+    const ruc = (entidad.ruc_principal || '').toLowerCase();
+    return nombre.includes(termino) || ruc.includes(termino);
   });
 
   // Obras valorizables con supervisor (registrada o en_ejecucion)
@@ -426,10 +429,10 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                 )}
               </div>
 
-              {/* Selector de Empresa Supervisora */}
+              {/* Selector de Empresa/Consorcio Supervisor */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Empresa Supervisora *
+                  Empresa o Consorcio Supervisor *
                 </label>
                 {/* Input de búsqueda */}
                 <div className="relative mb-2">
@@ -438,32 +441,35 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                     type="text"
                     value={busquedaSupervisora}
                     onChange={(e: any) => setBusquedaSupervisora(e.target.value)}
-                    placeholder="Buscar por RUC o razón social..."
+                    placeholder="Buscar empresa o consorcio..."
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
-                {/* Select con empresas filtradas */}
+                {/* Select con entidades filtradas */}
                 <select
                   value={empresaSupervisoraId}
                   onChange={(e: any) => setEmpresaSupervisoraId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
                 >
-                  <option value="">Seleccionar empresa supervisora...</option>
-                  {supervisorasFiltradas.map(empresa => (
-                    <option key={empresa.id} value={empresa.id}>
-                      RUC: {empresa.ruc_principal} - {empresa.nombre_completo?.substring(0, 60) || 'Sin nombre'}{empresa.nombre_completo && empresa.nombre_completo.length > 60 ? '...' : ''}
+                  <option value="">Seleccionar empresa o consorcio...</option>
+                  {supervisorasFiltradas.map(entidad => (
+                    <option key={entidad.id} value={entidad.id}>
+                      {entidad.tipo_entidad === 'CONSORCIO'
+                        ? `CONSORCIO: ${entidad.nombre_completo} - ${entidad.empresas_participantes?.length || 0} integrantes`
+                        : `RUC: ${entidad.ruc_principal} - ${entidad.nombre_completo?.substring(0, 60) || 'Sin nombre'}${entidad.nombre_completo && entidad.nombre_completo.length > 60 ? '...' : ''}`
+                      }
                     </option>
                   ))}
                 </select>
                 {busquedaSupervisora && supervisorasFiltradas.length === 0 && (
                   <p className="text-sm text-gray-500 mt-1">
-                    No se encontraron empresas supervisoras que coincidan con "{busquedaSupervisora}"
+                    No se encontraron empresas o consorcios que coincidan con "{busquedaSupervisora}"
                   </p>
                 )}
-                {!busquedaSupervisora && empresasSupervisoras.length === 0 && (
+                {!busquedaSupervisora && entidadesSupervisoras.length === 0 && (
                   <p className="text-sm text-gray-500 mt-1">
-                    No hay empresas supervisoras registradas. Regístrelas en el módulo Empresas.
+                    No hay empresas o consorcios registrados. Regístrelos en el módulo Empresas.
                   </p>
                 )}
               </div>

@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import type { Partida, PartidaDetalleForm, ValorizacionEjecucionForm, CalculosValorizacion } from '../../../types/valorizacion.types';
 import type { ValorizacionForm } from '../../../hooks/useValorizaciones';
 import { useObras } from '../../../hooks/useObras';
-import { useEmpresas } from '../../../hooks/useEmpresas';
+import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
 import {
   ArrowLeft,
   Save,
@@ -68,7 +68,7 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
     loading
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
-  const { empresas: todasEmpresas, loading: loadingEmpresas } = useEmpresas({ autoLoad: true });
+  const { entidades: todasEntidades, loading: loadingEntidades } = useEntidadesContratistas();
   // Obras valorizables (registrada = primera valorización, en_ejecucion = valorizaciones subsecuentes)
   const obrasValorizables = obras.filter(o =>
     (o as any).estado_obra === 'en_ejecucion' || (o as any).estado_obra === 'registrada'
@@ -84,18 +84,21 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
     return nombre.includes(termino) || cui.includes(termino) || numeroContrato.includes(termino);
   });
 
-  // Filtrar empresas ejecutoras
-  const empresasEjecutoras = todasEmpresas.filter(e =>
+  // Filtrar entidades ejecutoras (empresas y consorcios)
+  const entidadesEjecutoras = todasEntidades.filter(e =>
+    // Incluir consorcios (tipo_entidad === 'CONSORCIO')
+    // O empresas con categoria_contratista === 'EJECUTORA'
+    e.tipo_entidad === 'CONSORCIO' ||
     e.datos_empresa?.categoria_contratista === 'EJECUTORA'
   );
 
   // Filtrar por búsqueda
-  const ejecutorasFiltradas = empresasEjecutoras.filter(empresa => {
+  const ejecutorasFiltradas = entidadesEjecutoras.filter(entidad => {
     if (!busquedaEjecutora.trim()) return true;
     const termino = busquedaEjecutora.toLowerCase();
-    const razonSocial = (empresa.nombre_completo || '').toLowerCase();
-    const ruc = (empresa.ruc_principal || '').toLowerCase();
-    return razonSocial.includes(termino) || ruc.includes(termino);
+    const nombre = (entidad.nombre_completo || '').toLowerCase();
+    const ruc = (entidad.ruc_principal || '').toLowerCase();
+    return nombre.includes(termino) || ruc.includes(termino);
   });
 
   // Obra actual
@@ -384,10 +387,10 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
                 )}
               </div>
 
-              {/* Selector de Empresa Ejecutora */}
+              {/* Selector de Empresa/Consorcio Ejecutor */}
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Empresa Ejecutora *
+                  Empresa o Consorcio Ejecutor *
                 </label>
                 {/* Input de búsqueda */}
                 <div className="relative mb-2">
@@ -396,32 +399,35 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
                     type="text"
                     value={busquedaEjecutora}
                     onChange={(e: any) => setBusquedaEjecutora(e.target.value)}
-                    placeholder="Buscar por RUC o razón social..."
+                    placeholder="Buscar empresa o consorcio..."
                     className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
-                {/* Select con empresas filtradas */}
+                {/* Select con entidades filtradas */}
                 <select
                   value={empresaEjecutoraId}
                   onChange={(e: any) => setEmpresaEjecutoraId(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
                 >
-                  <option value="">Seleccionar empresa ejecutora...</option>
-                  {ejecutorasFiltradas.map(empresa => (
-                    <option key={empresa.id} value={empresa.id}>
-                      RUC: {empresa.ruc_principal} - {empresa.nombre_completo?.substring(0, 60) || 'Sin nombre'}{empresa.nombre_completo && empresa.nombre_completo.length > 60 ? '...' : ''}
+                  <option value="">Seleccionar empresa o consorcio...</option>
+                  {ejecutorasFiltradas.map(entidad => (
+                    <option key={entidad.id} value={entidad.id}>
+                      {entidad.tipo_entidad === 'CONSORCIO'
+                        ? `CONSORCIO: ${entidad.nombre_completo} - ${entidad.empresas_participantes?.length || 0} integrantes`
+                        : `RUC: ${entidad.ruc_principal} - ${entidad.nombre_completo?.substring(0, 60) || 'Sin nombre'}${entidad.nombre_completo && entidad.nombre_completo.length > 60 ? '...' : ''}`
+                      }
                     </option>
                   ))}
                 </select>
                 {busquedaEjecutora && ejecutorasFiltradas.length === 0 && (
                   <p className="text-sm text-gray-500 mt-1">
-                    No se encontraron empresas ejecutoras que coincidan con "{busquedaEjecutora}"
+                    No se encontraron empresas o consorcios que coincidan con "{busquedaEjecutora}"
                   </p>
                 )}
-                {!busquedaEjecutora && empresasEjecutoras.length === 0 && (
+                {!busquedaEjecutora && entidadesEjecutoras.length === 0 && (
                   <p className="text-sm text-gray-500 mt-1">
-                    No hay empresas ejecutoras registradas. Regístrelas en el módulo Empresas.
+                    No hay empresas o consorcios registrados. Regístrelos en el módulo Empresas.
                   </p>
                 )}
               </div>
