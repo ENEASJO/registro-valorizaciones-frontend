@@ -4,7 +4,8 @@ import { useCallback } from 'react';
 import type { ValorizacionSupervisionForm } from '../../../types/valorizacion.types';
 import type { ValorizacionForm } from '../../../hooks/useValorizaciones';
 import { useObras } from '../../../hooks/useObras';
-import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
+import { useEntidadesContratistas, useConsorcios } from '../../../hooks/useEmpresas';
+import type { CrearConsorcioParams } from '../../../types/empresa.types';
 import {
   ArrowLeft,
   Save,
@@ -19,9 +20,11 @@ import {
   X,
   Pause,
   MoreHorizontal,
-  Search
+  Search,
+  Plus
 } from 'lucide-react';
 import { useValorizaciones } from '../../../hooks/useValorizaciones';
+import FormularioConsorcio from '../../empresas/components/FormularioConsorcio';
 
 
 
@@ -38,6 +41,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
   // Empresa contratista supervisora
   const [empresaSupervisoraId, setEmpresaSupervisoraId] = useState<string>('');
   const [busquedaSupervisora, setBusquedaSupervisora] = useState('');
+  const [modalConsorcioAbierto, setModalConsorcioAbierto] = useState(false);
   // Expediente
   const [numeroExpediente, setNumeroExpediente] = useState('');
   const [numeroExpedienteSiaf, setNumeroExpedienteSiaf] = useState('');
@@ -67,6 +71,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
   const { entidades: todasEntidades, loading: loadingEntidades } = useEntidadesContratistas();
+  const { crearConsorcio: crearConsorcioHook, loading: loadingConsorcio } = useConsorcios();
 
   // Filtrar entidades supervisoras (empresas y consorcios)
   const entidadesSupervisoras = todasEntidades.filter(e =>
@@ -218,6 +223,22 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
       ve.periodo_fin === fechaFin
     );
   }, [obraSeleccionada, fechaInicio, fechaFin, valorizacionesEjecucion]);
+
+  // Función para crear consorcio
+  const handleCrearConsorcio = async (params: CrearConsorcioParams) => {
+    try {
+      const consorcioCreado = await crearConsorcioHook(params);
+      if (consorcioCreado) {
+        // Seleccionar automáticamente el consorcio recién creado
+        setEmpresaSupervisoraId(String(consorcioCreado.id + 1000)); // ID transformado como en useEntidadesContratistas
+        setModalConsorcioAbierto(false);
+      }
+    } catch (error) {
+      console.error('Error al crear consorcio:', error);
+      // El error ya se maneja en el hook
+    }
+  };
+
   // Función para guardar
   const handleGuardar = async () => {
     // Validaciones básicas
@@ -431,9 +452,19 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
 
               {/* Selector de Empresa/Consorcio Supervisor */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Empresa o Consorcio Supervisor *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Empresa o Consorcio Supervisor *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setModalConsorcioAbierto(true)}
+                    className="flex items-center gap-1 px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Crear Consorcio
+                  </button>
+                </div>
                 {/* Input de búsqueda */}
                 <div className="relative mb-2">
                   <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -792,6 +823,15 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
           )}
         </div>
       </div>
+
+      {/* Modal de Formulario de Consorcio */}
+      <FormularioConsorcio
+        isOpen={modalConsorcioAbierto}
+        onClose={() => setModalConsorcioAbierto(false)}
+        onSubmit={handleCrearConsorcio}
+        loading={loadingConsorcio}
+        title="Crear Consorcio para Valorización de Supervisión"
+      />
     </div>
   );
 };

@@ -4,7 +4,8 @@ import { useCallback } from 'react';
 import type { Partida, PartidaDetalleForm, ValorizacionEjecucionForm, CalculosValorizacion } from '../../../types/valorizacion.types';
 import type { ValorizacionForm } from '../../../hooks/useValorizaciones';
 import { useObras } from '../../../hooks/useObras';
-import { useEntidadesContratistas } from '../../../hooks/useEmpresas';
+import { useEntidadesContratistas, useEmpresas, useConsorcios } from '../../../hooks/useEmpresas';
+import type { CrearConsorcioParams } from '../../../types/empresa.types';
 import {
   ArrowLeft,
   Save,
@@ -25,6 +26,7 @@ import { useValorizaciones } from '../../../hooks/useValorizaciones';
 
 
 import TablaPartidas from './TablaPartidas';
+import FormularioConsorcio from '../../empresas/components/FormularioConsorcio';
 interface Props {
   onCancel: () => void;
   onSuccess: () => void;
@@ -38,6 +40,8 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
   // Empresa contratista ejecutora
   const [empresaEjecutoraId, setEmpresaEjecutoraId] = useState<string>('');
   const [busquedaEjecutora, setBusquedaEjecutora] = useState('');
+  // Modal de creación de consorcio
+  const [modalConsorcioAbierto, setModalConsorcioAbierto] = useState(false);
   // Expediente
   const [numeroExpediente, setNumeroExpediente] = useState('');
   const [numeroExpedienteSiaf, setNumeroExpedienteSiaf] = useState('');
@@ -69,6 +73,7 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
   const { entidades: todasEntidades, loading: loadingEntidades } = useEntidadesContratistas();
+  const { crearConsorcio: crearConsorcioHook, loading: loadingConsorcio } = useConsorcios();
   // Obras valorizables (registrada = primera valorización, en_ejecucion = valorizaciones subsecuentes)
   const obrasValorizables = obras.filter(o =>
     (o as any).estado_obra === 'en_ejecucion' || (o as any).estado_obra === 'registrada'
@@ -182,6 +187,21 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
     const diferencia = fin.getTime() - inicio.getTime();
     return Math.ceil(diferencia / (1000 * 60 * 60 * 24)) + 1;
   }, [fechaInicio, fechaFin]);
+
+  // Función para crear consorcio
+  const handleCrearConsorcio = async (params: CrearConsorcioParams) => {
+    try {
+      const consorcioCreado = await crearConsorcioHook(params);
+      if (consorcioCreado) {
+        // Seleccionar automáticamente el consorcio recién creado
+        setEmpresaEjecutoraId(String(consorcioCreado.id + 1000)); // ID transformado como en useEntidadesContratistas
+        setModalConsorcioAbierto(false);
+      }
+    } catch (error) {
+      console.error('Error al crear consorcio:', error);
+      // El error ya se maneja en el hook
+    }
+  };
   // Función para guardar
   const handleGuardar = async () => {
     // Validaciones básicas
@@ -389,9 +409,19 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
 
               {/* Selector de Empresa/Consorcio Ejecutor */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Empresa o Consorcio Ejecutor *
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Empresa o Consorcio Ejecutor *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setModalConsorcioAbierto(true)}
+                    className="flex items-center gap-1 px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Crear Consorcio
+                  </button>
+                </div>
                 {/* Input de búsqueda */}
                 <div className="relative mb-2">
                   <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -672,6 +702,15 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
           )}
         </div>
       )}
+
+      {/* Modal para crear consorcio */}
+      <FormularioConsorcio
+        isOpen={modalConsorcioAbierto}
+        onClose={() => setModalConsorcioAbierto(false)}
+        onSubmit={handleCrearConsorcio}
+        loading={loadingConsorcio}
+        title="Crear Consorcio para Valorización"
+      />
     </div>
   );
 };
