@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 import type { Partida, PartidaDetalleForm, ValorizacionEjecucionForm, CalculosValorizacion } from '../../../types/valorizacion.types';
 import type { ValorizacionForm } from '../../../hooks/useValorizaciones';
 import { useObras } from '../../../hooks/useObras';
+import { useEmpresas } from '../../../hooks/useEmpresas';
 import {
   ArrowLeft,
   Save,
@@ -16,7 +17,8 @@ import {
   Plus,
   Minus,
   Info,
-  Search
+  Search,
+  Users
 } from 'lucide-react';
 import { useValorizaciones } from '../../../hooks/useValorizaciones';
 
@@ -33,6 +35,11 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
   const [busquedaObra, setBusquedaObra] = useState('');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
+  // Empresas contratistas
+  const [empresaEjecutoraId, setEmpresaEjecutoraId] = useState<string>('');
+  const [empresaSupervisoraId, setEmpresaSupervisoraId] = useState<string>('');
+  const [busquedaEjecutora, setBusquedaEjecutora] = useState('');
+  const [busquedaSupervisora, setBusquedaSupervisora] = useState('');
   // Expediente
   const [numeroExpediente, setNumeroExpediente] = useState('');
   const [numeroExpedienteSiaf, setNumeroExpedienteSiaf] = useState('');
@@ -53,16 +60,17 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
   const [errores, setErrores] = useState<string[]>([]);
   const [mostrarCalculos, setMostrarCalculos] = useState(false);
   // Hooks
-  const { 
-    crearValorizacionEjecucion, 
-    calcularMontos, 
+  const {
+    crearValorizacionEjecucion,
+    calcularMontos,
     validarValorizacion,
     formatearMoneda,
     cargarPartidasPorObra,
     partidas,
-    loading 
+    loading
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
+  const { empresas: todasEmpresas, loading: loadingEmpresas } = useEmpresas({ autoLoad: true });
   // Obras valorizables (registrada = primera valorización, en_ejecucion = valorizaciones subsecuentes)
   const obrasValorizables = obras.filter(o =>
     (o as any).estado_obra === 'en_ejecucion' || (o as any).estado_obra === 'registrada'
@@ -76,6 +84,32 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
     const cui = ((obra as any).cui || '').toLowerCase();
     const numeroContrato = (obra.numero_contrato || '').toLowerCase();
     return nombre.includes(termino) || cui.includes(termino) || numeroContrato.includes(termino);
+  });
+
+  // Filtrar empresas por categoría
+  const empresasEjecutoras = todasEmpresas.filter(e =>
+    e.datos_empresa?.categoria_contratista === 'EJECUTORA'
+  );
+
+  const empresasSupervisoras = todasEmpresas.filter(e =>
+    e.datos_empresa?.categoria_contratista === 'SUPERVISORA'
+  );
+
+  // Filtrar empresas por búsqueda
+  const ejecutorasFiltradas = empresasEjecutoras.filter(empresa => {
+    if (!busquedaEjecutora.trim()) return true;
+    const termino = busquedaEjecutora.toLowerCase();
+    const razonSocial = (empresa.nombre_completo || '').toLowerCase();
+    const ruc = (empresa.ruc_principal || '').toLowerCase();
+    return razonSocial.includes(termino) || ruc.includes(termino);
+  });
+
+  const supervisorasFiltradas = empresasSupervisoras.filter(empresa => {
+    if (!busquedaSupervisora.trim()) return true;
+    const termino = busquedaSupervisora.toLowerCase();
+    const razonSocial = (empresa.nombre_completo || '').toLowerCase();
+    const ruc = (empresa.ruc_principal || '').toLowerCase();
+    return razonSocial.includes(termino) || ruc.includes(termino);
   });
 
   // Obra actual
@@ -161,10 +195,26 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
   }, [fechaInicio, fechaFin]);
   // Función para guardar
   const handleGuardar = async () => {
+    // Validaciones básicas
+    const erroresValidacion: string[] = [];
+
     if (!obraActual) {
-      setErrores(['Debe seleccionar una obra']);
+      erroresValidacion.push('Debe seleccionar una obra');
+    }
+
+    if (!empresaEjecutoraId) {
+      erroresValidacion.push('Debe seleccionar una empresa ejecutora');
+    }
+
+    if (!empresaSupervisoraId) {
+      erroresValidacion.push('Debe seleccionar una empresa supervisora');
+    }
+
+    if (erroresValidacion.length > 0) {
+      setErrores(erroresValidacion);
       return;
     }
+
     const form: ValorizacionForm = {
       obra_id: obraActual.id,
       numero_valorizacion: 1,
@@ -182,7 +232,9 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
       residente_obra: residente,
       supervisor_obra: supervisor,
       observaciones_residente: observacionesResidente,
-      observaciones_supervisor: observacionesSupervisor
+      observaciones_supervisor: observacionesSupervisor,
+      empresa_ejecutora_id: empresaEjecutoraId,
+      empresa_supervisora_id: empresaSupervisoraId
     } as ValorizacionForm;
     try {
       const validacion = validarValorizacion(form);
@@ -351,6 +403,93 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
                   </p>
                 )}
               </div>
+
+              {/* Selector de Empresa Ejecutora */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Empresa Ejecutora *
+                </label>
+                {/* Input de búsqueda */}
+                <div className="relative mb-2">
+                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={busquedaEjecutora}
+                    onChange={(e: any) => setBusquedaEjecutora(e.target.value)}
+                    placeholder="Buscar por RUC o razón social..."
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                {/* Select con empresas filtradas */}
+                <select
+                  value={empresaEjecutoraId}
+                  onChange={(e: any) => setEmpresaEjecutoraId(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  required
+                  size={Math.min(ejecutorasFiltradas.length + 1, 5)}
+                >
+                  <option value="">Seleccionar empresa ejecutora...</option>
+                  {ejecutorasFiltradas.map(empresa => (
+                    <option key={empresa.id} value={empresa.id}>
+                      RUC: {empresa.ruc_principal} - {empresa.nombre_completo?.substring(0, 60) || 'Sin nombre'}{empresa.nombre_completo && empresa.nombre_completo.length > 60 ? '...' : ''}
+                    </option>
+                  ))}
+                </select>
+                {busquedaEjecutora && ejecutorasFiltradas.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No se encontraron empresas ejecutoras que coincidan con "{busquedaEjecutora}"
+                  </p>
+                )}
+                {!busquedaEjecutora && empresasEjecutoras.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No hay empresas ejecutoras registradas. Regístrelas en el módulo Empresas.
+                  </p>
+                )}
+              </div>
+
+              {/* Selector de Empresa Supervisora */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Empresa Supervisora *
+                </label>
+                {/* Input de búsqueda */}
+                <div className="relative mb-2">
+                  <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={busquedaSupervisora}
+                    onChange={(e: any) => setBusquedaSupervisora(e.target.value)}
+                    placeholder="Buscar por RUC o razón social..."
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                {/* Select con empresas filtradas */}
+                <select
+                  value={empresaSupervisoraId}
+                  onChange={(e: any) => setEmpresaSupervisoraId(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  required
+                  size={Math.min(supervisorasFiltradas.length + 1, 5)}
+                >
+                  <option value="">Seleccionar empresa supervisora...</option>
+                  {supervisorasFiltradas.map(empresa => (
+                    <option key={empresa.id} value={empresa.id}>
+                      RUC: {empresa.ruc_principal} - {empresa.nombre_completo?.substring(0, 60) || 'Sin nombre'}{empresa.nombre_completo && empresa.nombre_completo.length > 60 ? '...' : ''}
+                    </option>
+                  ))}
+                </select>
+                {busquedaSupervisora && supervisorasFiltradas.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No se encontraron empresas supervisoras que coincidan con "{busquedaSupervisora}"
+                  </p>
+                )}
+                {!busquedaSupervisora && empresasSupervisoras.length === 0 && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    No hay empresas supervisoras registradas. Regístrelas en el módulo Empresas.
+                  </p>
+                )}
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Monto Contractual (de Ejecución)
