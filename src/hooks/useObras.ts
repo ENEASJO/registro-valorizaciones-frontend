@@ -230,12 +230,14 @@ export const useObras = (options: UseObrasOptions = {}) => {
         : API_ENDPOINTS.obras;
       
       const data = await realizarPeticionHTTP(url);
-      
+
       // Mapear respuestas del backend al tipo frontend
-      const obrasMapeadas = Array.isArray(data) 
-        ? data.map(mapearObraResponse)
+      // El backend retorna { status: "success", data: [...] }
+      const obrasArray = data?.data || data;
+      const obrasMapeadas = Array.isArray(obrasArray)
+        ? obrasArray.map(mapearObraResponse)
         : [];
-      
+
       setObras(obrasMapeadas);
     } catch (err) {
       const errorMessage = manejarErrorAPI(err);
