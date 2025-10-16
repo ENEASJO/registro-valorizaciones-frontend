@@ -60,11 +60,8 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
     loading 
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
-  // Obras activas con supervisor asignado
-  const obrasConSupervisor = obras.filter(o => 
-    (o.estado === 'EN_EJECUCION' || o.estado === 'REGISTRADA') && 
-    o.entidad_supervisora_id
-  );
+  // Todas las obras con supervisor asignado (sin filtrar por estado)
+  const obrasConSupervisor = obras.filter(o => o.entidad_supervisora_id);
   // Obra actual
   const [obraActual, setObraActual] = useState<any>(null);
   

@@ -61,8 +61,6 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
     loading 
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
-  // Obras activas (en ejecución)
-  const obrasActivas = obras.filter(o => o.estado === 'EN_EJECUCION' || o.estado === 'REGISTRADA');
   // Obra actual
   const [obraActual, setObraActual] = useState<any>(null);
   
@@ -306,7 +304,7 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
                   required
                 >
                   <option value="">Seleccionar obra...</option>
-                  {obrasActivas.map(obra => (
+                  {obras.map(obra => (
                     <option key={obra.id} value={obra.id}>
                       {obra.numero_contrato} - {obra.nombre}
                     </option>
