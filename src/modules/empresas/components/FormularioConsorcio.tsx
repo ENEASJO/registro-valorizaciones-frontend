@@ -47,14 +47,14 @@ interface IntegranteData {
   porcentajeParticipacion?: number;
   datosCompletos: any;
 }
-const FormularioConsorcio = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
+const FormularioConsorcio = ({
+  isOpen,
+  onClose,
+  onSubmit,
   loading = false,
-  title = "Nuevo Consorcio" 
+  title = "Nuevo Consorcio"
 }: FormularioConsorcioProps) => {
-  const { crearEmpresa } = useEmpresas();
+  const { crearEmpresa, empresas } = useEmpresas();
   // Hook de consulta RUC
   const {
     loading: loadingConsultaRuc,
@@ -75,7 +75,7 @@ const FormularioConsorcio = ({
   const [modalAgregarIntegrante, setModalAgregarIntegrante] = useState(false);
   // Estados para formularios
   const [rucConsorcio, setRucConsorcio] = useState('');
-  const [rucIntegrante, setRucIntegrante] = useState('');
+  const [empresaSeleccionadaId, setEmpresaSeleccionadaId] = useState<string>('');
   const [porcentajeIntegrante, setPorcentajeIntegrante] = useState<number>(0);
   // Estados de carga específicos
   const [consultandoTipo, setConsultandoTipo] = useState<'consorcio' | 'integrante' | null>(null);
@@ -88,7 +88,7 @@ const FormularioConsorcio = ({
       setModalAgregarConsorcio(false);
       setModalAgregarIntegrante(false);
       setRucConsorcio('');
-      setRucIntegrante('');
+      setEmpresaSeleccionadaId('');
       setPorcentajeIntegrante(0);
       setConsultandoTipo(null);
       limpiarDatosRuc();
@@ -144,61 +144,36 @@ const FormularioConsorcio = ({
     setRucConsorcio('');
     limpiarDatosRuc();
   };
-  // Función para consultar RUC del integrante
-  const handleConsultarRucIntegrante = async () => {
-    if (!rucIntegrante) {
-      setErrors([{ campo: 'ruc_integrante', mensaje: 'Ingrese un RUC para consultar' }]);
-      return;
-    }
-    const validacion = validarRuc(rucIntegrante);
-    if (!validacion.valido) {
-      setErrors([{ campo: 'ruc_integrante', mensaje: validacion.error || 'RUC inválido' }]);
-      return;
-    }
-    // Verificar que no esté ya agregado
-    if (integrantes.some(i => i.ruc === rucIntegrante) || consorcio?.ruc === rucIntegrante) {
-      setErrors([{ campo: 'ruc_integrante', mensaje: 'Este RUC ya está agregado' }]);
-      return;
-    }
-    setConsultandoTipo('integrante');
-    try {
-      const resultado = await consultarYAutocompletar(rucIntegrante);
-      if (resultado.success && resultado.datosFormulario) {
-        // Limpiar errores cuando la consulta es exitosa
-        setErrors([]);
-      } else {
-        setErrors([{ 
-          campo: 'ruc_integrante', 
-          mensaje: resultado.error || 'No se pudo consultar la información del RUC' 
-        }]);
-      }
-    } catch (error) {
-      console.error('Error en consulta RUC integrante:', error);
-      setErrors([{ 
-        campo: 'ruc_integrante', 
-        mensaje: 'Error de conexión. Verifique su conexión a internet e intente nuevamente.' 
-      }]);
-    } finally {
-      setConsultandoTipo(null);
-    }
-  };
-  // Función para confirmar agregar integrante
+  // Función para confirmar agregar integrante desde empresa seleccionada
   const confirmarAgregarIntegrante = () => {
-    if (!datosOriginalesRuc) return;
+    if (!empresaSeleccionadaId) {
+      setErrors([{ campo: 'empresa_integrante', mensaje: 'Seleccione una empresa' }]);
+      return;
+    }
+
+    const empresaSeleccionada = empresas.find(e => e.id.toString() === empresaSeleccionadaId);
+    if (!empresaSeleccionada) return;
+
+    // Verificar que no esté ya agregado
+    if (integrantes.some(i => i.ruc === empresaSeleccionada.ruc) || consorcio?.ruc === empresaSeleccionada.ruc) {
+      setErrors([{ campo: 'empresa_integrante', mensaje: 'Esta empresa ya está agregada al consorcio' }]);
+      return;
+    }
+
     const nuevoIntegrante: IntegranteData = {
       id: Date.now().toString(),
-      ruc: rucIntegrante,
-      razonSocial: datosOriginalesRuc.razon_social,
-      direccion: datosOriginalesRuc.direccion_completa,
-      domicilioFiscal: datosOriginalesRuc.domicilio_fiscal,
+      ruc: empresaSeleccionada.ruc,
+      razonSocial: empresaSeleccionada.razon_social,
+      direccion: empresaSeleccionada.direccion || '',
+      domicilioFiscal: empresaSeleccionada.direccion || '',
       porcentajeParticipacion: porcentajeIntegrante || 0,
-      datosCompletos: datosOriginalesRuc
+      datosCompletos: empresaSeleccionada // Guardar toda la empresa
     };
     setIntegrantes(prev => [...prev, nuevoIntegrante]);
     setModalAgregarIntegrante(false);
-    setRucIntegrante('');
+    setEmpresaSeleccionadaId('');
     setPorcentajeIntegrante(0);
-    limpiarDatosRuc();
+    setErrors([]);
   };
   // Función para eliminar consorcio
   const eliminarConsorcio = () => {
@@ -276,31 +251,14 @@ const FormularioConsorcio = ({
         especialidades: []
       };
       empresaConsorcio = await crearEmpresa(empresaConsorcioData);
-      // Crear empresas integrantes
+      // Usar empresas integrantes ya existentes (NO crear nuevas)
       const empresasParticipantes = [];
       for (const integrante of integrantes) {
-        const empresaIntegranteData = {
-          ruc: integrante.ruc,
-          razon_social: integrante.razonSocial,
-          nombre_comercial: integrante.datosCompletos.nombre_comercial || '',
-          direccion: integrante.datosCompletos.direccion || '',
-          distrito: integrante.datosCompletos.distrito || '',
-          provincia: integrante.datosCompletos.provincia || '',
-          departamento: integrante.datosCompletos.departamento || '',
-          representante_legal: integrante.datosCompletos.representantes_legales?.[0]?.nombre_completo || '',
-          dni_representante: integrante.datosCompletos.representantes_legales?.[0]?.numero_documento || '',
-          email: '',
-          telefono: '',
-          celular: '',
-          estado: 'ACTIVO' as const,
-          tipo_empresa: 'SAC' as const,
-          categoria_contratista: 'EJECUTORA' as const,
-          especialidades: []
-        };
-        const empresaIntegrante = await crearEmpresa(empresaIntegranteData);
-        if (empresaIntegrante) {
+        // Los integrantes ya son empresas existentes, usar su ID directamente
+        const empresaExistente = empresas.find(e => e.ruc === integrante.ruc);
+        if (empresaExistente) {
           empresasParticipantes.push({
-            empresa_id: empresaIntegrante.id,
+            empresa_id: empresaExistente.id,
             porcentaje: integrante.porcentajeParticipacion || 0,
             responsabilidades: []
           });
@@ -952,9 +910,8 @@ const FormularioConsorcio = ({
                   <button
                     onClick={() => {
                       setModalAgregarIntegrante(false);
-                      setRucIntegrante('');
+                      setEmpresaSeleccionadaId('');
                       setPorcentajeIntegrante(0);
-                      limpiarDatosRuc();
                       setErrors([]);
                     }}
                     className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 rounded-lg"
@@ -963,47 +920,42 @@ const FormularioConsorcio = ({
                   </button>
                 </div>
                 <div className="space-y-6">
+                  {/* Selector de Empresa */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      RUC del Integrante
+                      Seleccionar Empresa del Módulo Empresas
                     </label>
-                    <div className="flex gap-3">
-                      <input
-                        type="text"
-                        value={rucIntegrante}
-                        onChange={(e: any) => {
-                          const valor = e.target.value.replace(/\D/g, '').substring(0, 11);
-                          setRucIntegrante(valor);
-                          setErrors(prev => prev.filter(error => error.campo !== 'ruc_integrante'));
-                        }}
-                        className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
-                          errors.find(e => e.campo === 'ruc_integrante') ? 'border-red-300' : 'border-gray-300'
-                        }`}
-                        placeholder="20123456789"
-                        maxLength={11}
-                      />
-                      <button
-                        onClick={handleConsultarRucIntegrante}
-                        disabled={consultandoTipo === 'integrante' || !rucIntegrante || rucIntegrante.length !== 11}
-                        className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                      >
-                        {consultandoTipo === 'integrante' ? (
-                          <Loader className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Search className="w-4 h-4" />
-                        )}
-                        {consultandoTipo === 'integrante' ? 'Obteniendo datos...' : 'OBTENER DATOS'}
-                      </button>
-                    </div>
-                    {errors.find(e => e.campo === 'ruc_integrante') && (
+                    <select
+                      value={empresaSeleccionadaId}
+                      onChange={(e) => {
+                        setEmpresaSeleccionadaId(e.target.value);
+                        setErrors(prev => prev.filter(error => error.campo !== 'empresa_integrante'));
+                      }}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                        errors.find(e => e.campo === 'empresa_integrante') ? 'border-red-300' : 'border-gray-300'
+                      }`}
+                    >
+                      <option value="">-- Seleccione una empresa --</option>
+                      {empresas.filter(empresa => {
+                        // Filtrar empresas que no estén ya agregadas
+                        const yaAgregada = integrantes.some(i => i.ruc === empresa.ruc) || consorcio?.ruc === empresa.ruc;
+                        return !yaAgregada;
+                      }).map(empresa => (
+                        <option key={empresa.id} value={empresa.id.toString()}>
+                          {empresa.razon_social} - RUC: {empresa.ruc}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.find(e => e.campo === 'empresa_integrante') && (
                       <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
                         <AlertCircle className="w-4 h-4" />
-                        {errors.find(e => e.campo === 'ruc_integrante')?.mensaje}
+                        {errors.find(e => e.campo === 'empresa_integrante')?.mensaje}
                       </p>
                     )}
                   </div>
+
                   {/* Campo porcentaje */}
-                  {consultandoTipo !== 'integrante' && datosOriginalesRuc && (
+                  {empresaSeleccionadaId && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Porcentaje de Participación (%)
@@ -1023,145 +975,89 @@ const FormularioConsorcio = ({
                       </p>
                     </div>
                   )}
-                  {/* Mostrar datos consultados */}
-                  {consultandoTipo !== 'integrante' && datosOriginalesRuc && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-green-50 border border-green-200 rounded-lg p-4"
-                    >
-                      <div className="flex items-center gap-2 text-green-800 font-medium mb-3">
-                        <CheckCircle className="w-5 h-5" />
-                        Información encontrada en SUNAT
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div className="md:col-span-2">
-                          <span className="font-medium text-gray-700">
-                            {datosOriginalesRuc.tipo_persona === 'NATURAL' ? 'Nombre:' : 'Razón Social:'}
-                          </span>
-                          <p className="text-gray-900 font-semibold text-lg">{datosOriginalesRuc.razon_social}</p>
-                          <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {datosOriginalesRuc.ruc}</p>
-                          {/* Show DNI for persona natural */}
-                          {datosOriginalesRuc.tipo_persona === 'NATURAL' && datosOriginalesRuc.representantes_legales?.[0]?.numero_documento && (
-                            <p className="text-gray-600 dark:text-gray-300 text-sm">DNI: {datosOriginalesRuc.representantes_legales[0].numero_documento}</p>
+
+                  {/* Mostrar datos de empresa seleccionada */}
+                  {empresaSeleccionadaId && (() => {
+                    const empresaSeleccionada = empresas.find(e => e.id.toString() === empresaSeleccionadaId);
+                    return empresaSeleccionada ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-green-50 border border-green-200 rounded-lg p-4"
+                      >
+                        <div className="flex items-center gap-2 text-green-800 font-medium mb-3">
+                          <CheckCircle className="w-5 h-5" />
+                          Empresa registrada en el sistema
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                          <div className="md:col-span-2">
+                            <span className="font-medium text-gray-700">Razón Social:</span>
+                            <p className="text-gray-900 font-semibold text-lg">{empresaSeleccionada.razon_social}</p>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {empresaSeleccionada.ruc}</p>
+                          </div>
+                          {empresaSeleccionada.categoria_contratista && (
+                            <div>
+                              <span className="font-medium text-gray-700">Categoría:</span>
+                              <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                                empresaSeleccionada.categoria_contratista === 'EJECUTORA'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-purple-100 text-purple-800'
+                              }`}>
+                                {empresaSeleccionada.categoria_contratista}
+                              </span>
+                            </div>
+                          )}
+                          {empresaSeleccionada.estado && (
+                            <div>
+                              <span className="font-medium text-gray-700">Estado:</span>
+                              <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                                empresaSeleccionada.estado === 'ACTIVO'
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {empresaSeleccionada.estado}
+                              </span>
+                            </div>
+                          )}
+                          {empresaSeleccionada.direccion && (
+                            <div className="md:col-span-2">
+                              <span className="font-medium text-gray-700">Dirección:</span>
+                              <p className="text-gray-900">{empresaSeleccionada.direccion}</p>
+                            </div>
+                          )}
+                          {empresaSeleccionada.representante_legal && (
+                            <div className="md:col-span-2">
+                              <span className="font-medium text-gray-700">Representante Legal:</span>
+                              <p className="text-gray-900">{empresaSeleccionada.representante_legal}</p>
+                            </div>
                           )}
                         </div>
-                        {/* Tipo de Contribuyente */}
-                        {datosOriginalesRuc.tipo_contribuyente && (
-                          <div>
-                            <span className="font-medium text-gray-700">Tipo Contribuyente:</span>
-                            <p className="text-gray-900 font-medium">{datosOriginalesRuc.tipo_contribuyente}</p>
-                          </div>
-                        )}
-                        {/* Fecha de Inscripción */}
-                        {datosOriginalesRuc.fecha_inscripcion && (
-                          <div>
-                            <span className="font-medium text-gray-700">Fecha Inscripción:</span>
-                            <p className="text-gray-900">{datosOriginalesRuc.fecha_inscripcion}</p>
-                          </div>
-                        )}
-                        <div>
-                          <span className="font-medium text-gray-700">Estado:</span>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            datosOriginalesRuc.estado_contribuyente === 'ACTIVO' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {datosOriginalesRuc.estado_contribuyente}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">Condición:</span>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            datosOriginalesRuc.condicion_domicilio === 'HABIDO' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {datosOriginalesRuc.condicion_domicilio}
-                          </span>
-                        </div>
-                        {datosOriginalesRuc.direccion_completa && (
-                          <div className="md:col-span-2">
-                            <span className="font-medium text-gray-700">Dirección:</span>
-                            <p className="text-gray-900">{datosOriginalesRuc.direccion_completa}</p>
-                          </div>
-                        )}
-                        {datosOriginalesRuc.tipo_persona !== 'NATURAL' && datosOriginalesRuc.representantes_legales && datosOriginalesRuc.representantes_legales.length > 0 && (
-                          <div className="md:col-span-2">
-                            <span className="font-medium text-gray-700">Representantes Legales:</span>
-                            <div className="space-y-3 mt-2">
-                              {datosOriginalesRuc.representantes_legales.map((representante: any, index: number) => (
-                                <div key={index} className="bg-gray-50 p-3 rounded-lg border">
-                                  <p className="text-gray-900 font-semibold">{representante.nombre_completo}</p>
-                                  {representante.cargo && (
-                                    <p className="text-blue-600 text-sm font-medium">{representante.cargo}</p>
-                                  )}
-                                  {representante.numero_documento && (
-                                    <p className="text-gray-600 dark:text-gray-300 text-xs mt-1">
-                                      {representante.tipo_documento || 'DNI'}: {representante.numero_documento}
-                                    </p>
-                                  )}
-                                  {representante.fecha_desde && (
-                                    <p className="text-gray-500 dark:text-gray-300 text-xs">Desde: {representante.fecha_desde}</p>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {/* Actividad Comercial */}
-                        {datosOriginalesRuc.actividades_economicas && datosOriginalesRuc.actividades_economicas.length > 0 && (
-                          <div className="md:col-span-2">
-                            <span className="font-medium text-gray-700">Actividades Económicas:</span>
-                            <div className="mt-1 space-y-1">
-                              {datosOriginalesRuc.actividades_economicas.slice(0, 2).map((actividad: any, index: number) => (
-                                <div key={index} className="flex items-start gap-2">
-                                  <span className={`inline-block px-2 py-1 text-xs rounded ${
-                                    actividad.principal 
-                                      ? 'bg-blue-100 text-blue-800 font-medium' 
-                                      : 'bg-gray-100 text-gray-700'
-                                  }`}>
-                                    {actividad.principal ? 'Principal' : 'Secundaria'}
-                                  </span>
-                                  <div className="flex-1">
-                                    {actividad.ciiu && (
-                                      <p className="text-xs text-gray-500">CIIU: {actividad.ciiu}</p>
-                                    )}
-                                    <p className="text-sm text-gray-900">{actividad.descripcion}</p>
-                                  </div>
-                                </div>
-                              ))}
-                              {datosOriginalesRuc.actividades_economicas.length > 2 && (
-                                <p className="text-xs text-gray-500 dark:text-gray-300 italic">
-                                  + {datosOriginalesRuc.actividades_economicas.length - 2} actividades más
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex justify-end gap-3 mt-6">
-                        <button
-                          onClick={() => {
-                            setModalAgregarIntegrante(false);
-                            setRucIntegrante('');
-                            setPorcentajeIntegrante(0);
-                            limpiarDatosRuc();
-                          }}
-                          className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={confirmarAgregarIntegrante}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium flex items-center gap-2"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                          Confirmar
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
+                      </motion.div>
+                    ) : null;
+                  })()}
+
+                  {/* Botones de acción */}
+                  <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={() => {
+                        setModalAgregarIntegrante(false);
+                        setEmpresaSeleccionadaId('');
+                        setPorcentajeIntegrante(0);
+                        setErrors([]);
+                      }}
+                      className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={confirmarAgregarIntegrante}
+                      disabled={!empresaSeleccionadaId}
+                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Agregar Integrante
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
