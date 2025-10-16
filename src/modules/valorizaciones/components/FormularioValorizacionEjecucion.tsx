@@ -61,8 +61,8 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
     loading 
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
-  // Obras en ejecución (solo se pueden valorizar obras en ejecución)
-  const obrasEnEjecucion = obras.filter(o => o.estado === 'EN_EJECUCION');
+  // Obras valorizables (REGISTRADA = primera valorización, EN_EJECUCION = valorizaciones subsecuentes)
+  const obrasValorizables = obras.filter(o => o.estado === 'EN_EJECUCION' || o.estado === 'REGISTRADA');
   // Obra actual
   const [obraActual, setObraActual] = useState<any>(null);
   
@@ -305,8 +305,8 @@ const FormularioValorizacionEjecucion = ({ onCancel, onSuccess }: Props) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
                 >
-                  <option value="">Seleccionar obra en ejecución...</option>
-                  {obrasEnEjecucion.map(obra => (
+                  <option value="">Seleccionar obra...</option>
+                  {obrasValorizables.map(obra => (
                     <option key={obra.id} value={obra.id}>
                       {obra.numero_contrato} - {obra.nombre}
                     </option>
