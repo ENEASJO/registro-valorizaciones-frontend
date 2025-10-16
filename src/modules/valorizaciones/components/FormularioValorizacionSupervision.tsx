@@ -60,8 +60,11 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
     loading 
   } = useValorizaciones();
   const { obras, obtenerObraPorId } = useObras();
-  // Todas las obras con supervisor asignado (sin filtrar por estado)
-  const obrasConSupervisor = obras.filter(o => o.entidad_supervisora_id);
+  // Obras en ejecución con supervisor asignado (solo se pueden valorizar obras en ejecución)
+  const obrasConSupervisor = obras.filter(o =>
+    o.estado === 'EN_EJECUCION' &&
+    o.entidad_supervisora_id
+  );
   // Obra actual
   const [obraActual, setObraActual] = useState<any>(null);
   
@@ -341,7 +344,7 @@ const FormularioValorizacionSupervision = ({ onCancel, onSuccess }: Props) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
                   required
                 >
-                  <option value="">Seleccionar obra con supervisor...</option>
+                  <option value="">Seleccionar obra en ejecución con supervisor...</option>
                   {obrasConSupervisor.map(obra => (
                     <option key={obra.id} value={obra.id}>
                       {obra.numero_contrato} - {obra.nombre}
