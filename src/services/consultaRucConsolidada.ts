@@ -111,6 +111,7 @@ export interface DatosFormularioConsolidado {
   departamento?: string;
   representante_legal?: string;
   dni_representante?: string;
+  representantes?: MiembroConsolidado[];  // Array completo de representantes
   especialidades?: string[];
   estado?: 'ACTIVO' | 'INACTIVO' | 'SUSPENDIDO';
   tipo_empresa?: 'SAC' | 'SA' | 'SRL' | 'EIRL' | 'SCS' | 'SCR' | 'OTROS';
@@ -270,10 +271,12 @@ function determinarEstadoEmpresa(registro: RegistroConsolidado): 'ACTIVO' | 'INA
  * Transforma datos consolidados al formato del formulario
  */
 function transformarDatosConsolidados(datos: EmpresaConsolidada): DatosFormularioConsolidado {
-  
+
   const ubicacion = extraerUbicacion(datos.contacto.direccion || datos.contacto.domicilio_fiscal || '');
   const especialidadesFormulario = mapearEspecialidadesOSCE(datos.especialidades);
   const estado = determinarEstadoEmpresa(datos.registro);
+  const representantePrincipal = seleccionarRepresentantePrincipal(datos.representantes);
+
   return {
     ruc: datos.ruc,
     razon_social: datos.razon_social,
@@ -285,12 +288,13 @@ function transformarDatosConsolidados(datos: EmpresaConsolidada): DatosFormulari
     distrito: ubicacion.distrito,
     provincia: ubicacion.provincia,
     departamento: ubicacion.departamento,
-    representante_legal: undefined /* representantePrincipal?.nombre */,
-    dni_representante: undefined /* representantePrincipal?.numero_documento */,
+    representante_legal: representantePrincipal?.nombre,
+    dni_representante: representantePrincipal?.numero_documento || representantePrincipal?.documento,
+    representantes: datos.representantes,  // Preservar array completo de representantes
     especialidades: especialidadesFormulario,
     estado,
     tipo_empresa: 'SAC', // Default, se puede inferir de la razón social
-    categoria_contratista: datos.especialidades.includes('CATEGORIA A') ? 'A' : 
+    categoria_contratista: datos.especialidades.includes('CATEGORIA A') ? 'A' :
                           datos.especialidades.includes('CATEGORIA B') ? 'B' :
                           datos.especialidades.includes('CATEGORIA C') ? 'C' : 'B'
   };
