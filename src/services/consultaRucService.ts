@@ -93,9 +93,8 @@ export interface ResultadoConsultaFormulario {
 // =================================================================
 // CONFIGURACIÓN DEL SERVICIO
 // =================================================================
-import { API_ENDPOINTS, DEFAULT_HEADERS, API_TIMEOUT } from '../config/api';
+import { API_BASE_URL, API_ENDPOINTS, DEFAULT_HEADERS, API_TIMEOUT } from '../config/api';
 
-const API_BASE_URL = API_ENDPOINTS.consultaRuc.replace('/consulta-ruc', '');
 const TIMEOUT_MS = API_TIMEOUT; // Usar timeout configurado centralizadamente
 // =================================================================
 // FUNCIONES DE VALIDACIÓN
