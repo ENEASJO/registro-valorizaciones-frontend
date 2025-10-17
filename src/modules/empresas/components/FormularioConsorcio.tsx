@@ -1269,20 +1269,96 @@ const FormularioConsorcio = ({
                         </p>
                       </div>
 
-                      {/* Indicador de guardado exitoso */}
-                      {!guardandoEmpresa && !consultandoTipo && datosOriginalesRuc && rucIntegrante === datosOriginalesRuc.ruc && (
+                      {/* Vista previa de datos consultados - INTEGRANTE */}
+                      {consultandoTipo !== 'integrante' && datosOriginalesRuc && rucIntegrante === datosOriginalesRuc.ruc && (
                         <motion.div
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="bg-green-50 border-2 border-green-200 rounded-lg p-4"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-green-50 border border-green-200 rounded-lg p-4"
                         >
-                          <div className="flex items-center gap-2 text-green-800 font-medium mb-2">
+                          <div className="flex items-center gap-2 text-green-800 font-medium mb-3">
                             <CheckCircle className="w-5 h-5" />
-                            Empresa registrada exitosamente
+                            {guardandoEmpresa ? 'Guardando empresa...' : 'Información encontrada en SUNAT'}
                           </div>
-                          <p className="text-sm text-green-700">
-                            La empresa ha sido guardada en el módulo Empresas y agregada como integrante del consorcio.
-                          </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="md:col-span-2">
+                              <span className="font-medium text-gray-700">
+                                {datosOriginalesRuc.tipo_persona === 'NATURAL' ? 'Nombre:' : 'Razón Social:'}
+                              </span>
+                              <p className="text-gray-900 font-semibold text-lg">{datosOriginalesRuc.razon_social}</p>
+                              <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {datosOriginalesRuc.ruc}</p>
+                              {/* Show DNI for persona natural */}
+                              {datosOriginalesRuc.tipo_persona === 'NATURAL' && datosOriginalesRuc.representantes?.[0]?.numero_documento && (
+                                <p className="text-gray-600 dark:text-gray-300 text-sm">DNI: {datosOriginalesRuc.representantes[0].numero_documento}</p>
+                              )}
+                            </div>
+                            {/* Estado */}
+                            {datosOriginalesRuc.registro?.estado_sunat && (
+                              <div>
+                                <span className="font-medium text-gray-700">Estado:</span>
+                                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                                  datosOriginalesRuc.registro.estado_sunat.includes('ACTIVO')
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {datosOriginalesRuc.registro.estado_sunat}
+                                </span>
+                              </div>
+                            )}
+                            {/* Dirección */}
+                            {datosOriginalesRuc && (datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal) && (
+                              <div className="md:col-span-2">
+                                <span className="font-medium text-gray-700">Dirección:</span>
+                                <p className="text-gray-900">{datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal}</p>
+                              </div>
+                            )}
+                            {/* Representantes */}
+                            {datosOriginalesRuc.tipo_persona !== 'NATURAL' && datosOriginalesRuc.representantes && datosOriginalesRuc.representantes.length > 0 && (
+                              <div className="md:col-span-2">
+                                <span className="font-medium text-gray-700">Representantes Legales:</span>
+                                <div className="space-y-3 mt-2">
+                                  {datosOriginalesRuc.representantes.map((representante: any, index: number) => (
+                                    <div key={index} className="bg-gray-50 p-3 rounded-lg border">
+                                      <p className="text-gray-900 font-semibold">{representante.nombre}</p>
+                                      {representante.cargo && (
+                                        <p className="text-blue-600 text-sm font-medium">{representante.cargo}</p>
+                                      )}
+                                      {representante.numero_documento && (
+                                        <p className="text-gray-600 dark:text-gray-300 text-xs mt-1">
+                                          {representante.tipo_documento || 'DNI'}: {representante.numero_documento}
+                                        </p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {/* Especialidades */}
+                            {datosOriginalesRuc.especialidades && datosOriginalesRuc.especialidades.length > 0 && (
+                              <div className="md:col-span-2">
+                                <span className="font-medium text-gray-700">Especialidades:</span>
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {datosOriginalesRuc.especialidades.slice(0, 5).map((esp: string, index: number) => (
+                                    <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+                                      {esp}
+                                    </span>
+                                  ))}
+                                  {datosOriginalesRuc.especialidades.length > 5 && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-300 italic px-2 py-1">
+                                      + {datosOriginalesRuc.especialidades.length - 5} más
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                          {!guardandoEmpresa && (
+                            <div className="mt-4 p-3 bg-green-100 rounded-lg">
+                              <p className="text-sm text-green-800 font-medium">
+                                ✓ Empresa guardada exitosamente. Cierre el modal para ver el integrante agregado.
+                              </p>
+                            </div>
+                          )}
                         </motion.div>
                       )}
                     </>
