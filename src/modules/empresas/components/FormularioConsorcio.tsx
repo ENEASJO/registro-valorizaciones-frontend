@@ -175,10 +175,20 @@ const FormularioConsorcio = ({
       // 1. Consultar datos de SUNAT
       const resultado = await consultarYAutocompletar(rucIntegrante);
 
-      if (!resultado.success || !resultado.datosFormulario || !resultado.datosOriginales) {
+      if (!resultado.success || !resultado.datosFormulario) {
         setErrors([{
           campo: 'ruc_integrante',
           mensaje: resultado.error || 'No se pudo consultar la información del RUC'
+        }]);
+        setConsultandoTipo(null);
+        return;
+      }
+
+      // Los datos originales están disponibles en datosOriginalesRuc del hook
+      if (!datosOriginalesRuc) {
+        setErrors([{
+          campo: 'ruc_integrante',
+          mensaje: 'No se pudieron obtener los datos completos del RUC'
         }]);
         setConsultandoTipo(null);
         return;
@@ -210,15 +220,15 @@ const FormularioConsorcio = ({
       setGuardandoEmpresa(false);
 
       if (empresaCreada) {
-        // 3. Agregar al integrante usando los datos originales
+        // 3. Agregar al integrante usando los datos originales del hook
         const nuevoIntegrante: IntegranteData = {
           id: Date.now().toString(),
-          ruc: resultado.datosOriginales.ruc,
-          razonSocial: resultado.datosOriginales.razon_social,
-          direccion: resultado.datosOriginales.direccion_completa || '',
-          domicilioFiscal: resultado.datosOriginales.domicilio_fiscal || '',
+          ruc: datosOriginalesRuc.ruc,
+          razonSocial: datosOriginalesRuc.razon_social,
+          direccion: datosOriginalesRuc.direccion_completa || '',
+          domicilioFiscal: datosOriginalesRuc.domicilio_fiscal || '',
           porcentajeParticipacion: porcentajeIntegrante || 0,
-          datosCompletos: resultado.datosOriginales
+          datosCompletos: datosOriginalesRuc
         };
 
         setIntegrantes(prev => [...prev, nuevoIntegrante]);
