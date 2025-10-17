@@ -21,7 +21,7 @@ import type {
   ErrorValidacion 
 } from '../../../types/empresa.types';
 import { useEmpresas } from '../../../hooks/useEmpresas';
-import { useConsultaRuc } from '../../../hooks/useConsultaRuc';
+import { useConsultaRucConsolidada } from '../../../hooks/useConsultaRucConsolidada';
 interface FormularioConsorcioProps {
   isOpen: boolean;
   onClose: () => void;
@@ -55,17 +55,39 @@ const FormularioConsorcio = ({
   title = "Nuevo Consorcio"
 }: FormularioConsorcioProps) => {
   const { crearEmpresa, empresas } = useEmpresas();
-  // Hook de consulta RUC
+  // Hook de consulta RUC consolidada (SUNAT + OSCE)
   const {
     loading: loadingConsultaRuc,
     datos: datosConsultaRuc,
     datosOriginales: datosOriginalesRuc,
     error: errorConsultaRuc,
     advertencias: advertenciasRuc,
+    representantesDisponibles,
+    fuentesUtilizadas,
     consultarYAutocompletar,
-    limpiarDatos: limpiarDatosRuc,
-    validarRuc
-  } = useConsultaRuc();
+    limpiarDatos: limpiarDatosRuc
+  } = useConsultaRucConsolidada();
+
+  // Función local de validación de RUC
+  const validarRuc = (ruc: string): { valido: boolean; error?: string } => {
+    const rucLimpio = ruc.replace(/\D/g, '');
+    if (!rucLimpio || rucLimpio.length === 0) {
+      return { valido: false, error: 'Debe ingresar un RUC' };
+    }
+    if (rucLimpio.length < 11) {
+      return { valido: false, error: `El RUC debe tener 11 dígitos (actual: ${rucLimpio.length})` };
+    }
+    if (rucLimpio.length > 11) {
+      return { valido: false, error: `El RUC debe tener 11 dígitos (actual: ${rucLimpio.length})` };
+    }
+    const prefijo = rucLimpio.substring(0, 2);
+    const prefijoValidos = ['10', '15', '17', '20', '25'];
+    if (!prefijoValidos.includes(prefijo)) {
+      return { valido: false, error: `RUC inválido. Debe comenzar con 10, 15, 17, 20 o 25 (actual: ${prefijo})` };
+    }
+    return { valido: true };
+  };
+
   // Estados principales
   const [consorcio, setConsorcio] = useState<ConsorcioData | null>(null);
   const [integrantes, setIntegrantes] = useState<IntegranteData[]>([]);
@@ -187,6 +209,27 @@ const FormularioConsorcio = ({
       // 2. Guardar automáticamente en tabla empresas
       setGuardandoEmpresa(true);
       const datosFormulario = resultado.datosFormulario;
+
+      // DEBUG: Verificar datos originales
+      console.log('🔍 DEBUG - resultado.datosOriginales:', resultado.datosOriginales);
+      console.log('🔍 DEBUG - representantes array:', resultado.datosOriginales?.representantes);
+
+      // Transformar representantes de EmpresaConsolidada a RepresentanteFormulario[]
+      const representantesTransformados = resultado.datosOriginales?.representantes
+        ? resultado.datosOriginales.representantes.map((miembro, index) => ({
+            nombre: miembro.nombre,
+            cargo: miembro.cargo || '',
+            numero_documento: miembro.numero_documento || miembro.documento || '',
+            tipo_documento: (miembro.tipo_documento as 'DNI' | 'CE' | 'PASSPORT') || 'DNI',
+            es_principal: index === 0, // Primer representante es principal
+            fuente: miembro.fuente,
+            activo: true
+          }))
+        : undefined;
+
+      // DEBUG: Verificar transformación
+      console.log('🔍 DEBUG - representantesTransformados:', representantesTransformados);
+
       const empresaData = {
         ruc: datosFormulario.ruc,
         razon_social: datosFormulario.razon_social,
@@ -203,10 +246,18 @@ const FormularioConsorcio = ({
         estado: 'ACTIVO' as const,
         tipo_empresa: 'SAC' as const,
         categoria_contratista: 'EJECUTORA' as const,
-        especialidades: []
+        especialidades: [],
+        representantes: representantesTransformados // ← NEW: Include representantes from OSCE
       };
 
+      // DEBUG: Verificar payload completo antes de enviar
+      console.log('🔍 DEBUG - empresaData completo:', empresaData);
+      console.log('🔍 DEBUG - empresaData.representantes:', empresaData.representantes);
+
       const empresaCreada = await crearEmpresa(empresaData);
+
+      // DEBUG: Verificar respuesta
+      console.log('🔍 DEBUG - empresaCreada response:', empresaCreada);
       setGuardandoEmpresa(false);
 
       if (empresaCreada) {
