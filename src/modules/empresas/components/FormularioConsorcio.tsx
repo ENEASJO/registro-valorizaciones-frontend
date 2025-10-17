@@ -79,6 +79,10 @@ const FormularioConsorcio = ({
   const [porcentajeIntegrante, setPorcentajeIntegrante] = useState<number>(0);
   // Estados de carga específicos
   const [consultandoTipo, setConsultandoTipo] = useState<'consorcio' | 'integrante' | null>(null);
+  // Estados para agregar integrante por RUC
+  const [rucIntegrante, setRucIntegrante] = useState('');
+  const [modoIntegrante, setModoIntegrante] = useState<'seleccionar' | 'consultar'>('seleccionar');
+  const [guardandoEmpresa, setGuardandoEmpresa] = useState(false);
   useEffect(() => {
     if (isOpen) {
       // Reset completo del formulario
@@ -91,6 +95,9 @@ const FormularioConsorcio = ({
       setEmpresaSeleccionadaId('');
       setPorcentajeIntegrante(0);
       setConsultandoTipo(null);
+      setRucIntegrante('');
+      setModoIntegrante('seleccionar');
+      setGuardandoEmpresa(false);
       limpiarDatosRuc();
     }
   }, [isOpen, limpiarDatosRuc]);
@@ -144,6 +151,96 @@ const FormularioConsorcio = ({
     setRucConsorcio('');
     limpiarDatosRuc();
   };
+  // Función para consultar RUC de integrante y guardarlo en tabla empresas
+  const handleConsultarRucIntegrante = async () => {
+    if (!rucIntegrante) {
+      setErrors([{ campo: 'ruc_integrante', mensaje: 'Ingrese un RUC para consultar' }]);
+      return;
+    }
+
+    const validacion = validarRuc(rucIntegrante);
+    if (!validacion.valido) {
+      setErrors([{ campo: 'ruc_integrante', mensaje: validacion.error || 'RUC inválido' }]);
+      return;
+    }
+
+    // Verificar que no esté ya agregado
+    if (integrantes.some(i => i.ruc === rucIntegrante) || consorcio?.ruc === rucIntegrante) {
+      setErrors([{ campo: 'ruc_integrante', mensaje: 'Esta empresa ya está agregada al consorcio' }]);
+      return;
+    }
+
+    setConsultandoTipo('integrante');
+    try {
+      // 1. Consultar datos de SUNAT
+      const resultado = await consultarYAutocompletar(rucIntegrante);
+
+      if (!resultado.success || !resultado.datosFormulario || !resultado.datosOriginales) {
+        setErrors([{
+          campo: 'ruc_integrante',
+          mensaje: resultado.error || 'No se pudo consultar la información del RUC'
+        }]);
+        setConsultandoTipo(null);
+        return;
+      }
+
+      // 2. Guardar automáticamente en tabla empresas
+      setGuardandoEmpresa(true);
+      const datosFormulario = resultado.datosFormulario;
+      const empresaData = {
+        ruc: datosFormulario.ruc,
+        razon_social: datosFormulario.razon_social,
+        nombre_comercial: datosFormulario.nombre_comercial || '',
+        direccion: datosFormulario.direccion || '',
+        distrito: datosFormulario.distrito || '',
+        provincia: datosFormulario.provincia || '',
+        departamento: datosFormulario.departamento || '',
+        representante_legal: datosFormulario.representante_legal || '',
+        dni_representante: datosFormulario.dni_representante || '',
+        email: datosFormulario.email || '',
+        telefono: datosFormulario.telefono || '',
+        celular: '',
+        estado: 'ACTIVO' as const,
+        tipo_empresa: 'SAC' as const,
+        categoria_contratista: 'EJECUTORA' as const,
+        especialidades: []
+      };
+
+      const empresaCreada = await crearEmpresa(empresaData);
+      setGuardandoEmpresa(false);
+
+      if (empresaCreada) {
+        // 3. Agregar al integrante usando los datos originales
+        const nuevoIntegrante: IntegranteData = {
+          id: Date.now().toString(),
+          ruc: resultado.datosOriginales.ruc,
+          razonSocial: resultado.datosOriginales.razon_social,
+          direccion: resultado.datosOriginales.direccion_completa || '',
+          domicilioFiscal: resultado.datosOriginales.domicilio_fiscal || '',
+          porcentajeParticipacion: porcentajeIntegrante || 0,
+          datosCompletos: resultado.datosOriginales
+        };
+
+        setIntegrantes(prev => [...prev, nuevoIntegrante]);
+        setModalAgregarIntegrante(false);
+        setRucIntegrante('');
+        setPorcentajeIntegrante(0);
+        setModoIntegrante('seleccionar');
+        limpiarDatosRuc();
+        setErrors([]);
+      }
+    } catch (error) {
+      console.error('Error consultando RUC integrante:', error);
+      setErrors([{
+        campo: 'ruc_integrante',
+        mensaje: 'Error al guardar la empresa. Intente nuevamente.'
+      }]);
+    } finally {
+      setConsultandoTipo(null);
+      setGuardandoEmpresa(false);
+    }
+  };
+
   // Función para confirmar agregar integrante desde empresa seleccionada
   const confirmarAgregarIntegrante = () => {
     if (!empresaSeleccionadaId) {
@@ -922,12 +1019,48 @@ const FormularioConsorcio = ({
                   </button>
                 </div>
                 <div className="space-y-6">
-                  {/* Selector de Empresa */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Seleccionar Empresa del Módulo Empresas
-                    </label>
-                    <select
+                  {/* Selector de Modo: Seleccionar Existente o Consultar Nuevo */}
+                  <div className="flex gap-4 p-4 bg-gray-50 rounded-lg">
+                    <button
+                      onClick={() => {
+                        setModoIntegrante('seleccionar');
+                        setRucIntegrante('');
+                        limpiarDatosRuc();
+                        setErrors(prev => prev.filter(e => e.campo !== 'ruc_integrante'));
+                      }}
+                      className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                        modoIntegrante === 'seleccionar'
+                          ? 'bg-green-600 text-white shadow-md'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Seleccionar Empresa Existente
+                    </button>
+                    <button
+                      onClick={() => {
+                        setModoIntegrante('consultar');
+                        setEmpresaSeleccionadaId('');
+                        setErrors(prev => prev.filter(e => e.campo !== 'empresa_integrante'));
+                      }}
+                      className={`flex-1 px-4 py-3 rounded-lg font-medium transition-all ${
+                        modoIntegrante === 'consultar'
+                          ? 'bg-green-600 text-white shadow-md'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                      }`}
+                    >
+                      Consultar RUC Nuevo
+                    </button>
+                  </div>
+
+                  {/* Modo: Seleccionar Empresa Existente */}
+                  {modoIntegrante === 'seleccionar' && (
+                    <>
+                      {/* Selector de Empresa */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Seleccionar Empresa del Módulo Empresas
+                        </label>
+                        <select
                       value={empresaSeleccionadaId}
                       onChange={(e) => {
                         setEmpresaSeleccionadaId(e.target.value);
@@ -1041,6 +1174,103 @@ const FormularioConsorcio = ({
                       </motion.div>
                     ) : null;
                   })()}
+                    </>
+                  )}
+
+                  {/* Modo: Consultar RUC Nuevo */}
+                  {modoIntegrante === 'consultar' && (
+                    <>
+                      {/* Campo RUC con botón OBTENER DATOS */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          RUC del Integrante
+                        </label>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            value={rucIntegrante}
+                            onChange={(e: any) => {
+                              const valor = e.target.value.replace(/\D/g, '').substring(0, 11);
+                              setRucIntegrante(valor);
+                              setErrors(prev => prev.filter(error => error.campo !== 'ruc_integrante'));
+                            }}
+                            className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent ${
+                              errors.find(e => e.campo === 'ruc_integrante') ? 'border-red-300' : 'border-gray-300'
+                            }`}
+                            placeholder="20123456789"
+                            maxLength={11}
+                            disabled={consultandoTipo === 'integrante' || guardandoEmpresa}
+                          />
+                          <button
+                            onClick={handleConsultarRucIntegrante}
+                            disabled={consultandoTipo === 'integrante' || guardandoEmpresa || !rucIntegrante || rucIntegrante.length !== 11}
+                            className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[180px]"
+                          >
+                            {consultandoTipo === 'integrante' ? (
+                              <>
+                                <Loader className="w-4 h-4 animate-spin" />
+                                Consultando...
+                              </>
+                            ) : guardandoEmpresa ? (
+                              <>
+                                <Loader className="w-4 h-4 animate-spin" />
+                                Guardando...
+                              </>
+                            ) : (
+                              <>
+                                <Search className="w-4 h-4" />
+                                OBTENER DATOS
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        {errors.find(e => e.campo === 'ruc_integrante') && (
+                          <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-4 h-4" />
+                            {errors.find(e => e.campo === 'ruc_integrante')?.mensaje}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Campo porcentaje para modo consultar */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Porcentaje de Participación (%)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          step="0.1"
+                          value={porcentajeIntegrante || ''}
+                          onChange={(e: any) => setPorcentajeIntegrante(parseFloat(e.target.value) || 0)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          placeholder="0.0"
+                          disabled={consultandoTipo === 'integrante' || guardandoEmpresa}
+                        />
+                        <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
+                          Porcentaje asignado en el consorcio (opcional, se puede ajustar después)
+                        </p>
+                      </div>
+
+                      {/* Indicador de guardado exitoso */}
+                      {!guardandoEmpresa && !consultandoTipo && datosOriginalesRuc && rucIntegrante === datosOriginalesRuc.ruc && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="bg-green-50 border-2 border-green-200 rounded-lg p-4"
+                        >
+                          <div className="flex items-center gap-2 text-green-800 font-medium mb-2">
+                            <CheckCircle className="w-5 h-5" />
+                            Empresa registrada exitosamente
+                          </div>
+                          <p className="text-sm text-green-700">
+                            La empresa ha sido guardada en el módulo Empresas y agregada como integrante del consorcio.
+                          </p>
+                        </motion.div>
+                      )}
+                    </>
+                  )}
 
                   {/* Botones de acción */}
                   <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
@@ -1049,20 +1279,28 @@ const FormularioConsorcio = ({
                         setModalAgregarIntegrante(false);
                         setEmpresaSeleccionadaId('');
                         setPorcentajeIntegrante(0);
+                        setRucIntegrante('');
+                        setModoIntegrante('seleccionar');
+                        limpiarDatosRuc();
                         setErrors([]);
                       }}
-                      className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                      disabled={consultandoTipo === 'integrante' || guardandoEmpresa}
+                      className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancelar
                     </button>
-                    <button
-                      onClick={confirmarAgregarIntegrante}
-                      disabled={!empresaSeleccionadaId}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      Agregar Integrante
-                    </button>
+
+                    {/* Solo mostrar botón Agregar en modo seleccionar */}
+                    {modoIntegrante === 'seleccionar' && (
+                      <button
+                        onClick={confirmarAgregarIntegrante}
+                        disabled={!empresaSeleccionadaId}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Agregar Integrante
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
