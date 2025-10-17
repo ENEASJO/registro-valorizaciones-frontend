@@ -210,13 +210,12 @@ const FormularioConsorcio = ({
       setGuardandoEmpresa(false);
 
       if (empresaCreada) {
-        // 3. Usar datosOriginalesRuc del hook que debe estar actualizado ahora
-        //    Si por alguna razón no está disponible, crear datos completos desde datosFormulario
+        // 3. Usar datos originales del resultado o crear fallback desde datosFormulario
         let datosCompletosIntegrante;
 
-        if (datosOriginalesRuc && datosOriginalesRuc.ruc === rucIntegrante) {
-          // Caso ideal: usar datos originales del hook
-          datosCompletosIntegrante = datosOriginalesRuc;
+        if (resultado.datosOriginales) {
+          // Caso ideal: usar datos originales del resultado
+          datosCompletosIntegrante = resultado.datosOriginales;
         } else {
           // Fallback: construir datos completos desde datosFormulario
           datosCompletosIntegrante = {

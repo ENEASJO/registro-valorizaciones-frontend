@@ -47,6 +47,7 @@ export interface AccionesConsultaRuc {
   consultarYAutocompletar: (ruc: string, autorellenarCallback?: (datos: DatosEmpresaFormulario) => void) => Promise<{
     success: boolean;
     datosFormulario?: DatosEmpresaFormulario;
+    datosOriginales?: DatosRucConsulta;
     error?: string;
     advertencias: string[];
   }>;
@@ -220,6 +221,7 @@ export function useConsultaRuc(): EstadoConsultaRuc & AccionesConsultaRuc {
   ): Promise<{
     success: boolean;
     datosFormulario?: DatosEmpresaFormulario;
+    datosOriginales?: DatosRucConsulta;
     error?: string;
     advertencias: string[];
   }> => {
@@ -246,7 +248,7 @@ export function useConsultaRuc(): EstadoConsultaRuc & AccionesConsultaRuc {
     try {
       const resultado = await consultarRucConCache(rucLimpio);
       finalizarConsulta(resultado, tiempoInicio);
-      
+
       if (resultado.success && resultado.datos && autorellenarCallback) {
         // Ejecutar callback para auto-rellenar formulario
         try {
@@ -256,25 +258,26 @@ export function useConsultaRuc(): EstadoConsultaRuc & AccionesConsultaRuc {
           console.error('Error al auto-completar formulario:', error);
         }
       }
-      
+
       return {
         success: resultado.success,
         datosFormulario: resultado.datos,
+        datosOriginales: resultado.datosOriginales,
         error: resultado.error,
         advertencias: resultado.advertencias,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      
+
       actualizarEstado({
         estado: 'error',
         loading: false,
         error: errorMessage,
         tiempoConsulta: Date.now() - tiempoInicio,
       });
-      
+
       abortControllerRef.current = null;
-      
+
       return {
         success: false,
         error: errorMessage,
