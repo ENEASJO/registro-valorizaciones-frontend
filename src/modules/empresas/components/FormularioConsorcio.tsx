@@ -152,22 +152,24 @@ const FormularioConsorcio = ({
     }
 
     const empresaSeleccionada = empresas.find(e => e.id.toString() === empresaSeleccionadaId);
-    if (!empresaSeleccionada) return;
+    if (!empresaSeleccionada || !empresaSeleccionada.datos_empresa) return;
+
+    const datosEmpresa = empresaSeleccionada.datos_empresa;
 
     // Verificar que no esté ya agregado
-    if (integrantes.some(i => i.ruc === empresaSeleccionada.ruc) || consorcio?.ruc === empresaSeleccionada.ruc) {
+    if (integrantes.some(i => i.ruc === datosEmpresa.ruc) || consorcio?.ruc === datosEmpresa.ruc) {
       setErrors([{ campo: 'empresa_integrante', mensaje: 'Esta empresa ya está agregada al consorcio' }]);
       return;
     }
 
     const nuevoIntegrante: IntegranteData = {
       id: Date.now().toString(),
-      ruc: empresaSeleccionada.ruc,
-      razonSocial: empresaSeleccionada.razon_social,
-      direccion: empresaSeleccionada.direccion || '',
-      domicilioFiscal: empresaSeleccionada.direccion || '',
+      ruc: datosEmpresa.ruc,
+      razonSocial: datosEmpresa.razon_social,
+      direccion: datosEmpresa.direccion || '',
+      domicilioFiscal: datosEmpresa.direccion || '',
       porcentajeParticipacion: porcentajeIntegrante || 0,
-      datosCompletos: empresaSeleccionada // Guardar toda la empresa
+      datosCompletos: datosEmpresa // Guardar datos de empresa
     };
     setIntegrantes(prev => [...prev, nuevoIntegrante]);
     setModalAgregarIntegrante(false);
@@ -255,7 +257,7 @@ const FormularioConsorcio = ({
       const empresasParticipantes = [];
       for (const integrante of integrantes) {
         // Los integrantes ya son empresas existentes, usar su ID directamente
-        const empresaExistente = empresas.find(e => e.ruc === integrante.ruc);
+        const empresaExistente = empresas.find(e => e.datos_empresa?.ruc === integrante.ruc);
         if (empresaExistente) {
           empresasParticipantes.push({
             empresa_id: empresaExistente.id,
@@ -936,13 +938,16 @@ const FormularioConsorcio = ({
                       }`}
                     >
                       <option value="">-- Seleccione una empresa --</option>
-                      {empresas.filter(empresa => {
+                      {empresas.filter(entidad => {
+                        // Solo mostrar empresas (no consorcios)
+                        if (entidad.tipo_entidad !== 'EMPRESA' || !entidad.datos_empresa) return false;
+
                         // Filtrar empresas que no estén ya agregadas
-                        const yaAgregada = integrantes.some(i => i.ruc === empresa.ruc) || consorcio?.ruc === empresa.ruc;
+                        const yaAgregada = integrantes.some(i => i.ruc === entidad.datos_empresa!.ruc) || consorcio?.ruc === entidad.datos_empresa!.ruc;
                         return !yaAgregada;
-                      }).map(empresa => (
-                        <option key={empresa.id} value={empresa.id.toString()}>
-                          {empresa.razon_social} - RUC: {empresa.ruc}
+                      }).map(entidad => (
+                        <option key={entidad.id} value={entidad.id.toString()}>
+                          {entidad.datos_empresa!.razon_social} - RUC: {entidad.datos_empresa!.ruc}
                         </option>
                       ))}
                     </select>
@@ -978,8 +983,9 @@ const FormularioConsorcio = ({
 
                   {/* Mostrar datos de empresa seleccionada */}
                   {empresaSeleccionadaId && (() => {
-                    const empresaSeleccionada = empresas.find(e => e.id.toString() === empresaSeleccionadaId);
-                    return empresaSeleccionada ? (
+                    const entidadSeleccionada = empresas.find(e => e.id.toString() === empresaSeleccionadaId);
+                    const datosEmpresa = entidadSeleccionada?.datos_empresa;
+                    return entidadSeleccionada && datosEmpresa ? (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -992,43 +998,43 @@ const FormularioConsorcio = ({
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                           <div className="md:col-span-2">
                             <span className="font-medium text-gray-700">Razón Social:</span>
-                            <p className="text-gray-900 font-semibold text-lg">{empresaSeleccionada.razon_social}</p>
-                            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {empresaSeleccionada.ruc}</p>
+                            <p className="text-gray-900 font-semibold text-lg">{datosEmpresa.razon_social}</p>
+                            <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {datosEmpresa.ruc}</p>
                           </div>
-                          {empresaSeleccionada.categoria_contratista && (
+                          {datosEmpresa.categoria_contratista && (
                             <div>
                               <span className="font-medium text-gray-700">Categoría:</span>
                               <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                                empresaSeleccionada.categoria_contratista === 'EJECUTORA'
+                                datosEmpresa.categoria_contratista === 'EJECUTORA'
                                   ? 'bg-blue-100 text-blue-800'
                                   : 'bg-purple-100 text-purple-800'
                               }`}>
-                                {empresaSeleccionada.categoria_contratista}
+                                {datosEmpresa.categoria_contratista}
                               </span>
                             </div>
                           )}
-                          {empresaSeleccionada.estado && (
+                          {entidadSeleccionada.estado && (
                             <div>
                               <span className="font-medium text-gray-700">Estado:</span>
                               <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                                empresaSeleccionada.estado === 'ACTIVO'
+                                entidadSeleccionada.estado === 'ACTIVO'
                                   ? 'bg-green-100 text-green-800'
                                   : 'bg-red-100 text-red-800'
                               }`}>
-                                {empresaSeleccionada.estado}
+                                {entidadSeleccionada.estado}
                               </span>
                             </div>
                           )}
-                          {empresaSeleccionada.direccion && (
+                          {datosEmpresa.direccion && (
                             <div className="md:col-span-2">
                               <span className="font-medium text-gray-700">Dirección:</span>
-                              <p className="text-gray-900">{empresaSeleccionada.direccion}</p>
+                              <p className="text-gray-900">{datosEmpresa.direccion}</p>
                             </div>
                           )}
-                          {empresaSeleccionada.representante_legal && (
+                          {datosEmpresa.representante_legal && (
                             <div className="md:col-span-2">
                               <span className="font-medium text-gray-700">Representante Legal:</span>
-                              <p className="text-gray-900">{empresaSeleccionada.representante_legal}</p>
+                              <p className="text-gray-900">{datosEmpresa.representante_legal}</p>
                             </div>
                           )}
                         </div>
