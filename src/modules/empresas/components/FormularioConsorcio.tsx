@@ -210,13 +210,13 @@ const FormularioConsorcio = ({
       setGuardandoEmpresa(true);
       const datosFormulario = resultado.datosFormulario;
 
-      // DEBUG: Verificar datos originales
-      console.log('🔍 DEBUG - resultado.datosOriginales:', resultado.datosOriginales);
-      console.log('🔍 DEBUG - representantes array:', resultado.datosOriginales?.representantes);
+      // DEBUG: Verificar datos originales (usar estado del hook, no resultado)
+      console.log('🔍 DEBUG - datosOriginalesRuc:', datosOriginalesRuc);
+      console.log('🔍 DEBUG - representantes array:', datosOriginalesRuc?.representantes);
 
       // Transformar representantes de EmpresaConsolidada a RepresentanteFormulario[]
-      const representantesTransformados = resultado.datosOriginales?.representantes
-        ? resultado.datosOriginales.representantes.map((miembro, index) => ({
+      const representantesTransformados = datosOriginalesRuc?.representantes
+        ? datosOriginalesRuc.representantes.map((miembro, index) => ({
             nombre: miembro.nombre,
             cargo: miembro.cargo || '',
             numero_documento: miembro.numero_documento || miembro.documento || '',
@@ -261,12 +261,12 @@ const FormularioConsorcio = ({
       setGuardandoEmpresa(false);
 
       if (empresaCreada) {
-        // 3. Usar datos originales del resultado o crear fallback desde datosFormulario
+        // 3. Usar datos originales del estado del hook o crear fallback desde datosFormulario
         let datosCompletosIntegrante;
 
-        if (resultado.datosOriginales) {
-          // Caso ideal: usar datos originales del resultado
-          datosCompletosIntegrante = resultado.datosOriginales;
+        if (datosOriginalesRuc) {
+          // Caso ideal: usar datos originales del estado del hook
+          datosCompletosIntegrante = datosOriginalesRuc;
         } else {
           // Fallback: construir datos completos desde datosFormulario
           datosCompletosIntegrante = {
@@ -275,7 +275,7 @@ const FormularioConsorcio = ({
             tipo_persona: 'JURIDICA' as 'NATURAL' | 'JURIDICA',
             contacto: {
               direccion: datosFormulario.direccion,
-              domicilio_fiscal: datosFormulario.domicilio_fiscal,
+              domicilio_fiscal: datosFormulario?.domicilio_fiscal,
               departamento: datosFormulario.departamento,
               email: datosFormulario.email,
               telefono: datosFormulario.telefono
