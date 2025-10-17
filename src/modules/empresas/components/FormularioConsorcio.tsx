@@ -172,23 +172,13 @@ const FormularioConsorcio = ({
 
     setConsultandoTipo('integrante');
     try {
-      // 1. Consultar datos de SUNAT
+      // 1. Consultar datos de SUNAT usando el hook (para UI feedback)
       const resultado = await consultarYAutocompletar(rucIntegrante);
 
       if (!resultado.success || !resultado.datosFormulario) {
         setErrors([{
           campo: 'ruc_integrante',
           mensaje: resultado.error || 'No se pudo consultar la información del RUC'
-        }]);
-        setConsultandoTipo(null);
-        return;
-      }
-
-      // Los datos originales están disponibles en datosOriginalesRuc del hook
-      if (!datosOriginalesRuc) {
-        setErrors([{
-          campo: 'ruc_integrante',
-          mensaje: 'No se pudieron obtener los datos completos del RUC'
         }]);
         setConsultandoTipo(null);
         return;
@@ -220,15 +210,46 @@ const FormularioConsorcio = ({
       setGuardandoEmpresa(false);
 
       if (empresaCreada) {
-        // 3. Agregar al integrante usando los datos originales del hook
+        // 3. Usar datosOriginalesRuc del hook que debe estar actualizado ahora
+        //    Si por alguna razón no está disponible, crear datos completos desde datosFormulario
+        let datosCompletosIntegrante;
+
+        if (datosOriginalesRuc && datosOriginalesRuc.ruc === rucIntegrante) {
+          // Caso ideal: usar datos originales del hook
+          datosCompletosIntegrante = datosOriginalesRuc;
+        } else {
+          // Fallback: construir datos completos desde datosFormulario
+          datosCompletosIntegrante = {
+            ruc: datosFormulario.ruc,
+            razon_social: datosFormulario.razon_social,
+            nombre_comercial: datosFormulario.nombre_comercial,
+            direccion: datosFormulario.direccion,
+            direccion_completa: datosFormulario.direccion || '',
+            domicilio_fiscal: datosFormulario.domicilio_fiscal,
+            distrito: datosFormulario.distrito,
+            provincia: datosFormulario.provincia,
+            departamento: datosFormulario.departamento,
+            estado_contribuyente: 'ACTIVO',
+            condicion_domicilio: 'HABIDO',
+            representantes_legales: datosFormulario.representante_legal ? [{
+              tipo_documento: 'DNI',
+              numero_documento: datosFormulario.dni_representante || '',
+              nombre_completo: datosFormulario.representante_legal,
+              cargo: '',
+              fecha_desde: ''
+            }] : []
+          };
+        }
+
+        // Agregar al integrante
         const nuevoIntegrante: IntegranteData = {
           id: Date.now().toString(),
-          ruc: datosOriginalesRuc.ruc,
-          razonSocial: datosOriginalesRuc.razon_social,
-          direccion: datosOriginalesRuc.direccion_completa || '',
-          domicilioFiscal: datosOriginalesRuc.domicilio_fiscal || '',
+          ruc: datosCompletosIntegrante.ruc,
+          razonSocial: datosCompletosIntegrante.razon_social,
+          direccion: datosCompletosIntegrante.direccion_completa || datosCompletosIntegrante.direccion || '',
+          domicilioFiscal: datosCompletosIntegrante.domicilio_fiscal || '',
           porcentajeParticipacion: porcentajeIntegrante || 0,
-          datosCompletos: datosOriginalesRuc
+          datosCompletos: datosCompletosIntegrante
         };
 
         setIntegrantes(prev => [...prev, nuevoIntegrante]);
