@@ -413,7 +413,49 @@ export async function consultarRucConsolidado(ruc: string): Promise<ResultadoCon
         timestamp: new Date().toISOString(),
       };
     }
-    return data as RespuestaConsolidada;
+
+    // Transformar respuesta del backend al formato esperado
+    const backendData = data.data;
+    const empresaConsolidada: EmpresaConsolidada = {
+      ruc: backendData.ruc || '',
+      razon_social: backendData.razon_social || '',
+      tipo_persona: backendData.tipo_persona || ('JURIDICA' as 'NATURAL' | 'JURIDICA'),
+      contacto: {
+        direccion: backendData.direccion || '',
+        domicilio_fiscal: backendData.direccion || '',
+        departamento: backendData.departamento || '',
+        email: backendData.contactos?.[0]?.email || '',
+        telefono: backendData.contactos?.[0]?.telefono || '',
+      },
+      representantes: (backendData.representantes || []).map((rep: any) => ({
+        nombre: rep.nombre || '',
+        cargo: rep.cargo || '',
+        numero_documento: rep.documento || '',
+        documento: rep.documento || '',
+        tipo_documento: 'DNI',
+        fuente: (rep.fuente || 'SUNAT') as 'SUNAT' | 'OECE' | 'AMBOS',
+        fuentes_detalle: {},
+      })),
+      especialidades: backendData.especialidades || [],
+      especialidades_detalle: [],
+      registro: {
+        estado_sunat: backendData.estado || '',
+        estado_osce: '',
+      },
+      timestamp: data.timestamp || new Date().toISOString(),
+      fuentes_consultadas: backendData.fuentes || ['SUNAT'],
+      fuentes_con_errores: [],
+      consolidacion_exitosa: backendData.consolidacion_exitosa || true,
+      observaciones: [],
+    };
+
+    return {
+      success: true,
+      data: empresaConsolidada,
+      timestamp: data.timestamp || new Date().toISOString(),
+      fuente: 'CONSOLIDADO',
+      version: '1.0',
+    } as RespuestaConsolidada;
   } catch (error) {
     let errorMessage = 'Error de conexión con el servicio consolidado';
     let errorCode = 'NETWORK_ERROR';
