@@ -928,7 +928,7 @@ const FormularioConsorcio = ({
                           </div>
                         )}
                         {/* Dirección */}
-                        {(datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal) && (
+                        {datosOriginalesRuc && (datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal) && (
                           <div className="md:col-span-2">
                             <span className="font-medium text-gray-700">Dirección:</span>
                             <p className="text-gray-900">{datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal}</p>
