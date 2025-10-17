@@ -275,7 +275,7 @@ const FormularioConsorcio = ({
             tipo_persona: 'JURIDICA' as 'NATURAL' | 'JURIDICA',
             contacto: {
               direccion: datosFormulario.direccion,
-              domicilio_fiscal: datosFormulario?.domicilio_fiscal,
+              domicilio_fiscal: datosFormulario.direccion, // DatosFormularioConsolidado no tiene domicilio_fiscal
               departamento: datosFormulario.departamento,
               email: datosFormulario.email,
               telefono: datosFormulario.telefono
