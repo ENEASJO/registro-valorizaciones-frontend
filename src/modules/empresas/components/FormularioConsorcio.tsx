@@ -163,9 +163,9 @@ const FormularioConsorcio = ({
       id: Date.now().toString(),
       ruc: rucConsorcio,
       razonSocial: datosOriginalesRuc.razon_social,
-      direccion: datosOriginalesRuc.direccion_completa,
-      domicilioFiscal: datosOriginalesRuc.domicilio_fiscal,
-      representanteLegal: datosOriginalesRuc.representantes_legales?.[0]?.nombre_completo,
+      direccion: datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal || '',
+      domicilioFiscal: datosOriginalesRuc.contacto.domicilio_fiscal,
+      representanteLegal: datosOriginalesRuc.representantes?.[0]?.nombre,
       datosCompletos: datosOriginalesRuc
     };
     setConsorcio(nuevoConsorcio);
@@ -272,22 +272,29 @@ const FormularioConsorcio = ({
           datosCompletosIntegrante = {
             ruc: datosFormulario.ruc,
             razon_social: datosFormulario.razon_social,
-            nombre_comercial: datosFormulario.nombre_comercial,
-            direccion: datosFormulario.direccion,
-            direccion_completa: datosFormulario.direccion || '',
-            domicilio_fiscal: datosFormulario.domicilio_fiscal,
-            distrito: datosFormulario.distrito,
-            provincia: datosFormulario.provincia,
-            departamento: datosFormulario.departamento,
-            estado_contribuyente: 'ACTIVO',
-            condicion_domicilio: 'HABIDO',
-            representantes_legales: datosFormulario.representante_legal ? [{
-              tipo_documento: 'DNI',
-              numero_documento: datosFormulario.dni_representante || '',
-              nombre_completo: datosFormulario.representante_legal,
+            tipo_persona: 'JURIDICA' as 'NATURAL' | 'JURIDICA',
+            contacto: {
+              direccion: datosFormulario.direccion,
+              domicilio_fiscal: datosFormulario.domicilio_fiscal,
+              departamento: datosFormulario.departamento,
+              email: datosFormulario.email,
+              telefono: datosFormulario.telefono
+            },
+            representantes: datosFormulario.representante_legal ? [{
+              nombre: datosFormulario.representante_legal,
               cargo: '',
-              fecha_desde: ''
-            }] : []
+              numero_documento: datosFormulario.dni_representante || '',
+              tipo_documento: 'DNI',
+              fuente: 'SUNAT' as 'SUNAT' | 'OECE' | 'AMBOS',
+              fuentes_detalle: {}
+            }] : [],
+            especialidades: [],
+            especialidades_detalle: [],
+            registro: {
+              estado_sunat: 'ACTIVO',
+              estado_osce: ''
+            },
+            timestamp: new Date().toISOString()
           };
         }
 
@@ -296,8 +303,8 @@ const FormularioConsorcio = ({
           id: Date.now().toString(),
           ruc: datosCompletosIntegrante.ruc,
           razonSocial: datosCompletosIntegrante.razon_social,
-          direccion: datosCompletosIntegrante.direccion_completa || datosCompletosIntegrante.direccion || '',
-          domicilioFiscal: datosCompletosIntegrante.domicilio_fiscal || '',
+          direccion: datosCompletosIntegrante.contacto.direccion || datosCompletosIntegrante.contacto.domicilio_fiscal || '',
+          domicilioFiscal: datosCompletosIntegrante.contacto.domicilio_fiscal || '',
           porcentajeParticipacion: porcentajeIntegrante || 0,
           datosCompletos: datosCompletosIntegrante
         };
@@ -415,15 +422,15 @@ const FormularioConsorcio = ({
       const empresaConsorcioData = {
         ruc: consorcio.ruc,
         razon_social: consorcio.razonSocial,
-        nombre_comercial: consorcio.datosCompletos.nombre_comercial || '',
-        direccion: consorcio.datosCompletos.direccion || '',
-        distrito: consorcio.datosCompletos.distrito || '',
-        provincia: consorcio.datosCompletos.provincia || '',
-        departamento: consorcio.datosCompletos.departamento || '',
+        nombre_comercial: '',
+        direccion: consorcio.datosCompletos.contacto.direccion || '',
+        distrito: '',
+        provincia: '',
+        departamento: consorcio.datosCompletos.contacto.departamento || '',
         representante_legal: consorcio.representanteLegal || '',
-        dni_representante: consorcio.datosCompletos.representantes_legales?.[0]?.numero_documento || '',
-        email: '',
-        telefono: '',
+        dni_representante: consorcio.datosCompletos.representantes?.[0]?.numero_documento || '',
+        email: consorcio.datosCompletos.contacto.email || '',
+        telefono: consorcio.datosCompletos.contacto.telefono || '',
         celular: '',
         estado: 'ACTIVO' as const,
         tipo_empresa: 'SAC' as const,
@@ -571,24 +578,15 @@ const FormularioConsorcio = ({
                         <div className="flex-1">
                           <h4 className="text-xl font-bold text-gray-900">{consorcio.razonSocial}</h4>
                           <p className="text-blue-700 font-medium">RUC: {consorcio.ruc}</p>
-                          {/* Badges de Estado y Condición */}
+                          {/* Badges de Estado */}
                           <div className="flex items-center gap-2 mt-2">
-                            {consorcio.datosCompletos.estado_contribuyente && (
+                            {consorcio.datosCompletos.registro?.estado_sunat && (
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                consorcio.datosCompletos.estado_contribuyente === 'ACTIVO' 
-                                  ? 'bg-green-100 text-green-800' 
+                                consorcio.datosCompletos.registro.estado_sunat.includes('ACTIVO')
+                                  ? 'bg-green-100 text-green-800'
                                   : 'bg-red-100 text-red-800'
                               }`}>
-                                {consorcio.datosCompletos.estado_contribuyente}
-                              </span>
-                            )}
-                            {consorcio.datosCompletos.condicion_domicilio && (
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                consorcio.datosCompletos.condicion_domicilio === 'HABIDO' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {consorcio.datosCompletos.condicion_domicilio}
+                                {consorcio.datosCompletos.registro.estado_sunat}
                               </span>
                             )}
                           </div>
@@ -596,31 +594,19 @@ const FormularioConsorcio = ({
                       </div>
                       {/* Información adicional en grid */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {consorcio.datosCompletos.tipo_contribuyente && (
-                          <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Tipo Contribuyente:</p>
-                            <p className="text-gray-900 font-semibold">{consorcio.datosCompletos.tipo_contribuyente}</p>
-                          </div>
-                        )}
-                        {consorcio.datosCompletos.fecha_inscripcion && (
-                          <div>
-                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Fecha Inscripción:</p>
-                            <p className="text-gray-900">{consorcio.datosCompletos.fecha_inscripcion}</p>
-                          </div>
-                        )}
                         {consorcio.direccion && (
                           <div className="md:col-span-2">
                             <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Dirección:</p>
                             <p className="text-gray-900">{consorcio.direccion}</p>
                           </div>
                         )}
-                        {consorcio.datosCompletos.tipo_persona !== 'NATURAL' && consorcio.datosCompletos.representantes_legales && consorcio.datosCompletos.representantes_legales.length > 0 && (
+                        {consorcio.datosCompletos.tipo_persona !== 'NATURAL' && consorcio.datosCompletos.representantes && consorcio.datosCompletos.representantes.length > 0 && (
                           <div className="md:col-span-2">
                             <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Representantes Legales:</p>
                             <div className="space-y-2 mt-2">
-                              {consorcio.datosCompletos.representantes_legales.map((representante: any, index: number) => (
+                              {consorcio.datosCompletos.representantes.map((representante: any, index: number) => (
                                 <div key={index} className="bg-gray-50 p-2 rounded-lg border">
-                                  <p className="text-gray-900 font-semibold text-sm">{representante.nombre_completo}</p>
+                                  <p className="text-gray-900 font-semibold text-sm">{representante.nombre}</p>
                                   {representante.cargo && (
                                     <p className="text-blue-600 text-xs font-medium">{representante.cargo}</p>
                                   )}
@@ -634,33 +620,16 @@ const FormularioConsorcio = ({
                             </div>
                           </div>
                         )}
-                        {/* Actividad Comercial */}
-                        {consorcio.datosCompletos.actividades_economicas && consorcio.datosCompletos.actividades_economicas.length > 0 && (
+                        {/* Especialidades */}
+                        {consorcio.datosCompletos.especialidades && consorcio.datosCompletos.especialidades.length > 0 && (
                           <div className="md:col-span-2">
-                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Actividades Económicas:</p>
-                            <div className="mt-2 space-y-2">
-                              {consorcio.datosCompletos.actividades_economicas.slice(0, 3).map((actividad: any, index: number) => (
-                                <div key={index} className="flex items-start gap-2">
-                                  <span className={`inline-block px-2 py-1 text-xs rounded flex-shrink-0 ${
-                                    actividad.principal 
-                                      ? 'bg-blue-100 text-blue-800 font-medium' 
-                                      : 'bg-gray-100 text-gray-700'
-                                  }`}>
-                                    {actividad.principal ? 'Principal' : 'Secundaria'}
-                                  </span>
-                                  <div className="flex-1 min-w-0">
-                                    {actividad.ciiu && (
-                                      <p className="text-xs text-gray-500">CIIU: {actividad.ciiu}</p>
-                                    )}
-                                    <p className="text-sm text-gray-900 break-words">{actividad.descripcion}</p>
-                                  </div>
-                                </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">Especialidades:</p>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {consorcio.datosCompletos.especialidades.map((esp: string, index: number) => (
+                                <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+                                  {esp}
+                                </span>
                               ))}
-                              {consorcio.datosCompletos.actividades_economicas.length > 3 && (
-                                <p className="text-xs text-gray-500 dark:text-gray-300 italic">
-                                  + {consorcio.datosCompletos.actividades_economicas.length - 3} actividades más
-                                </p>
-                              )}
                             </div>
                           </div>
                         )}
@@ -941,57 +910,38 @@ const FormularioConsorcio = ({
                           <p className="text-gray-900 font-semibold text-lg">{datosOriginalesRuc.razon_social}</p>
                           <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">RUC: {datosOriginalesRuc.ruc}</p>
                           {/* Show DNI for persona natural */}
-                          {datosOriginalesRuc.tipo_persona === 'NATURAL' && datosOriginalesRuc.representantes_legales?.[0]?.numero_documento && (
-                            <p className="text-gray-600 dark:text-gray-300 text-sm">DNI: {datosOriginalesRuc.representantes_legales[0].numero_documento}</p>
+                          {datosOriginalesRuc.tipo_persona === 'NATURAL' && datosOriginalesRuc.representantes?.[0]?.numero_documento && (
+                            <p className="text-gray-600 dark:text-gray-300 text-sm">DNI: {datosOriginalesRuc.representantes[0].numero_documento}</p>
                           )}
                         </div>
-                        {/* Tipo de Contribuyente */}
-                        {datosOriginalesRuc.tipo_contribuyente && (
+                        {/* Estado */}
+                        {datosOriginalesRuc.registro?.estado_sunat && (
                           <div>
-                            <span className="font-medium text-gray-700">Tipo Contribuyente:</span>
-                            <p className="text-gray-900 font-medium">{datosOriginalesRuc.tipo_contribuyente}</p>
+                            <span className="font-medium text-gray-700">Estado:</span>
+                            <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                              datosOriginalesRuc.registro.estado_sunat.includes('ACTIVO')
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {datosOriginalesRuc.registro.estado_sunat}
+                            </span>
                           </div>
                         )}
-                        {/* Fecha de Inscripción */}
-                        {datosOriginalesRuc.fecha_inscripcion && (
-                          <div>
-                            <span className="font-medium text-gray-700">Fecha Inscripción:</span>
-                            <p className="text-gray-900">{datosOriginalesRuc.fecha_inscripcion}</p>
-                          </div>
-                        )}
-                        <div>
-                          <span className="font-medium text-gray-700">Estado:</span>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            datosOriginalesRuc.estado_contribuyente === 'ACTIVO' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {datosOriginalesRuc.estado_contribuyente}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">Condición:</span>
-                          <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                            datosOriginalesRuc.condicion_domicilio === 'HABIDO' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {datosOriginalesRuc.condicion_domicilio}
-                          </span>
-                        </div>
-                        {datosOriginalesRuc.direccion_completa && (
+                        {/* Dirección */}
+                        {(datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal) && (
                           <div className="md:col-span-2">
                             <span className="font-medium text-gray-700">Dirección:</span>
-                            <p className="text-gray-900">{datosOriginalesRuc.direccion_completa}</p>
+                            <p className="text-gray-900">{datosOriginalesRuc.contacto.direccion || datosOriginalesRuc.contacto.domicilio_fiscal}</p>
                           </div>
                         )}
-                        {datosOriginalesRuc.tipo_persona !== 'NATURAL' && datosOriginalesRuc.representantes_legales && datosOriginalesRuc.representantes_legales.length > 0 && (
+                        {/* Representantes */}
+                        {datosOriginalesRuc.tipo_persona !== 'NATURAL' && datosOriginalesRuc.representantes && datosOriginalesRuc.representantes.length > 0 && (
                           <div className="md:col-span-2">
                             <span className="font-medium text-gray-700">Representantes Legales:</span>
                             <div className="space-y-3 mt-2">
-                              {datosOriginalesRuc.representantes_legales.map((representante: any, index: number) => (
+                              {datosOriginalesRuc.representantes.map((representante: any, index: number) => (
                                 <div key={index} className="bg-gray-50 p-3 rounded-lg border">
-                                  <p className="text-gray-900 font-semibold">{representante.nombre_completo}</p>
+                                  <p className="text-gray-900 font-semibold">{representante.nombre}</p>
                                   {representante.cargo && (
                                     <p className="text-blue-600 text-sm font-medium">{representante.cargo}</p>
                                   )}
@@ -1000,40 +950,25 @@ const FormularioConsorcio = ({
                                       {representante.tipo_documento || 'DNI'}: {representante.numero_documento}
                                     </p>
                                   )}
-                                  {representante.fecha_desde && (
-                                    <p className="text-gray-500 dark:text-gray-300 text-xs">Desde: {representante.fecha_desde}</p>
-                                  )}
                                 </div>
                               ))}
                             </div>
                           </div>
                         )}
-                        {/* Actividad Comercial */}
-                        {datosOriginalesRuc.actividades_economicas && datosOriginalesRuc.actividades_economicas.length > 0 && (
+                        {/* Especialidades */}
+                        {datosOriginalesRuc.especialidades && datosOriginalesRuc.especialidades.length > 0 && (
                           <div className="md:col-span-2">
-                            <span className="font-medium text-gray-700">Actividades Económicas:</span>
-                            <div className="mt-1 space-y-1">
-                              {datosOriginalesRuc.actividades_economicas.slice(0, 2).map((actividad: any, index: number) => (
-                                <div key={index} className="flex items-start gap-2">
-                                  <span className={`inline-block px-2 py-1 text-xs rounded ${
-                                    actividad.principal 
-                                      ? 'bg-blue-100 text-blue-800 font-medium' 
-                                      : 'bg-gray-100 text-gray-700'
-                                  }`}>
-                                    {actividad.principal ? 'Principal' : 'Secundaria'}
-                                  </span>
-                                  <div className="flex-1">
-                                    {actividad.ciiu && (
-                                      <p className="text-xs text-gray-500">CIIU: {actividad.ciiu}</p>
-                                    )}
-                                    <p className="text-sm text-gray-900">{actividad.descripcion}</p>
-                                  </div>
-                                </div>
+                            <span className="font-medium text-gray-700">Especialidades:</span>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {datosOriginalesRuc.especialidades.slice(0, 5).map((esp: string, index: number) => (
+                                <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
+                                  {esp}
+                                </span>
                               ))}
-                              {datosOriginalesRuc.actividades_economicas.length > 2 && (
-                                <p className="text-xs text-gray-500 dark:text-gray-300 italic">
-                                  + {datosOriginalesRuc.actividades_economicas.length - 2} actividades más
-                                </p>
+                              {datosOriginalesRuc.especialidades.length > 5 && (
+                                <span className="text-xs text-gray-500 dark:text-gray-300 italic px-2 py-1">
+                                  + {datosOriginalesRuc.especialidades.length - 5} más
+                                </span>
                               )}
                             </div>
                           </div>
